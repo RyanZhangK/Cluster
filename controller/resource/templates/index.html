@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>战鼓-后台管理系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>战鼓-后台管理系统</h1>
+            <nav class="main-nav">
+                <button class="nav-link active" data-tab="status">状态监控</button>
+                <button class="nav-link" data-tab="config">游戏配置</button>
+                <button class="nav-link" data-tab="logs">系统日志</button>
+            </nav>
+        </header>
+
+        <div class="status-bar">
+            <div class="game-mode">
+                <span>游戏模式: </span>
+                <strong id="current-game-mode">征服</strong>
+            </div>
+            <div class="system-stats">
+                <span class="network-status">
+                    <span>网络: </span>
+                    <strong id="network-status">已连接</strong>
+                    <span id="network-dbm">(-67dBm)</span>
+                </span>
+                <span class="cpu-usage">
+                    <span>CPU: </span>
+                    <strong id="cpu-usage">24</strong>%
+                </span>
+                <span class="memory-usage">
+                    <span>内存: </span>
+                    <strong id="memory-usage">38</strong>%
+                </span>
+            </div>
+        </div>
+
+        <main class="app-main">
+            <!-- 状态页 -->
+            <section id="status" class="tab-content active">
+                <div class="nodes-grid-container full-width">
+                    <h2>节点状态</h2>
+                    <div class="nodes-grid" id="nodes-grid">
+                        <!-- 节点将通过JS动态加载 -->
+                        <div class="loading-indicator">加载节点数据中...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 游戏配置页 -->
+            <section id="config" class="tab-content">
+                <h2>游戏配置</h2>
+                <div class="config-container">
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="config-team-count">队伍数量:</label>
+                            <select id="config-team-count" class="form-control" disabled>
+                                <option value="2">2队</option>
+                                <option value="3">3队</option>
+                                <option value="4">4队</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="config-game-mode">游戏模式:</label>
+                            <select id="config-game-mode" class="form-control" disabled>
+                                <option value="conquer">征服</option>
+                                <option value="capture">夺点</option>
+                                <option value="demolition">爆破</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button id="save-config" class="btn" disabled>保存配置</button>
+                            <button id="reset-config" class="btn btn-warning" disabled>重置配置</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- 日志页 -->
+            <section id="logs" class="tab-content">
+                <h2>系统日志</h2>
+                <div class="logs-container">
+                    <div class="log-files-list">
+                        <h3>日志文件</h3>
+                        <ul id="log-files">
+                            <li class="loading-indicator">加载日志文件中...</li>
+                        </ul>
+                    </div>
+                    <div class="log-viewer">
+                        <h3>日志内容 <span id="current-log-file"></span></h3>
+                        <pre id="log-content">请从左侧选择日志文件</pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>系统版本: 1.0.0 | 最后更新: <span id="last-update">2025-10-24</span></p>
+        </footer>
+    </div>
+</body>
+</html>
