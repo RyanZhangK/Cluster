@@ -1,0 +1,15 @@
+2025-12-21 01:22:37,501 - __main__ - INFO - 开始启动系统模块...
+2025-12-21 01:22:37,502 - __main__ - INFO - 正在启动模块: database_process.py
+2025-12-21 01:22:39,512 - __main__ - INFO - 模块 database_process.py 已启动 (PID: 11732)
+2025-12-21 01:22:39,513 - __main__ - INFO - 数据库已初始化完成
+2025-12-21 01:22:39,514 - __main__ - INFO - 正在启动模块: mqtt_process.py
+2025-12-21 01:22:40,530 - __main__ - INFO - 模块 mqtt_process.py 已启动 (PID: 36260)
+2025-12-21 01:22:40,531 - __main__ - INFO - 正在启动模块: flask_app.py
+2025-12-21 01:22:41,545 - __main__ - INFO - 模块 flask_app.py 已启动 (PID: 36600)
+2025-12-21 01:22:41,546 - __main__ - INFO - 正在启动模块: game_process.py
+2025-12-21 01:22:42,563 - __main__ - ERROR - 模块 game_process.py 启动失败: 退出码: 1, 详情见: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.py_proc_20251221_012241.log
+2025-12-21 01:22:42,564 - __main__ - ERROR - 模块 game_process.py 启动失败
+2025-12-21 01:22:42,564 - __main__ - ERROR - 模块启动失败，系统退出
+2025-12-21 01:22:42,567 - __main__ - INFO - 已终止模块 database_process.py (PID: 11732)
+2025-12-21 01:22:42,573 - __main__ - INFO - 已终止模块 mqtt_process.py (PID: 36260)
+2025-12-21 01:22:42,577 - __main__ - INFO - 已终止模块 flask_app.py (PID: 36600)

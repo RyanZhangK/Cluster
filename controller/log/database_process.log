@@ -1,0 +1,100 @@
+2025-12-21 00:59:46,736 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 00:59:46,747 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 00:59:46,747 - database_process - INFO - 数据库模块启动
+2025-12-21 00:59:46,748 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status params: ()
+2025-12-21 00:59:46,748 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM game_config params: ()
+2025-12-21 00:59:46,748 - database_process - INFO - 节点状态查询结果: [('STA01', 1, 1, '2025-10-31 15:41:46'), ('STA02', 1, 0, '2025-10-31 15:41:37'), ('STA03', 1, 0, '2025-10-31 15:41:37'), ('STA04', 1, 0, '2025-10-31 15:41:37'), ('DET01', 1, 0, '2025-10-31 15:41:37'), ('DET02', 1, 0, '2025-10-31 15:41:37'), ('DET03', 1, 0, '2025-10-31 15:41:37'), ('DET04', 1, 0, '2025-10-31 15:41:37'), ('DET05', 1, 0, '2025-10-31 15:41:37'), ('DET06', 1, 0, '2025-10-31 15:41:37')]
+2025-12-21 00:59:46,749 - database_process - INFO - 游戏配置查询结果: [(1, 2, 'conquer', 'unstart', '2025-12-20 16:59:46')]
+2025-12-21 00:59:46,758 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 00:59:48,983 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 00:59:48,990 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 00:59:50,768 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 00:59:50,776 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 00:59:50,777 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 00:59:50,787 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 00:59:51,301 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 00:59:51,302 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:02:24,129 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:24,136 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:24,137 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:02:24,145 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:02:24,658 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:02:24,659 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:02:32,793 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:32,799 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:32,800 - database_process - INFO - 数据库模块启动
+2025-12-21 01:02:32,801 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status params: ()
+2025-12-21 01:02:32,801 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM game_config params: ()
+2025-12-21 01:02:32,801 - database_process - INFO - 节点状态查询结果: [('STA01', 1, 1, '2025-10-31 15:41:46'), ('STA02', 1, 0, '2025-10-31 15:41:37'), ('STA03', 1, 0, '2025-10-31 15:41:37'), ('STA04', 1, 0, '2025-10-31 15:41:37'), ('DET01', 1, 0, '2025-10-31 15:41:37'), ('DET02', 1, 0, '2025-10-31 15:41:37'), ('DET03', 1, 0, '2025-10-31 15:41:37'), ('DET04', 1, 0, '2025-10-31 15:41:37'), ('DET05', 1, 0, '2025-10-31 15:41:37'), ('DET06', 1, 0, '2025-10-31 15:41:37')]
+2025-12-21 01:02:32,801 - database_process - INFO - 游戏配置查询结果: [(1, 2, 'conquer', 'unstart', '2025-12-20 17:02:32')]
+2025-12-21 01:02:32,806 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:34,995 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:35,002 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:36,488 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:36,494 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:36,826 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:36,833 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:36,834 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:02:36,843 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:02:37,350 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:02:37,351 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:02:49,433 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:02:49,440 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:02:49,441 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:02:49,449 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:02:49,954 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:02:49,955 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:09:38,254 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:09:38,261 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:38,262 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:09:38,271 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:09:38,771 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:09:38,772 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:09:49,452 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:09:49,458 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:49,459 - database_process - INFO - 数据库模块启动
+2025-12-21 01:09:49,460 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status params: ()
+2025-12-21 01:09:49,460 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM game_config params: ()
+2025-12-21 01:09:49,460 - database_process - INFO - 节点状态查询结果: [('STA01', 1, 1, '2025-10-31 15:41:46'), ('STA02', 1, 0, '2025-10-31 15:41:37'), ('STA03', 1, 0, '2025-10-31 15:41:37'), ('STA04', 1, 0, '2025-10-31 15:41:37'), ('DET01', 1, 0, '2025-10-31 15:41:37'), ('DET02', 1, 0, '2025-10-31 15:41:37'), ('DET03', 1, 0, '2025-10-31 15:41:37'), ('DET04', 1, 0, '2025-10-31 15:41:37'), ('DET05', 1, 0, '2025-10-31 15:41:37'), ('DET06', 1, 0, '2025-10-31 15:41:37')]
+2025-12-21 01:09:49,460 - database_process - INFO - 游戏配置查询结果: [(1, 2, 'conquer', 'unstart', '2025-12-20 17:09:49')]
+2025-12-21 01:09:49,465 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:51,639 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:09:51,646 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:52,586 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:09:52,592 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:53,485 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:09:53,491 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:09:53,492 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:09:53,501 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:09:54,004 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:09:54,004 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:22:02,959 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:22:02,966 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:02,967 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:22:02,975 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:22:03,480 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:22:03,480 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:22:37,560 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:22:37,566 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:37,566 - database_process - INFO - 数据库模块启动
+2025-12-21 01:22:37,567 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status params: ()
+2025-12-21 01:22:37,567 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM game_config params: ()
+2025-12-21 01:22:37,568 - database_process - INFO - 节点状态查询结果: [('STA01', 1, 1, '2025-10-31 15:41:46'), ('STA02', 1, 0, '2025-10-31 15:41:37'), ('STA03', 1, 0, '2025-10-31 15:41:37'), ('STA04', 1, 0, '2025-10-31 15:41:37'), ('DET01', 1, 0, '2025-10-31 15:41:37'), ('DET02', 1, 0, '2025-10-31 15:41:37'), ('DET03', 1, 0, '2025-10-31 15:41:37'), ('DET04', 1, 0, '2025-10-31 15:41:37'), ('DET05', 1, 0, '2025-10-31 15:41:37'), ('DET06', 1, 0, '2025-10-31 15:41:37')]
+2025-12-21 01:22:37,568 - database_process - INFO - 游戏配置查询结果: [(1, 2, 'conquer', 'unstart', '2025-12-20 17:22:37')]
+2025-12-21 01:22:37,572 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:39,769 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:22:39,777 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:40,711 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:22:40,717 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:41,625 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:22:41,632 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:22:41,634 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:22:41,643 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:22:42,153 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:22:42,154 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)
+2025-12-21 01:24:49,946 - database_process - DEBUG - 模块 database_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\database_process.log)
+2025-12-21 01:24:49,953 - database_process - INFO - 所有数据库初始化完成
+2025-12-21 01:24:49,954 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)
+2025-12-21 01:24:49,963 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)
+2025-12-21 01:24:50,476 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)
+2025-12-21 01:24:50,477 - database_process - DEBUG - 处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)

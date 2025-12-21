@@ -35,6 +35,10 @@ MODULES = [
     "game_process.py"      # 游戏逻辑管理和音频生成播放模块
 ]
 
+# Web模块配置
+WEB_HOST = '0.0.0.0'
+WEB_PORT = 5000
+
 class ProcessManager:
     def __init__(self):
         self.processes = {}

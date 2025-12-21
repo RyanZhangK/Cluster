@@ -7,10 +7,10 @@
 if ! command -v mosquitto &> /dev/null
 then
     echo "正在安装mosquitto..."
-    #sudo apt upgrade
-   # sudo apt -S  mosquitto mosquitto-clients
-   sudo pacman -S mosquitto mosquitto-clients
-    sudo systemctl enable mosquitto
+    sudo apt update
+    sudo apt install -y mosquitto mosquitto-clients
+else
+    echo "mosquitto已安装."
 fi
 
 # 创建自定义配置文件

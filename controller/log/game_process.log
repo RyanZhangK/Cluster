@@ -1,0 +1,162 @@
+2025-12-21 00:59:50,768 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 00:59:50,770 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 00:59:50,776 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 00:59:50,787 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 00:59:50,787 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 00:59:50,787 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 00:59:50,787 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 00:59:51,301 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 00:59:51,302 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 00:59:51,302 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 00:59:51,302 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 00:59:51,302 - game_process - INFO - 游戏模块启动
+2025-12-21 00:59:51,302 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 00:59:51,302 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:24,129 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:02:24,130 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:02:24,136 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:02:24,145 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:02:24,145 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:02:24,146 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:02:24,146 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:02:24,659 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:02:24,659 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:02:24,659 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:02:24,659 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:02:24,659 - game_process - INFO - 游戏模块启动
+2025-12-21 01:02:24,660 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:24,660 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:36,827 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:02:36,827 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:02:36,833 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:02:36,843 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:02:36,843 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:02:36,843 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:02:36,843 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:02:37,350 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:02:37,350 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:02:37,351 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:02:37,351 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:02:37,351 - game_process - INFO - 游戏模块启动
+2025-12-21 01:02:37,351 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:37,351 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:49,434 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:02:49,434 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:02:49,440 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:02:49,449 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:02:49,449 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:02:49,450 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:02:49,450 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:02:49,955 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:02:49,955 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:02:49,955 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:02:49,955 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:02:49,955 - game_process - INFO - 游戏模块启动
+2025-12-21 01:02:49,955 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:02:49,955 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:09:38,254 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:09:38,255 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:09:38,261 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:09:38,270 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:09:38,271 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:09:38,271 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:09:38,271 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:09:38,772 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:09:38,772 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:09:38,772 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:09:38,772 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:09:38,772 - game_process - INFO - 游戏模块启动
+2025-12-21 01:09:38,773 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:09:38,773 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:09:53,485 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:09:53,486 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:09:53,491 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:09:53,501 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:09:53,501 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:09:53,502 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:09:53,502 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:09:54,004 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:09:54,004 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:09:54,005 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:09:54,005 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:09:54,005 - game_process - INFO - 游戏模块启动
+2025-12-21 01:09:54,005 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:09:54,005 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:22:02,960 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:22:02,961 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:22:02,966 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:22:02,975 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:22:02,975 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:22:02,976 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:22:02,976 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:22:03,480 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:22:03,480 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:22:03,481 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:22:03,481 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:22:03,481 - game_process - INFO - 游戏模块启动
+2025-12-21 01:22:03,481 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:22:03,481 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:22:41,626 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:22:41,626 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:22:41,633 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:22:41,643 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:22:41,643 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:22:41,643 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:22:41,644 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:22:42,153 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:22:42,153 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:22:42,154 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:22:42,154 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:22:42,154 - game_process - INFO - 游戏模块启动
+2025-12-21 01:22:42,154 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:22:42,154 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-21 01:24:49,947 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-21 01:24:49,947 - game_process - INFO - 游戏数据库初始化完成
+2025-12-21 01:24:49,954 - game_process - INFO - 开始测试节点状态读取...
+2025-12-21 01:24:49,963 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-21 01:24:49,963 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-21 01:24:49,963 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-21 01:24:49,963 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-21 01:24:50,476 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-21 01:24:50,476 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-21 01:24:50,477 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-21 01:24:50,477 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-21 01:24:50,477 - game_process - INFO - 游戏模块启动
+2025-12-21 01:24:50,477 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
+2025-12-21 01:24:50,477 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'

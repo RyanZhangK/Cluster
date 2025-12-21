@@ -55,14 +55,25 @@ class DatabaseManager:
                         node_id TEXT PRIMARY KEY,
                         online_status INTEGER DEFAULT 0,
                         active_status INTEGER DEFAULT 0,
+                        activator TEXT DEFAULT NULL,
                         last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
-                for node_id in NODE_IDS:
-                    cursor.execute(
-                        "INSERT OR REPLACE INTO node_status (node_id) VALUES (?)",
-                        (node_id,)
+                
+                # 只插入不存在的节点，不覆盖已有节点状态
+                existing_nodes = [row[0] for row in cursor.execute(
+                    "SELECT node_id FROM node_status"
+                ).fetchall()]
+                
+                new_nodes = [node_id for node_id in NODE_IDS if node_id not in existing_nodes]
+                
+                if new_nodes:
+                    cursor.executemany(
+                        "INSERT OR IGNORE INTO node_status (node_id) VALUES (?)",
+                        [(node_id,) for node_id in new_nodes]
                     )
+                    logger.info(f"初始化了 {len(new_nodes)} 个新节点")
+                
                 conn.commit()
 
             # 初始化游戏配置数据库（单记录模式）
