@@ -1,162 +1,544 @@
-2025-12-21 00:59:50,768 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 00:59:50,770 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 00:59:50,776 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 00:59:50,787 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:14,016 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-23 10:13:14,021 - game_process - INFO - 游戏数据库初始化完成
+2025-12-23 10:13:14,028 - game_process - INFO - 开始测试节点状态读取...
+2025-12-23 10:13:14,039 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 00:59:50,787 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 00:59:50,787 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:14,039 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-23 10:13:14,039 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 00:59:50,787 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 00:59:51,301 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:14,039 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-23 10:13:14,543 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 00:59:51,302 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 00:59:51,302 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:14,543 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-23 10:13:14,543 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 00:59:51,302 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 00:59:51,302 - game_process - INFO - 游戏模块启动
-2025-12-21 00:59:51,302 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 00:59:51,302 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:24,129 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:02:24,130 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:02:24,136 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:02:24,145 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:14,543 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-23 10:13:14,544 - game_process - INFO - 游戏模块启动
+2025-12-23 10:13:18,229 - game_process - INFO - TTS引擎(EdgeTTS)初始化成功，使用语音: zh-CN-YunxiNeural
+2025-12-23 10:13:25,408 - game_process - INFO - TTS播放: 主控系统已上线，初始化完成，等待玩家入场
+2025-12-23 10:13:25,415 - game_process - INFO - 音频日志记录: 主控系统已上线，初始化完成，等待玩家入场
+2025-12-23 10:13:25,415 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_5f174eadd2354dc2b178d6ae96807fe7.mp3
+2025-12-23 10:13:29,613 - game_process - INFO - TTS播放: 监控系统上线
+2025-12-23 10:13:29,620 - game_process - INFO - 音频日志记录: 监控系统上线
+2025-12-23 10:13:29,620 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_2bfa1ec964f4473fa49974a31be902d7.mp3
+2025-12-23 10:13:29,620 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456009.620907}
+2025-12-23 10:13:29,620 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:29,621 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:29,621 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:29,621 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:02:24,145 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:02:24,146 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:29,621 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:29,621 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:13:33,699 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:13:33,706 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:13:33,706 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_8f80fb4e445f40e2ac03a8027bd9d0b8.mp3
+2025-12-23 10:13:33,707 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:02:24,146 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:02:24,659 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:33,707 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:33,707 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:02:24,659 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:02:24,659 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:33,707 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:34,218 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:02:24,659 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:02:24,659 - game_process - INFO - 游戏模块启动
-2025-12-21 01:02:24,660 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:24,660 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:36,827 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:02:36,827 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:02:36,833 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:02:36,843 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:34,218 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:35,219 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456015.2198212}
+2025-12-23 10:13:35,219 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:35,220 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:35,220 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:35,247 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:02:36,843 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:02:36,843 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:35,247 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:35,247 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:13:39,172 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:13:39,179 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:13:39,179 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_cb3f868457b64805a28b129b8f20bd1d.mp3
+2025-12-23 10:13:39,179 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:02:36,843 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:02:37,350 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:39,179 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:39,179 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:02:37,350 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:02:37,351 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:39,179 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:39,684 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:02:37,351 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:02:37,351 - game_process - INFO - 游戏模块启动
-2025-12-21 01:02:37,351 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:37,351 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:49,434 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:02:49,434 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:02:49,440 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:02:49,449 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:39,684 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:40,686 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456020.6860094}
+2025-12-23 10:13:40,686 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:40,686 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:40,686 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:40,711 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:02:49,449 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:02:49,450 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:40,712 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:40,712 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:13:44,631 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:13:44,637 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:13:44,638 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_8c9e393fa4f84f2bb723bf811673fd5d.mp3
+2025-12-23 10:13:44,638 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:02:49,450 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:02:49,955 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:44,638 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:44,638 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:02:49,955 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:02:49,955 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:44,638 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:45,148 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:02:49,955 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:02:49,955 - game_process - INFO - 游戏模块启动
-2025-12-21 01:02:49,955 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:02:49,955 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:09:38,254 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:09:38,255 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:09:38,261 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:09:38,270 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:45,149 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:46,149 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456026.1498995}
+2025-12-23 10:13:46,149 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:46,150 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:46,150 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:46,176 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:09:38,271 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:09:38,271 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:46,176 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:46,176 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:13:50,132 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:13:50,139 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:13:50,139 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_9595e00adbe34f568f45769cbcab5935.mp3
+2025-12-23 10:13:50,139 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:09:38,271 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:09:38,772 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:50,139 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:50,139 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:09:38,772 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:09:38,772 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:50,140 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:50,643 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:09:38,772 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:09:38,772 - game_process - INFO - 游戏模块启动
-2025-12-21 01:09:38,773 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:09:38,773 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:09:53,485 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:09:53,486 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:09:53,491 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:09:53,501 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:50,643 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:51,644 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456031.6442013}
+2025-12-23 10:13:51,644 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:51,644 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:51,644 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:51,653 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:09:53,501 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:09:53,502 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:51,653 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:51,653 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:13:55,623 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:13:55,630 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:13:55,630 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_0f97471255e442f6a9ca21abb0f46cba.mp3
+2025-12-23 10:13:55,630 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:09:53,502 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:09:54,004 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:55,630 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:55,630 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:09:54,004 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:09:54,005 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:55,630 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:56,133 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:09:54,005 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:09:54,005 - game_process - INFO - 游戏模块启动
-2025-12-21 01:09:54,005 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:09:54,005 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:22:02,960 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:22:02,961 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:22:02,966 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:22:02,975 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:56,133 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:13:57,134 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456037.1347077}
+2025-12-23 10:13:57,134 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:13:57,134 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:57,135 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:13:57,160 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:22:02,975 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:22:02,976 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:13:57,160 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:13:57,160 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:01,063 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:01,069 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:01,070 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_c84481975d4943289933a8bc9c5dd34a.mp3
+2025-12-23 10:14:01,070 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:22:02,976 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:22:03,480 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:01,070 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:01,070 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:22:03,480 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:22:03,481 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:01,070 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:01,585 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:22:03,481 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:22:03,481 - game_process - INFO - 游戏模块启动
-2025-12-21 01:22:03,481 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:22:03,481 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:22:41,626 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:22:41,626 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:22:41,633 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:22:41,643 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:01,585 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:02,586 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456042.586665}
+2025-12-23 10:14:02,586 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:02,586 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:02,586 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:02,598 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:22:41,643 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:22:41,643 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:02,598 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:02,598 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:06,516 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:06,523 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:06,523 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_be86749f6c9c4d86ae43021e092a69cf.mp3
+2025-12-23 10:14:06,523 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:22:41,644 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:22:42,153 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:06,523 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:06,523 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:22:42,153 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:22:42,154 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:06,523 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:07,031 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:22:42,154 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:22:42,154 - game_process - INFO - 游戏模块启动
-2025-12-21 01:22:42,154 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:22:42,154 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
-2025-12-21 01:24:49,947 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
-2025-12-21 01:24:49,947 - game_process - INFO - 游戏数据库初始化完成
-2025-12-21 01:24:49,954 - game_process - INFO - 开始测试节点状态读取...
-2025-12-21 01:24:49,963 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:07,031 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:08,033 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456048.033046}
+2025-12-23 10:14:08,033 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:08,033 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:08,033 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:08,040 - game_process - DEBUG - 完整原始节点数据:
 [{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
-2025-12-21 01:24:49,963 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
-2025-12-21 01:24:49,963 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:08,041 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:08,041 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:11,986 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:11,993 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:11,993 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_c73e6f23b4f44ba395dd712a5dc56d7f.mp3
+2025-12-23 10:14:11,994 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
-2025-12-21 01:24:49,963 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
-2025-12-21 01:24:50,476 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:11,994 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:11,994 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
-2025-12-21 01:24:50,476 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
-2025-12-21 01:24:50,477 - game_process - DEBUG - 完整原始节点数据:
+2025-12-23 10:14:11,994 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:12,509 - game_process - DEBUG - 完整原始节点数据:
 [{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
-2025-12-21 01:24:50,477 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
-2025-12-21 01:24:50,477 - game_process - INFO - 游戏模块启动
-2025-12-21 01:24:50,477 - game_process - ERROR - EdgeTTS初始化失败: No module named 'edge_tts'
-2025-12-21 01:24:50,477 - game_process - ERROR - 游戏模块运行异常: TTS引擎初始化失败: No module named 'edge_tts'
+2025-12-23 10:14:12,509 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:13,510 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456053.5102448}
+2025-12-23 10:14:13,510 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:13,510 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:13,510 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:13,522 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:13,522 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:13,522 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:17,422 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:17,429 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:17,429 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_92b2f22201104bebb68d7fa4e24d38fc.mp3
+2025-12-23 10:14:17,429 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:17,430 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:17,430 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:17,430 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:17,934 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:17,934 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:18,935 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456058.9352498}
+2025-12-23 10:14:18,935 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:18,935 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:18,935 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:18,962 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:18,962 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:18,962 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:22,927 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:22,934 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:22,934 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_68d31320a8064478b2c6a3ebdce3a2e5.mp3
+2025-12-23 10:14:22,934 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:22,934 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:22,935 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:22,935 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:23,446 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:23,446 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:24,447 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456064.4477446}
+2025-12-23 10:14:24,447 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:24,447 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:24,448 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:24,473 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:24,473 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:24,473 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:28,393 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:28,400 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:28,400 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_b31f70a0b5374a3db18e0407496f991b.mp3
+2025-12-23 10:14:28,401 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:28,401 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:28,401 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:28,401 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:28,913 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:28,913 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:29,914 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456069.9140637}
+2025-12-23 10:14:29,914 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:29,914 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:29,914 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:29,940 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:29,940 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:29,940 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:33,883 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:33,890 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:33,890 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_1bb78153e0c940ffa0f539fbacc81af1.mp3
+2025-12-23 10:14:33,891 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:33,891 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:33,891 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:33,891 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:34,406 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:34,406 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:35,407 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456075.407076}
+2025-12-23 10:14:35,407 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:35,407 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:35,407 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:35,434 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:35,434 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:35,434 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:39,362 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:39,369 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:39,369 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_f80be38eaec84be99aca559398c34390.mp3
+2025-12-23 10:14:39,369 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:39,369 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:39,370 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:39,370 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:39,884 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:39,884 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:40,885 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456080.8855672}
+2025-12-23 10:14:40,885 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:40,885 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:40,885 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:40,900 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:40,900 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:40,900 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:44,767 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:44,774 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:44,774 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_dc4788318f59498f91200103108d7f20.mp3
+2025-12-23 10:14:44,774 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:44,774 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:44,774 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:44,775 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:45,277 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:45,277 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:46,278 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456086.2788827}
+2025-12-23 10:14:46,278 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:46,279 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:46,279 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:46,293 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:46,293 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:46,294 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:50,494 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:50,500 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:50,501 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_3b6655ed06ef4ed2af3c9b05a5a0663b.mp3
+2025-12-23 10:14:50,871 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:50,871 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:50,871 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:50,871 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:51,384 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:51,384 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:52,385 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456092.385357}
+2025-12-23 10:14:52,385 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:52,385 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:52,385 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:52,396 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:52,396 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:52,396 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:14:56,284 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:14:56,290 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:14:56,290 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_69eb1bf4d97e419ca1bf13e13544f9c2.mp3
+2025-12-23 10:14:56,290 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:14:56,290 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:56,290 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:14:56,290 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:56,791 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:14:56,791 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:14:57,792 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456097.79262}
+2025-12-23 10:14:57,792 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:14:57,792 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:57,792 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:14:57,815 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:14:57,816 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:14:57,816 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:01,814 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:01,820 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:01,820 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_d48817bd700c4da6b02dabfcc4a0da00.mp3
+2025-12-23 10:15:01,821 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:01,821 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:01,821 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:01,821 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:02,334 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:02,334 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:03,335 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456103.3353722}
+2025-12-23 10:15:03,335 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:15:03,335 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:03,335 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:03,348 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:03,348 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:03,348 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:07,249 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:07,256 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:07,256 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_6e7b12f326324b468afecd91be75a873.mp3
+2025-12-23 10:15:07,256 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:07,256 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:07,257 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:07,257 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:07,759 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:07,759 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:08,760 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456108.760409}
+2025-12-23 10:15:08,760 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:15:08,760 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:08,760 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:08,785 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:08,785 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:08,785 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:13,039 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:13,046 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:13,046 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_3e25204752c64a178d21b820d643ceb8.mp3
+2025-12-23 10:15:13,356 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:13,356 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:13,371 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:13,371 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:13,870 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:13,870 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:14,871 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456114.8717303}
+2025-12-23 10:15:14,871 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:15:14,871 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:14,872 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:14,902 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:14,902 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:14,902 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:18,810 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:18,817 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:18,817 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_43a18effdf914e6daa7c360d400d7b0e.mp3
+2025-12-23 10:15:18,818 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:18,818 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:18,818 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:18,818 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:19,319 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:19,319 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:20,320 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}], 'timestamp': 1766456120.3209429}
+2025-12-23 10:15:20,320 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}]
+2025-12-23 10:15:20,321 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:20,321 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:13:14'}
+2025-12-23 10:15:20,346 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:20,346 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:20,346 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:21,948 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:30,785 - game_process - DEBUG - 模块 game_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\game_process.log)
+2025-12-23 10:15:30,787 - game_process - INFO - 游戏数据库初始化完成
+2025-12-23 10:15:30,792 - game_process - INFO - 开始测试节点状态读取...
+2025-12-23 10:15:30,802 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:30,802 - game_process - INFO - 节点 STA01 状态: 在线=True, 激活=1
+2025-12-23 10:15:30,802 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:30,802 - game_process - INFO - 节点 STA02 状态: 在线=True, 激活=0
+2025-12-23 10:15:31,310 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:31,310 - game_process - INFO - 节点 STA03 状态: 在线=True, 激活=0
+2025-12-23 10:15:31,310 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:31,310 - game_process - INFO - 节点 STA04 状态: 在线=True, 激活=0
+2025-12-23 10:15:31,310 - game_process - INFO - 游戏模块启动
+2025-12-23 10:15:33,165 - game_process - INFO - TTS引擎(EdgeTTS)初始化成功，使用语音: zh-CN-YunxiNeural
+2025-12-23 10:15:40,056 - game_process - INFO - TTS播放: 主控系统已上线，初始化完成，等待玩家入场
+2025-12-23 10:15:40,063 - game_process - INFO - 音频日志记录: 主控系统已上线，初始化完成，等待玩家入场
+2025-12-23 10:15:40,063 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_e88c787d3e3e441f8dd9d439fc942fbd.mp3
+2025-12-23 10:15:43,994 - game_process - INFO - TTS播放: 监控系统上线
+2025-12-23 10:15:44,000 - game_process - INFO - 音频日志记录: 监控系统上线
+2025-12-23 10:15:44,001 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_d9efb242004c4d4e9bb743324df63711.mp3
+2025-12-23 10:15:44,085 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}], 'timestamp': 1766456144.085177}
+2025-12-23 10:15:44,085 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}]
+2025-12-23 10:15:44,085 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:44,085 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:44,099 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:44,100 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:44,100 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:47,984 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:47,990 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:47,991 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_81d97b8db3f8467f99397c50442bd938.mp3
+2025-12-23 10:15:47,991 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:47,991 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:47,991 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:47,991 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:48,506 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:48,506 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:49,507 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}], 'timestamp': 1766456149.507697}
+2025-12-23 10:15:49,507 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}]
+2025-12-23 10:15:49,507 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:49,507 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:49,522 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:49,522 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:49,522 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:53,472 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:53,478 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:53,478 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_b4645009740148ccb00aafd077835bd8.mp3
+2025-12-23 10:15:53,479 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:53,479 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:53,479 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:53,479 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:53,985 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:53,985 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:54,985 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}], 'timestamp': 1766456154.9859736}
+2025-12-23 10:15:54,986 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}]
+2025-12-23 10:15:54,986 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:54,986 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:15:55,012 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:15:55,012 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:15:55,012 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:15:58,936 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:15:58,943 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:15:58,943 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_620f77f9ea494b73966412f555bb71bf.mp3
+2025-12-23 10:15:58,943 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:15:58,943 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:58,944 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:15:58,944 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:15:59,445 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:15:59,445 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:16:00,446 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}], 'timestamp': 1766456160.4460444}
+2025-12-23 10:16:00,446 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}]
+2025-12-23 10:16:00,446 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:16:00,446 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:16:00,472 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:16:00,472 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:16:00,472 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:16:04,405 - game_process - INFO - TTS播放: A队已就绪
+2025-12-23 10:16:04,422 - game_process - INFO - 音频日志记录: A队已就绪
+2025-12-23 10:16:04,422 - game_process - DEBUG - 已删除临时语音文件: c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\resource\tts_temp\tts_5000df391dee4d268454d7b8226413a8.mp3
+2025-12-23 10:16:04,422 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA02', 'online': True}]
+2025-12-23 10:16:04,423 - game_process - DEBUG - 检查节点 STA02 状态: {'node_id': 'STA02', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:16:04,423 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA03', 'online': True}]
+2025-12-23 10:16:04,423 - game_process - DEBUG - 检查节点 STA03 状态: {'node_id': 'STA03', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:16:04,933 - game_process - DEBUG - 完整原始节点数据:
+[{'active': False, 'last_update': '2025-10-31 15:41:37', 'node_id': 'STA04', 'online': True}]
+2025-12-23 10:16:04,934 - game_process - DEBUG - 检查节点 STA04 状态: {'node_id': 'STA04', 'online_status': True, 'active_status': 0, 'activator': '', 'last_update': '2025-10-31 15:41:37'}
+2025-12-23 10:16:05,934 - game_process - DEBUG - 收到游戏配置回调: {'success': True, 'data': [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}], 'timestamp': 1766456165.9348154}
+2025-12-23 10:16:05,934 - game_process - DEBUG - 成功获取游戏配置: [{'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}]
+2025-12-23 10:16:05,935 - game_process - DEBUG - 最终获取的游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:16:05,935 - game_process - DEBUG - 游戏配置: {'id': 1, 'team_count': 2, 'game_mode': 'conquer', 'game_state': 'unstart', 'timestamp': '2025-12-23 02:15:30'}
+2025-12-23 10:16:05,948 - game_process - DEBUG - 完整原始节点数据:
+[{'active': True, 'last_update': '2025-10-31 15:41:46', 'node_id': 'STA01', 'online': True}]
+2025-12-23 10:16:05,948 - game_process - DEBUG - 检查节点 STA01 状态: {'node_id': 'STA01', 'online_status': True, 'active_status': 1, 'activator': '', 'last_update': '2025-10-31 15:41:46'}
+2025-12-23 10:16:05,948 - game_process - DEBUG - 节点 STA01 已激活
+2025-12-23 10:16:09,376 - game_process - INFO - TTS播放: A队已就绪

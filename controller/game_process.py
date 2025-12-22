@@ -157,6 +157,7 @@ class GameManager:
             import os
             import uuid
             from pathlib import Path
+            import subprocess
             
             # 确保临时目录存在
             temp_dir = Path(__file__).parent / "resource" / "tts_temp"
@@ -168,13 +169,12 @@ class GameManager:
             try:
                 # 在文本前添加空格，确保语音咬字清晰
                 processed_text = f" {text.strip()}"
-                
+
                 # 生成语音文件
                 communicate = edge_tts.Communicate(text=processed_text, voice=self.tts_voice)
                 asyncio.run(communicate.save(str(temp_file)))
                 
                 # 播放生成的语音文件
-                import subprocess
                 subprocess.run(["ffplay", "-nodisp", "-autoexit", str(temp_file)])
                 
                 logger.info(f"TTS播放: {text}")

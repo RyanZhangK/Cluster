@@ -1,32 +1,8 @@
-2025-12-21 00:59:48,983 - mqtt_process - DEBUG - 模块 mqtt_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\mqtt_process.log)
-2025-12-21 00:59:48,991 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 00:59:48,991 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 00:59:48,997 - mqtt_process - DEBUG - 连接回调参数 - rc: Success, flags: ConnectFlags(session_present=False), properties: []
-2025-12-21 00:59:48,997 - mqtt_process - INFO - 成功连接到MQTT broker
-2025-12-21 00:59:48,998 - mqtt_process - DEBUG - 订阅结果 - topic: node/status, result: 0, mid: 1
-2025-12-21 00:59:48,998 - mqtt_process - INFO - 已订阅主题: node/status
-2025-12-21 00:59:48,998 - mqtt_process - DEBUG - 连接和订阅完成
-2025-12-21 01:02:34,995 - mqtt_process - DEBUG - 模块 mqtt_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\mqtt_process.log)
-2025-12-21 01:02:35,003 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:02:35,003 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:02:35,008 - mqtt_process - DEBUG - 连接回调参数 - rc: Success, flags: ConnectFlags(session_present=False), properties: []
-2025-12-21 01:02:35,008 - mqtt_process - INFO - 成功连接到MQTT broker
-2025-12-21 01:02:35,008 - mqtt_process - DEBUG - 订阅结果 - topic: node/status, result: 0, mid: 1
-2025-12-21 01:02:35,008 - mqtt_process - INFO - 已订阅主题: node/status
-2025-12-21 01:02:35,008 - mqtt_process - DEBUG - 连接和订阅完成
-2025-12-21 01:09:51,639 - mqtt_process - DEBUG - 模块 mqtt_process 日志已初始化 (path=C:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\mqtt_process.log)
-2025-12-21 01:09:51,647 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:09:51,647 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:09:51,651 - mqtt_process - DEBUG - 连接回调参数 - rc: Success, flags: ConnectFlags(session_present=False), properties: []
-2025-12-21 01:09:51,651 - mqtt_process - INFO - 成功连接到MQTT broker
-2025-12-21 01:09:51,652 - mqtt_process - DEBUG - 订阅结果 - topic: node/status, result: 0, mid: 1
-2025-12-21 01:09:51,652 - mqtt_process - INFO - 已订阅主题: node/status
-2025-12-21 01:09:51,652 - mqtt_process - DEBUG - 连接和订阅完成
-2025-12-21 01:22:39,770 - mqtt_process - DEBUG - 模块 mqtt_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\mqtt_process.log)
-2025-12-21 01:22:39,778 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:22:39,778 - mqtt_process - INFO - MQTT处理模块启动
-2025-12-21 01:22:40,857 - mqtt_process - DEBUG - 连接回调参数 - rc: Success, flags: ConnectFlags(session_present=False), properties: []
-2025-12-21 01:22:40,857 - mqtt_process - INFO - 成功连接到MQTT broker
-2025-12-21 01:22:40,858 - mqtt_process - DEBUG - 订阅结果 - topic: node/status, result: 0, mid: 1
-2025-12-21 01:22:40,858 - mqtt_process - INFO - 已订阅主题: node/status
-2025-12-21 01:22:40,858 - mqtt_process - DEBUG - 连接和订阅完成
+2025-12-23 10:15:28,945 - mqtt_process - DEBUG - 模块 mqtt_process 日志已初始化 (path=c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\log\mqtt_process.log)
+2025-12-23 10:15:28,953 - mqtt_process - INFO - MQTT处理模块启动
+2025-12-23 10:15:28,953 - mqtt_process - INFO - MQTT处理模块启动
+2025-12-23 10:15:29,369 - mqtt_process - DEBUG - 连接回调参数 - rc: Success, flags: ConnectFlags(session_present=False), properties: []
+2025-12-23 10:15:29,369 - mqtt_process - INFO - 成功连接到MQTT broker
+2025-12-23 10:15:29,370 - mqtt_process - DEBUG - 订阅结果 - topic: node/status, result: 0, mid: 1
+2025-12-23 10:15:29,371 - mqtt_process - INFO - 已订阅主题: node/status
+2025-12-23 10:15:29,371 - mqtt_process - DEBUG - 连接和订阅完成
