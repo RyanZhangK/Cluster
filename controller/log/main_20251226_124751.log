@@ -1,0 +1,17 @@
+2025-12-26 12:47:51,211 - __main__ - INFO - 开始启动系统模块...
+2025-12-26 12:47:51,211 - __main__ - INFO - 正在启动模块: database_process.py
+2025-12-26 12:47:53,222 - __main__ - INFO - 模块 database_process.py 已启动 (PID: 24540)
+2025-12-26 12:47:53,222 - __main__ - INFO - 数据库已初始化完成
+2025-12-26 12:47:53,223 - __main__ - INFO - 正在启动模块: mqtt_process.py
+2025-12-26 12:47:54,233 - __main__ - INFO - 模块 mqtt_process.py 已启动 (PID: 24692)
+2025-12-26 12:47:54,234 - __main__ - INFO - 正在启动模块: flask_app.py
+2025-12-26 12:47:55,243 - __main__ - INFO - 模块 flask_app.py 已启动 (PID: 18644)
+2025-12-26 12:47:55,245 - __main__ - INFO - 正在启动模块: game_process.py
+2025-12-26 12:47:56,254 - __main__ - INFO - 模块 game_process.py 已启动 (PID: 35180)
+2025-12-26 12:47:56,254 - __main__ - INFO - 所有模块已启动，开始监控...
+2025-12-26 12:50:01,755 - __main__ - INFO - 接收到中断信号，正在停止所有模块...
+2025-12-26 12:50:01,759 - __main__ - INFO - 已终止模块 database_process.py (PID: 24540)
+2025-12-26 12:50:01,765 - __main__ - INFO - 已终止模块 mqtt_process.py (PID: 24692)
+2025-12-26 12:50:01,770 - __main__ - INFO - 已终止模块 flask_app.py (PID: 18644)
+2025-12-26 12:50:01,777 - __main__ - INFO - 已终止模块 game_process.py (PID: 35180)
+2025-12-26 12:50:01,777 - __main__ - INFO - 所有模块已停止

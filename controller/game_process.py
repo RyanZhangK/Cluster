@@ -379,7 +379,7 @@ class GameManager:
 
     def _handle_conquer_mode(self, team_count):
         """处理征服模式"""
-        active_teams = team_count
+#        active_teams = team_count
         team_names = ['A队', 'B队', 'C队', 'D队'][:team_count]
         
         self._play_tts(f"本局模式为：征服模式，本局共有{team_count}队,消灭敌方所有玩家，或者夺取敌方出生点即为胜利")
@@ -397,23 +397,32 @@ class GameManager:
                 node_id = f"STA{i:02d}"
                 node = self._get_node_status(node_id)
                 if node and node['active_status'] == 1:
-                    self._play_tts(f"{team_names[i-1]}被淘汰")
-                    active_teams -= 1
-                    # 更新节点状态为未激活
-                    self._update_node_status(node_id, {'active_status': 0})
+                    eliminated_team = team_names[i-1] if team_names[i-1] is not None else None  
+                    if eliminated_team:      
+                        self._play_tts(f"{eliminated_team}被淘汰")
+                        team_names[i-1] = None
+                        self._update_node_status(node_id, {'active_status': 0})
+                        break
+#                    active_teams -= 1
+                    # 更新节点状态为未激活                    
             
             # 检查胜利条件
+#            if active_teams <= 1:
+            active_teams = sum(1 for team in team_names if team is not None)
             if active_teams <= 1:
-                winner = None
-                for i in range(1, team_count + 1):
-                    node_id = f"STA{i:02d}"
-                    node = self._get_node_status(node_id)
-                    if node and node['active_status'] == 0:
-                        winner = team_names[i-1]
-                        break
-                
+                winner = [team for team in team_names if team is not None][0] if active_teams == 1 else None
                 if winner:
-                    self._play_tts(f"{winner}取得胜利，对局结束")
+	                    self._play_tts(f"{winner}取得胜利，对局结束")
+
+#                for i in range(1, team_count + 1):
+#                    node_id = f"STA{i:02d}"
+#                    node = self._get_node_status(node_id)
+#                    if node and node['active_status'] == 1:
+                        
+#                        break
+                
+#                if winner:
+#                    self._play_tts(f"{winner}取得胜利，对局结束")
                 
                 # 重置游戏状态
                 self._update_game_config({

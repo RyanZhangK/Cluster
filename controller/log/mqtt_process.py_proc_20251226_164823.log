@@ -1,0 +1,299 @@
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, active_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 2, 'STA02']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 'STA01']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA01',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 'STA02']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA02',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 'STA04']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 'STA03']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA03',)"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 154, in _db_worker
+    logger.debug(f"处理写入 SQL: {write.get('sql')} params: {write.get('params')}")
+Message: "处理写入 SQL: UPDATE node_status SET online_status = ?, active_status = ?, last_update = CURRENT_TIMESTAMP WHERE node_id = ? params: [True, 2, 'STA04']"
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 80, in emit
+    self.doRollover()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 185, in doRollover
+    self.rotate(self.baseFilename, dfn)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\logging\handlers.py", line 121, in rotate
+    os.rename(source, dest)
+    ~~~~~~~~~^^^^^^^^^^^^^^
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log' -> 'c:\\Users\\zfj-AUTHOR\\Desktop\\VSC\\Cluster-20251215T135848Z-1-001\\Cluster\\controller\\log\\database_process.log.1'
+Call stack:
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1014, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+  File "c:\Users\zfj-AUTHOR\Desktop\VSC\Cluster-20251215T135848Z-1-001\Cluster\controller\database_process.py", line 125, in _db_worker
+    logger.debug(f"处理查询 SQL: {query.get('sql')} params: {query.get('params')}")
+Message: "处理查询 SQL: SELECT * FROM node_status WHERE node_id=? params: ('STA04',)"
+Arguments: ()
