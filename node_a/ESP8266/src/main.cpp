@@ -30,14 +30,14 @@
 #define WIFI_PASSWORD "11110000"
 
 /******************** MQTT配置 ********************/
-#define MQTT_SERVER "broker.hivemq.com"        //TODO: 请修改为自己的MQTT服务器地址
-#define MQTT_PORT 1883                //TODO: 请修改为自己的MQTT服务器端口
+#define MQTT_SERVER "156.238.234.207"        //TODO: 请修改为自己的MQTT服务器地址
+#define MQTT_PORT 6000                //TODO: 请修改为自己的MQTT服务器端口
 #define MQTT_TOPIC "node/status"
 #define MQTT_USER "nodeuser"
 #define MQTT_PASSWORD "nodeuserpassword"
 
 /******************** 节点配置 ********************/
-#define NODE_ID "STA02"      // 节点识别码
+#define NODE_ID "STA04"      // 节点识别码
 #define BUTTON_PIN D1        // 按键引脚(D1)
 #define LED_PIN D4           // 板载LED引脚(D4)
 #define HEARTBEAT_INTERVAL 180000  // 心跳间隔(ms)，3分钟=180000ms

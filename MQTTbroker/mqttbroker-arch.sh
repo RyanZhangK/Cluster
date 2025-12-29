@@ -96,7 +96,7 @@ fi
 
 # 启动服务
 echo "启动MQTT broker服务..."
-systemctl enable --now mosquitto
+#systemctl enable --now mosquitto
 systemctl restart mosquitto
 
 # 检查服务状态
