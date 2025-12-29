@@ -21,12 +21,12 @@ byte colPins[COLS] = {D5, D6, D7, D8}; // 列引脚(输入，内部上拉)
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /******************** 网络配置 ********************/
-#define WIFI_SSID "ZG1"
-#define WIFI_PASSWORD "ZG888888"
+#define WIFI_SSID "AL210#AuTHoR"
+#define WIFI_PASSWORD "11110000"
 
 /******************** MQTT配置 ********************/
-#define MQTT_SERVER "hk-1.lcf.im"
-#define MQTT_PORT 44376
+#define MQTT_SERVER "broker.hivemq.com"
+#define MQTT_PORT 1883
 #define MQTT_TOPIC "node/status"
 #define MQTT_USER "nodeuser"
 #define MQTT_PASSWORD "nodeuserpassword"

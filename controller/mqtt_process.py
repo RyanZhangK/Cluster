@@ -16,7 +16,7 @@ from logging_utils import configure_module_logging
 logger = configure_module_logging('mqtt_process', _Path(__file__).parent / 'log')
 
 # MQTT配置
-MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = "127.0.0.1"
 MQTT_PORT = 1883
 MQTT_TOPICS = [
     "node/status",  # 订阅所有节点的状态信息

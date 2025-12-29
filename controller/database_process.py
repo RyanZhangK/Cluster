@@ -329,13 +329,34 @@ if __name__ == "__main__":
                 logger.error(f"查询节点状态失败: {error}")
             else:
                 logger.info(f"节点状态查询结果: {result}")
+                 # 打印详细状态
+                if result and result.get('data'):
+                    for node in result['data']:
+                        logger.info(f"节点ID: {node['node_id']}, 在线状态: {node['online']}, 活跃状态: {node['active']}, 上次更新时间: {node['last_update']}")
         
         db_manager.query(
             DatabaseType.NODE_STATUS,
             "SELECT * FROM node_status",
             callback=query_node_callback
         )
-        
+
+        # 定义更新游戏配置的回调函数
+        def write_game_config_callback(response):
+            if response['success']:
+                logger.info("游戏配置更新成功")
+            else:
+                logger.error(f"游戏配置更新失败: {response['error']}")
+
+        # 执行写入操作
+        db_manager.write(
+            DatabaseType.GAME_CONFIG,  # 数据库类型
+            "UPDATE game_config SET team_count = ?, game_mode = ?, game_state = ? WHERE id = 1",  # SQL更新语句
+            (3, 'conquer', 'unstart'),  # 更新参数
+            callback=write_game_config_callback  # 回调函数
+        )   
+
+
+
         # 测试查询游戏配置
         def query_game_config_callback(result, error):
             if error:

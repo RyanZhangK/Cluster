@@ -5,6 +5,8 @@ import logging
 import os
 from pathlib import Path
 
+# from zfj 的项目更改测试
+
 # 添加项目根目录到Python路径
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
@@ -31,11 +33,11 @@ logger = logging.getLogger(__name__)
 MODULES = [
     "database_process.py",  # 数据库读写模块
     "mqtt_process.py",     # MQTT信息处理模块
-    "flask_app.py",        # Web端管理模块
+    "desktop_app.py",      # 桌面管理端应用
     "game_process.py"      # 游戏逻辑管理和音频生成播放模块
 ]
 
-# Web模块配置
+# 桌面应用配置（保留原有配置结构）
 WEB_HOST = '0.0.0.0'
 WEB_PORT = 5000
 
