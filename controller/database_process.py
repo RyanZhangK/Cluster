@@ -89,10 +89,10 @@ class DatabaseManager:
                         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
-#                cursor.execute('''
-#                    INSERT OR REPLACE INTO game_config (id, team_count, game_mode, game_state)
-#                    VALUES (1, 2, 'conquer', 'unstart')
-#                ''')
+                cursor.execute('''
+                    INSERT OR REPLACE INTO game_config (id, team_count, game_mode, game_state)
+                    VALUES (1, 2, 'conquer', 'unstart')
+                ''')
                 conn.commit()
 
             logger.info("所有数据库初始化完成")
