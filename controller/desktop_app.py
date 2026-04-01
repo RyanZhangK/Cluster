@@ -572,7 +572,7 @@ class MainWindow(QMainWindow):
         
     def init_ui(self):
         """初始化界面"""
-        self.setWindowTitle("战鼓系统 - 桌面管理端")
+        self.setWindowTitle("Cluster - 桌面管理端")
         self.setGeometry(100, 100, 1200, 700)
         
         # 创建中心部件
