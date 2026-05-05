@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import threading
@@ -450,17 +451,19 @@ class ConfigEditorPanel(QWidget):
         
         # 配置表单
         form_group = QGroupBox("修改配置")
-        form_layout = QFormLayout(form_group)
+        self.form_layout = QFormLayout(form_group)  # 存储为实例变量
         
         # 队伍数量
         self.team_count_combo = QComboBox()
         self.team_count_combo.addItems(["2", "3", "4"])
-        form_layout.addRow("队伍数量:", self.team_count_combo)
+        self.team_count_label = QLabel("队伍数量:")  # 创建标签控件
+        self.form_layout.addRow(self.team_count_label, self.team_count_combo)
         
         # 游戏模式
         self.game_mode_combo = QComboBox()
         self.game_mode_combo.addItems(["conquer", "defense", "race"])
-        form_layout.addRow("游戏模式:", self.game_mode_combo)
+        self.game_mode_combo.currentTextChanged.connect(self._update_team_count_options)
+        self.form_layout.addRow("游戏模式:", self.game_mode_combo)
         
         layout.addWidget(form_group)
         
@@ -510,8 +513,7 @@ class ConfigEditorPanel(QWidget):
             self, 
             "确认保存", 
             f"确定要保存以下配置吗？\n\n"
-            f"队伍数量: {config['team_count']}队\n"
-            f"游戏模式: {self._get_game_mode_name(config['game_mode'])}",
+            f"游戏配置: {self._get_game_mode_name(config['game_mode'])} {config['team_count']}队",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
@@ -526,7 +528,30 @@ class ConfigEditorPanel(QWidget):
                 "UPDATE game_config SET team_count=?, game_mode=? WHERE id=?",
                 (config['team_count'], config['game_mode'], self.current_config['id'])
             )
+            
+            # 如果是race模式，触发完整刷新
+            if config['game_mode'] == 'race':
+                self.load_config()
+                self.parent().info_panel.refresh_config_display()
         
+    def _update_team_count_options(self, mode):
+        """根据游戏模式更新队伍数量选项和标签"""
+        current_value = self.team_count_combo.currentText()
+        
+        self.team_count_combo.clear()
+        if mode == 'race':
+            self.team_count_combo.addItems(["1", "2", "3"])
+            self.team_count_label.setText("游戏配置:")  # 直接修改标签控件
+        else:
+            self.team_count_combo.addItems(["2", "3", "4"])
+            self.team_count_label.setText("队伍数量:")  # 直接修改标签控件
+            
+        # 尝试保留原值，如果不存在则使用第一个选项
+        if current_value in [self.team_count_combo.itemText(i) for i in range(self.team_count_combo.count())]:
+            self.team_count_combo.setCurrentText(current_value)
+        else:
+            self.team_count_combo.setCurrentIndex(0)
+            
     def update_config(self, config):
         """更新配置显示"""
         if config:
@@ -539,12 +564,13 @@ class ConfigEditorPanel(QWidget):
             config_team_count = str(config.get('team_count', 2))
             config_game_mode = config.get('game_mode', 'conquer')
             
-            # 只有当数据库中的值与当前显示值不同时才更新
-            if current_team_count != config_team_count:
-                self.team_count_combo.setCurrentText(config_team_count)
-            
+            # 更新游戏模式会触发队伍数量选项更新
             if current_game_mode != config_game_mode:
                 self.game_mode_combo.setCurrentText(config_game_mode)
+            
+            # 更新队伍数量选择
+            if current_team_count != config_team_count:
+                self.team_count_combo.setCurrentText(config_team_count)
             
             self.status_label.setText("配置加载完成")
             self.status_label.setStyleSheet("color: green;")
@@ -572,7 +598,7 @@ class MainWindow(QMainWindow):
         
     def init_ui(self):
         """初始化界面"""
-        self.setWindowTitle("Cluster - 桌面管理端")
+        self.setWindowTitle("战鼓系统 - 桌面管理端")
         self.setGeometry(100, 100, 1200, 700)
         
         # 创建中心部件
@@ -667,18 +693,34 @@ class MainWindow(QMainWindow):
 
 def main():
     """主函数"""
-    # 初始化数据库管理器
-    db_manager = DatabaseManager()
+    # 检查DISPLAY环境变量
+    if 'DISPLAY' not in os.environ:
+        os.environ['DISPLAY'] = ':0'  # 尝试设置默认显示
     
-    # 创建应用
-    app = QApplication(sys.argv)
-    
-    # 创建主窗口
-    window = MainWindow(db_manager)
-    window.show()
-    
-    # 运行应用
-    sys.exit(app.exec())
+    try:
+        # 初始化数据库管理器
+        db_manager = DatabaseManager()
+        
+        # 创建应用
+        app = QApplication(sys.argv)
+        
+        # 创建主窗口
+        window = MainWindow(db_manager)
+        window.show()
+        
+        # 运行应用
+        sys.exit(app.exec())
+        
+    except Exception as e:
+        logger.error(f"启动失败: {str(e)}")
+        if "QXcbConnection" in str(e):
+            print("错误: 无法连接到X服务器。请确保:")
+            print("1. 您正在图形环境中运行")
+            print("2. DISPLAY环境变量已正确设置")
+            print("3. X服务器正在运行")
+        else:
+            print(f"错误: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

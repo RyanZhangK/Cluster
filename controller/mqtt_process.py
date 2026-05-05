@@ -16,7 +16,8 @@ from logging_utils import configure_module_logging
 logger = configure_module_logging('mqtt_process', _Path(__file__).parent / 'log')
 
 # MQTT配置
-MQTT_BROKER = "127.0.0.1"
+#MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = "localhost"
 MQTT_PORT = 1883
 MQTT_TOPICS = [
     "node/status",  # 订阅所有节点的状态信息
@@ -74,8 +75,14 @@ class MQTTProcessor:
         thread = threading.Thread(target=checker, daemon=True)
         thread.start()
 
-    def _update_node_status(self, node_id, online_status, active_status=None):
-        """更新节点状态到数据库"""
+    def _update_node_status(self, node_id, online_status, active_status=None, activator=None):
+        """更新节点状态到数据库
+        Args:
+            node_id: 节点ID
+            online_status: 在线状态
+            active_status: 激活状态(可选)
+            activator: 激活器标识(可选)
+        """
         start_time = time.time()
         
         if not self.db_manager:
@@ -84,13 +91,20 @@ class MQTTProcessor:
             
         sql = "UPDATE node_status SET online_status = ?"
         params = [online_status]
-        
+
         if active_status is not None:
             sql += ", active_status = ?"
             params.append(active_status)
             
+        if activator is not None:
+            sql += ", activator = ?"
+            params.append(str(activator))
+            logger.debug(f"设置activator值: {activator}")  # 记录实际值
+
         sql += ", last_update = CURRENT_TIMESTAMP WHERE node_id = ?"
         params.append(node_id)
+        
+        logger.debug(f"完整更新参数: {params}")  # 记录所有参数
         
         def callback(response):
             elapsed = round((time.time() - start_time)*1000, 2)
@@ -127,10 +141,12 @@ class MQTTProcessor:
                     return
                     
                 node = response['data'][0]
+                logger.debug(f"从数据库获取的完整节点数据: {node}")  # 记录完整响应
                 status = {
                     'node_id': node['node_id'],
                     'online': node['online'],
                     'active': node['active'],
+                    'activator': node.get('activator', ''),  # 确保包含activator
                     'timestamp': node['last_update'],
                     'source': 'db_update'
                 }
@@ -147,9 +163,10 @@ class MQTTProcessor:
                     logger.error(f"发布MQTT消息失败: {str(e)}")
                 
         logger.debug(f"查询节点 {node_id} 状态")
+        # 明确指定查询字段，避免依赖表字段顺序
         self.db_manager.query(
             DatabaseType.NODE_STATUS,
-            "SELECT * FROM node_status WHERE node_id=?",
+            "SELECT node_id, online_status, active_status, last_update, activator FROM node_status WHERE node_id=?",
             (node_id,),
             callback=callback
         )
@@ -213,11 +230,14 @@ class MQTTProcessor:
             # 处理消息
             if action_type == 'H':
                 # 心跳包：更新在线状态并重置计时器
-                self._update_node_status(node_id, True)
+                self._update_node_status(node_id, online_status=True)
                 self.timer_manager.reset_timer(node_id)
             elif action_type == 'A':
-                # 激活包：更新激活状态
-                self._update_node_status(node_id, True, int(extra_info))
+                # 激活包：更新激活状态和activator
+                self._update_node_status(node_id, 
+                                      online_status=True,
+                                      active_status=int(extra_info),
+                                      activator=extra_info)
                 
             # 记录原始消息
             with open(self.data_dir / "mqtt_data.log", "a") as f:
