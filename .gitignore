@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+*.egg
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# controller
+controller/log/
+controller/resource/tts_cache/
+controller/resource/tts_temp/
+*.db
+
+# PlatformIO
+mcu/*/piolibdeps/
+mcu/*/.pio/
+mcu/*/.vscode/
+
+# Environment
+.env
+.env.local

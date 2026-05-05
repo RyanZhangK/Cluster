@@ -1,0 +1,18 @@
+{
+  "心跳报文": {
+    "#fitten_ref_0#": "NODE_ID + HEARTBEAT_CODE",
+    "#fitten_ref_1#": "NODE_ID + HEARTBEAT_CODE",
+    "示例": {
+      "#fitten_ref_0#": "DET01H0",
+      "#fitten_ref_1#": "STA03H0"
+    }
+  },
+  "激活报文": {
+    "#fitten_ref_0#": "NODE_ID + 'A' + team",
+    "#fitten_ref_1#": "NODE_ID + ACTIVATION_CODE",
+    "示例": {
+      "#fitten_ref_0#": "DET01A1",
+      "#fitten_ref_1#": "STA03C1"
+    }
+  }
+}
