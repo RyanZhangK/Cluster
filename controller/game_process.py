@@ -272,8 +272,8 @@ class GameManager:
             return {
                 'node_id': str(node_data.get('node_id', node_data.get('node_id', ''))),
                 'online_status': bool(node_data.get('online_status', node_data.get('online', False))),
-                'active_status': int(node_data.get('active_status', node_data.get('active', 0))),
-                'activator': str(node_data.get('activator', '')),
+                'active_status': 0 if int(node_data.get('active_status', node_data.get('active', 0))) == 0 else 1,
+                'activator': str(node_data.get('activator','')),  
                 'last_update': node_data.get('last_update', '')
             }
         except Exception as e:
@@ -362,6 +362,7 @@ class GameManager:
 
     def _monitor_game(self):
         """游戏监控函数"""
+        time.sleep(1)
         logger.info("进入游戏监控模式")
         
         while True:
@@ -373,78 +374,360 @@ class GameManager:
             # 根据游戏模式处理
             if config['game_mode'] == 'conquer':
                 self._handle_conquer_mode(config['team_count'])
+                return
+            elif config['game_mode'] == 'defense':  
+                self._handle_defense_mode(config['team_count'])
+                return
+            elif config['game_mode'] == 'race':  
+                self._handle_race_mode(config['team_count'])
+                return
             else:
                 self._play_tts("尚未开放该模式")
                 return
 
-    def _handle_conquer_mode(self, team_count):
-        """处理征服模式"""
-#        active_teams = team_count
-        team_names = ['A队', 'B队', 'C队', 'D队'][:team_count]
+
+    def _play_local_mp3(self, file_path):
+        """播放本地mp3文件"""
+        try:
+            import subprocess
+            from pathlib import Path
+            
+            # 检查文件是否存在
+            mp3_path = Path(__file__).parent / "resource" / "tts_temp" / file_path
+            if not mp3_path.exists():
+                raise FileNotFoundError(f"MP3文件不存在: {mp3_path}")
+                
+            # 播放mp3文件
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", str(mp3_path)])
+            logger.info(f"播放本地MP3: {file_path}")
+            return True
+        except Exception as e:
+            logger.error(f"播放本地MP3失败: {str(e)}")
+            raise Exception("播放本地MP3失败")
+
+
+    class _C4BeepThread(threading.Thread):
+        """C4滴滴声播放线程(支持动态间隔)"""
+        def __init__(self, game_process, dismantle_time):
+            super().__init__(daemon=True)
+            self.game_process = game_process
+            self.stop_event = threading.Event()
+            self.start_time = time.time()
+            self.dismantle_time = dismantle_time
+            
+        def calculate_interval(self):
+            """计算当前滴滴声模式"""
+            elapsed = time.time() - self.start_time
+            # 响一下
+            if elapsed < self.dismantle_time/2:
+                return "c4-dididi.mp3"
+            # 响两下
+            elif elapsed > self.dismantle_time / 2 and self.dismantle_time-elapsed > 30: 
+                return "c4-dididi2.mp3"
+            # 响三下
+            else:
+                return "c4-dididi3.mp3"
+            
+        def run(self):
+            """主循环"""
+            while not self.stop_event.is_set():
+                try:
+                    self.game_process._play_local_mp3(self.calculate_interval())
+                    time.sleep(1)
+                except Exception as e:
+                    self.game_process.logger.error(f"C4滴滴声线程异常: {str(e)}")
+                    break
+
+
+    def _handle_race_mode(self, team_count):
+        """处理C4爆破模式"""
+        # A队下包，B队拆包
+
+        # 启动滴滴声线程
+        c4_beep_thread = None
+
+        # 游戏配置
+        if team_count == 1:
+            place_time =3*60 # 3分钟
+            dismantle_time = 3*60 # 3分钟
+        elif team_count == 2:
+            place_time =5*60 # 5分钟
+            dismantle_time = 5*60 # 5分钟
+        elif team_count == 3:
+            place_time =8*60 # 8分钟
+            dismantle_time = 8*60 # 8分钟
+        c4_condition = False
+
+        self._play_tts("游戏准备开始,5,4,3,2,1,出发")   
+
+        # 重置节点激活状态
+        self._update_node_status(f"DET{6:02d}", {'active_status': 0})
+                
+        start_time = time.time()  # 记录游戏开始时间
+
+        while True:
+                # 检查游戏状态
+                config = self._get_game_config()
+                if not config or config['game_state'] == 'unstart':
+                    self._play_tts("对局意外终止")
+                    if c4_beep_thread and c4_beep_thread.is_alive():
+                        c4_beep_thread.stop_event.set()
+                        c4_beep_thread.join()                    
+                    return
         
-        self._play_tts(f"本局模式为：征服模式，本局共有{team_count}队,消灭敌方所有玩家，或者夺取敌方出生点即为胜利")
+                # 检查是否超时未下包
+                elapsed_time = time.time() - start_time
+                if not c4_condition and elapsed_time > place_time:
+                    
+                    self._play_tts("A队超时未放置C4炸药包，B队取得胜利，对局结束")
+                
+                    # 重置节点激活状态
+                    for i in range(1, 5):
+                        self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+                    self._update_node_status(f"DET{6:02d}", {'active_status': 0})
+
+                    # 重置游戏状态
+                    self._update_game_config({
+                        'game_state': 'unstart'
+                    })
+                    return
+            
+                 # 检查是否超时未拆包
+                if  c4_condition and elapsed_time > dismantle_time:
+
+                    # 停止滴滴声线程
+                    if c4_beep_thread and c4_beep_thread.is_alive():
+                        c4_beep_thread.stop_event.set()
+                        c4_beep_thread.join()
+
+                    self._play_local_mp3("c4-boom.mp3")
+
+                    self._play_tts("B队超时未拆除C4炸药包，A队取得胜利，对局结束")
+                
+                    # 重置节点激活状态
+                    for i in range(1, 5):
+                        self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+                    self._update_node_status(f"DET{6:02d}", {'active_status': 0})
+
+                    # 重置游戏状态
+                    self._update_game_config({
+                        'game_state': 'unstart'
+                    })
+                    return
+
+                # 检查C4炸药包状态
+                node_id = f"DET{6:02d}"
+                node = self._get_node_status(node_id)
+            
+                # 炸药包被激活
+                if node and node['active_status'] == 1 and not c4_condition and node['activator'] == str(1):
+
+                    # 重置节点激活状态
+                    self._update_node_status(f"DET{6:02d}", {'active_status': 0})
+
+                    c4_condition = True
+                    start_time = time.time()  # 重置计时器为拆包时间
+                    self._play_tts("C4炸药包被激活")
+                     
+                    # 启动滴滴声线程并传入拆包时间
+                    c4_beep_thread = self._C4BeepThread(self, dismantle_time)
+                    c4_beep_thread.start()
+
+                    node = None  # 重置节点状态变量
+
+                # 炸药包被拆除
+                if node and node['active_status'] == 1 and c4_condition and node['activator'] == str(2):
+                    # 停止滴滴声线程
+                    if c4_beep_thread and c4_beep_thread.is_alive():
+                        c4_beep_thread.stop_event.set()
+                        c4_beep_thread.join()
+
+                    self._play_tts("C4炸药包被拆除，B队取得胜利，对局结束")
+
+                    # 重置节点激活状态
+                    for i in range(1, 5):
+                        self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+                    self._update_node_status(f"DET{6:02d}", {'active_status': 0})
+
+                    # 重置游戏状态
+                    self._update_game_config({
+                        'game_state': 'unstart'
+                    })
+                    return
+            
+    def _handle_defense_mode(self, team_count):
+        """处理占点模式"""
+        team_names = ['A队', 'B队', 'C队', '滴队']
+        team_scores = [0] * 4  # 用于存储各队得分
+        det_previous_data = [0] * 5  # 用于存储上一次的DET状态
+
+        # 提前将未参与的队伍名称设为None
+        for i in range(1, 5):
+            node = self._get_node_status(f"STA{i:02d}")
+            if node and node['active_status'] == 0:
+                team_names[i-1] = None
+
+        # 判断点的个数
+        if team_names[0] != None and team_names[1] != None :
+            points_number = 5
+            win_number = 3
+            # AB全场
+        elif (team_names[1] != None and team_names[3] != None) or (team_names[0] != None and team_names[2] != None):    
+            # BD或AC半场        
+            points_number = 3
+            win_number = 2
+
+        # 重置节点激活状态
+        for i in range(1, 6):
+            self._update_node_status(f"DET{i:02d}", {'active_status': 0})
+        
+        self._play_tts("游戏准备开始,5,4,3,2,1,出发")   
 
         while True:
             # 检查游戏状态
-            #time.sleep(10)
             config = self._get_game_config()
             if not config or config['game_state'] == 'unstart':
                 self._play_tts("对局意外终止")
-                return
+
+            # 检查各密码盒状态
+            for i in range(1, points_number+1):
+                node_id = f"DET{i:02d}"
+                node = self._get_node_status(node_id)
+
+                if node and node['active_status'] == 1:
+
+                    # i密码盒被摁下
+                    for j in range(1, 5):
+
+                        #判断是x队摁下 
+                        if team_names[j-1] is not None and node['activator'] == str(j) and det_previous_data[i-1] != j:
+
+                            # 计算得分
+                            team_scores[j-1] = team_scores[j-1] + 1
+
+                            if det_previous_data[i-1] != 0:
+                                team_scores[det_previous_data[i-1]-1] = team_scores[det_previous_data[i-1]-1] - 1
+
+                            # 记录上次数据
+                            eliminated_team =str(team_names[j-1]) if team_names[j-1] is not None else None 
+                            det_previous_data[i-1] = int(j)
+
+                            self._play_tts(f"{eliminated_team}占领{i}点")
+
+                            # 判断胜利条件
+                            if team_scores[j-1] >= win_number:
+                                self._play_tts(f"{eliminated_team}取得胜利，对局结束")
+                                
+                                # 重置节点激活状态
+                                for i in range(1, 5):
+                                    self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+                                    self._update_node_status(f"DET{i:02d}", {'active_status': 0})
+                                self._update_node_status(f"DET{5:02d}", {'active_status': 0})
+
+                                # 重置游戏状态
+                                self._update_game_config({
+                                    'game_state': 'unstart'
+                                })
+                                return
+                            else:
+                                break
+
+                        # 无效操作处理
+                        elif  team_names[j-1] is not None and node['activator'] == str(j) and det_previous_data[i-1] == int(j):
+                            self._play_tts(f"{team_names[j-1]}重复占领{i}点，无效操作")
+                            break
+                        
+                        elif team_names[j-1] is None and node['activator'] == str(j):
+                            self._play_tts(f"{i}点有无效操作，未参与的队伍无法占领点位")
+                            break
+                    
+
+                    # 重置节点激活状态
+                    self._update_node_status(f"DET{i:02d}", {'active_status': 0})
+
+            time.sleep(1)
             
+    def _handle_conquer_mode(self, team_count):
+        """处理征服模式"""
+
+        team_names = ['A队', 'B队', 'C队', '滴队']
+        # 提前将未参与的队伍名称设为None
+        for i in range(1, 5):
+            node = self._get_node_status(f"STA{i:02d}")
+            if node and node['active_status'] == 0:
+                team_names[i-1] = None     
+
+
+        # 重置节点激活状态
+        for i in range(1, 5):
+            self._update_node_status(f"STA{i:02d}", {'active_status': 0})  
+
+        self._play_tts("游戏准备开始,5,4,3,2,1,出发")  
+
+        start_time = time.time()  # 记录游戏开始时间
+
+        while True:
+            # 检查游戏状态
+            config = self._get_game_config()
+            if not config or config['game_state'] == 'unstart':
+                self._play_tts("对局意外终止")
+                
             # 检查各队伍状态
-            for i in range(1, team_count + 1):
+            for i in range(1, 5):
                 node_id = f"STA{i:02d}"
                 node = self._get_node_status(node_id)
                 if node and node['active_status'] == 1:
                     eliminated_team = team_names[i-1] if team_names[i-1] is not None else None  
-                    if eliminated_team:      
-                        self._play_tts(f"{eliminated_team}被淘汰")
-                        team_names[i-1] = None
-                        self._update_node_status(node_id, {'active_status': 0})
-                        break
-#                    active_teams -= 1
-                    # 更新节点状态为未激活                    
-            
-            # 检查胜利条件
-#            if active_teams <= 1:
-            active_teams = sum(1 for team in team_names if team is not None)
-            if active_teams <= 1:
-                winner = [team for team in team_names if team is not None][0] if active_teams == 1 else None
-                if winner:
-	                    self._play_tts(f"{winner}取得胜利，对局结束")
-
-#                for i in range(1, team_count + 1):
-#                    node_id = f"STA{i:02d}"
-#                    node = self._get_node_status(node_id)
-#                    if node and node['active_status'] == 1:
+                    if eliminated_team:
+                        # 检查是否在10秒保护期内
+                        current_time = time.time()
+                        if current_time - start_time < 10:
+                            # 10秒保护期内，不触发淘汰，只重置节点状态
+                            self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+                            continue
                         
-#                        break
-                
-#                if winner:
-#                    self._play_tts(f"{winner}取得胜利，对局结束")
-                
-                # 重置游戏状态
-                self._update_game_config({
-                    'game_state': 'unstart'
-                })
-                return
-            
+                        team_names[i-1] = None
+                        if team_count==2:
+                            self._play_tts(f"{eliminated_team}被淘汰")
+                            active_teams = sum(1 for team in team_names if team is not None)
+                            winner = [team for team in team_names if team is not None][0] if active_teams == 1 else None
+                            if winner:
+                                self._play_tts(f"{winner}取得胜利，对局结束")
+                        else:                         
+                            self._play_tts(f"{eliminated_team}被偷家")
+                            self._play_tts(f"对局结束")
+
+                        # 重置节点激活状态
+                        for i in range(1, 5):
+                            self._update_node_status(f"STA{i:02d}", {'active_status': 0})
+
+                        # 重置游戏状态
+                        self._update_game_config({
+                            'game_state': 'unstart'
+                        })
+
+                        return
             time.sleep(1)
 
     def run(self):
         """主运行循环"""
         logger.info("游戏模块启动")
         try:
+            # 重置节点激活状态
+            for i in range(1, 5):
+                self._update_node_status(f"STA{i:02d}", {'active_status': 0})  
+
             # 尝试初始化TTS，但不强制要求
             tts_initialized = self._init_tts()
             if tts_initialized:
                 self._play_tts("主控系统已上线，初始化完成，等待玩家入场")
             else:
                 logger.warning("TTS初始化失败，继续运行无语音版本")
-            
+
             # 主监控循环
             self._play_tts("监控系统上线")
+            
+
             while True:
                 # 检查游戏配置
                 config = self._get_game_config()
@@ -462,21 +745,22 @@ class GameManager:
                     logger.debug(f"检查节点 {node_id} 状态: {node}")
                     if node and node['active_status'] == 1:
                         logger.debug(f"节点 {node_id} 已激活")
-                        self._play_tts(f"{['A队','B队','C队','D队'][i-1]}已就绪")
+                        self._play_tts(f"{['A队','B队','C队','滴队'][i-1]}已就绪")
                         active_nodes += 1
                 
+                # 爆破模式特殊处理
+                if config['game_mode'] == 'race':
+                    real_team_count = 2 
+                else:
+                    real_team_count = config['team_count']
+
                 # 检查是否满足开始条件
-                if (active_nodes >= config['team_count'] and 
+                if (active_nodes >= real_team_count and 
                     config['game_state'] == 'unstart'):
                     # 更新游戏状态
                     self._update_game_config({
                         'game_state': 'started'
                     })
-                    # 重置节点激活状态
-                    for i in range(1, 5):
-                        self._update_node_status(f"STA{i:02d}", {'active_status': 0})
-                    self._play_tts("对局开始")
-                    
                     # 进入游戏监控
                     self._monitor_game()
                 

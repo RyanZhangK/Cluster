@@ -59,7 +59,19 @@ class DatabaseManager:
                         last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
+
+
                 
+                
+                # 检查并添加缺失的activator列
+                cursor.execute("PRAGMA table_info(node_status)")
+                columns = [col[1] for col in cursor.fetchall()]
+                if 'activator' not in columns:
+                    cursor.execute("ALTER TABLE node_status ADD COLUMN activator TEXT DEFAULT NULL")
+                    logger.info("成功添加activator列到node_status表")
+                
+
+
                 # 只插入不存在的节点，不覆盖已有节点状态
                 existing_nodes = [row[0] for row in cursor.execute(
                     "SELECT node_id FROM node_status"
@@ -194,16 +206,42 @@ class DatabaseManager:
             self.worker_threads.append(worker)
 
     def _format_response(self, data, db_type):
-        """格式化数据库响应"""
+        """格式化数据库响应
+        统一字段处理规则：
+        - online_status: bool类型
+        - active_status: int类型(0-4)
+        - activator: str类型
+        """
         if db_type == DatabaseType.NODE_STATUS:
+            logger.debug(f"原始数据行: {data}")  # 打印原始查询结果
+            formatted_data = []
+            for row_idx, row in enumerate(data):
+                # 防御性处理：确保行数据长度足够
+                if len(row) < 5:
+                    row = list(row) + [None] * (5 - len(row))
+                
+                # 详细记录每行数据的结构和值
+                logger.debug(f"处理第{row_idx}行数据: node_id={row[0]}, "
+                           f"online_status={row[1]}, active_status={row[2]}, "
+                           f"activator={row[4] if len(row)>4 else None}")
+                
+                item = {
+                    'node_id': str(row[0]),
+                    'online_status': bool(row[1]),
+                    'active_status': int(row[2]) if row[2] is not None else 0,
+                    'activator': str(row[4]) if len(row)>4 and row[4] is not None else '',
+                    'last_update': row[3],
+                    # 兼容字段
+                    'online': bool(row[1]),
+                    'active': int(row[2]) if row[2] is not None else 0
+                }
+                formatted_data.append(item)
+            
+            logger.debug(f"格式化后的数据: {formatted_data}")
+            # 确保只返回包含完整字段的formatted_data
             return {
                 'success': True,
-                'data': [{
-                    'node_id': row[0],
-                    'online': bool(row[1]),
-                    'active': bool(row[2]),
-                    'last_update': row[3]
-                } for row in data],
+                'data': formatted_data,
                 'timestamp': time.time()
             }
         elif db_type == DatabaseType.GAME_CONFIG:
