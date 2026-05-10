@@ -9,6 +9,7 @@ dependencies = [
     "amqtt>=0.11.0",
     "pyside6>=6.7.0",
     "qasync>=0.27.1",
+    "toml>=0.10.2",
 ]
 
 [project.scripts]
