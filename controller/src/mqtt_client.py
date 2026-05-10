@@ -4,7 +4,14 @@ from typing import TYPE_CHECKING
 
 import aiomqtt
 
-from .config import MQTT_BROKER, MQTT_PORT, MQTT_QOS, MQTT_TOPIC_SUB, MSG_LENGTH, NODE_ID_LENGTH
+from .config import (
+    MQTT_BROKER,
+    MQTT_PORT,
+    MQTT_QOS,
+    MQTT_TOPIC_SUB,
+    MSG_LENGTH,
+    NODE_ID_LENGTH,
+)
 
 if TYPE_CHECKING:
     from node_manager import NodeManager
@@ -19,6 +26,7 @@ TEAM_MAP = {"1": 1, "2": 2, "3": 3, "4": 4, "A": 1, "B": 2, "C": 3, "D": 4}
 
 class MessageParseError(ValueError):
     """消息解析错误。"""
+
     pass
 
 
@@ -42,7 +50,9 @@ def parse_message(raw: str) -> tuple[str, str, int]:
 
     if action_type == "H":
         if extra_info != "0":
-            raise MessageParseError(f"心跳消息 extra_info 必须为 '0'，实际 {extra_info!r}")
+            raise MessageParseError(
+                f"心跳消息 extra_info 必须为 '0'，实际 {extra_info!r}"
+            )
         return node_id, action_type, 0
 
     else:

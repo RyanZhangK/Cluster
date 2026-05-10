@@ -25,11 +25,8 @@ def setup_logging() -> None:
     handler = TimedRotatingFileHandler(
         str(log_path), when="midnight", backupCount=7, encoding="utf-8"
     )
-    formatter = logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     handler.setFormatter(formatter)
-
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
