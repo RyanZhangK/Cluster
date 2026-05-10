@@ -57,7 +57,9 @@ class GameManager(QObject):
         self._bomb_task: asyncio.Task | None = None
         self._bomb_remaining: int = 0
 
-        logger.info(f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}")
+        logger.info(
+            f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}"
+        )
 
     def on_sta_activated(self, node_id: str, team: str, nodes: dict) -> None:
         """STA 节点激活时调用。"""
@@ -138,7 +140,8 @@ class GameManager(QObject):
         """检查占领模式胜利条件。"""
         # 统计在线 DET 节点总数
         online_det_count = sum(
-            1 for node_id, state in nodes.items()
+            1
+            for node_id, state in nodes.items()
             if node_id.startswith("DET") and state.status.value == "online"
         )
 
@@ -155,7 +158,9 @@ class GameManager(QObject):
         threshold = online_det_count / 2
         for team, count in team_det_count.items():
             if count > threshold:
-                logger.info(f"队伍 {team} 占领 {count}/{online_det_count} DET 节点，超过半数")
+                logger.info(
+                    f"队伍 {team} 占领 {count}/{online_det_count} DET 节点，超过半数"
+                )
                 self._end_game(team)
                 return
 

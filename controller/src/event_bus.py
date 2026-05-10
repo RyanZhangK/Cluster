@@ -34,8 +34,8 @@ class EventBus(QObject):
     # 游戏事件信号
     game_started = Signal()
     team_eliminated = Signal(str)  # team: str (A/B/C/D)
-    team_victory = Signal(str)     # team: str
+    team_victory = Signal(str)  # team: str
     bomb_activated = Signal()
     bomb_defused = Signal()
     bomb_exploded = Signal()
-    bomb_tick = Signal(int)        # 倒计时剩余秒数
+    bomb_tick = Signal(int)  # 倒计时剩余秒数

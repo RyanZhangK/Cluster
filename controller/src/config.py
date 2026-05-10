@@ -13,7 +13,7 @@ BROKER_BIND_PORT = 1883
 
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = 600  # 秒，节点心跳超时时间
-WATCHDOG_INTERVAL = 30   # 秒，看门狗检查间隔
+WATCHDOG_INTERVAL = 30  # 秒，看门狗检查间隔
 
 # 消息格式
 MSG_LENGTH = 7

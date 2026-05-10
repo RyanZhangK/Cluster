@@ -4,10 +4,21 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, Slot, QPropertyAnimation, QEasingCurve, QSize
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QTableWidget, QTableWidgetItem, QPushButton, QLabel,
-    QHeaderView, QAbstractItemView, QComboBox, QStackedWidget,
-    QFrame, QSizePolicy, QProgressBar,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
+    QLabel,
+    QHeaderView,
+    QAbstractItemView,
+    QComboBox,
+    QStackedWidget,
+    QFrame,
+    QSizePolicy,
+    QProgressBar,
 )
 
 from .node_manager import OnlineStatus
@@ -21,26 +32,27 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # ─── 色彩系统 ─────────────────────────────────────────────────────────────────
-C_BG          = "#0f1117"
-C_SURFACE     = "#161b27"
-C_CARD        = "#1e2435"
-C_BORDER      = "#2a3045"
-C_PRIMARY     = "#4f6ef7"
-C_PRIMARY_H   = "#6b84f8"
-C_SUCCESS     = "#22c55e"
-C_DANGER      = "#ef4444"
-C_WARNING     = "#f59e0b"
-C_TEXT        = "#e2e8f0"
-C_TEXT_SEC    = "#8b95b0"
-C_TEXT_MUTED  = "#4a5270"
-C_SIDEBAR     = "#0c0f1a"
-C_NAV_HOVER   = "#181d2e"
-C_NAV_ACTIVE  = "#1e2a4a"
+C_BG = "#0f1117"
+C_SURFACE = "#161b27"
+C_CARD = "#1e2435"
+C_BORDER = "#2a3045"
+C_PRIMARY = "#4f6ef7"
+C_PRIMARY_H = "#6b84f8"
+C_SUCCESS = "#22c55e"
+C_DANGER = "#ef4444"
+C_WARNING = "#f59e0b"
+C_TEXT = "#e2e8f0"
+C_TEXT_SEC = "#8b95b0"
+C_TEXT_MUTED = "#4a5270"
+C_SIDEBAR = "#0c0f1a"
+C_NAV_HOVER = "#181d2e"
+C_NAV_ACTIVE = "#1e2a4a"
 
 TEAM_COLORS = {"A": "#ef4444", "B": "#3b82f6", "C": "#22c55e", "D": "#f59e0b"}
 
 
 # ─── 复用组件 ─────────────────────────────────────────────────────────────────
+
 
 class NavButton(QPushButton):
     def __init__(self, icon_text: str, label: str, parent=None) -> None:
@@ -59,7 +71,11 @@ class NavButton(QPushButton):
 
     def _refresh(self) -> None:
         checked = self.isChecked()
-        left = f"border-left: 3px solid {C_PRIMARY};" if checked else "border-left: 3px solid transparent;"
+        left = (
+            f"border-left: 3px solid {C_PRIMARY};"
+            if checked
+            else "border-left: 3px solid transparent;"
+        )
         bg = C_NAV_ACTIVE if checked else "transparent"
         color = C_TEXT if checked else C_TEXT_SEC
         self.setStyleSheet(f"""
@@ -119,11 +135,12 @@ class SectionLabel(QLabel):
 
 # ─── 主窗口 ───────────────────────────────────────────────────────────────────
 
+
 class MainWindow(QMainWindow):
-    COL_NODE_ID   = 0
-    COL_TYPE      = 1
-    COL_STATUS    = 2
-    COL_TEAM      = 3
+    COL_NODE_ID = 0
+    COL_TYPE = 1
+    COL_STATUS = 2
+    COL_TEAM = 3
     COL_HEARTBEAT = 4
     COLUMN_HEADERS = ["节点ID", "类型", "在线状态", "激活队伍", "最后心跳"]
 
@@ -149,7 +166,9 @@ class MainWindow(QMainWindow):
 
     def _setup_ui(self) -> None:
         root = QWidget()
-        root.setStyleSheet(f"background-color: {C_BG}; font-family: 'Segoe UI', 'Arial', sans-serif;")
+        root.setStyleSheet(
+            f"background-color: {C_BG}; font-family: 'Segoe UI', 'Arial', sans-serif;"
+        )
         self.setCentralWidget(root)
         root_layout = QHBoxLayout(root)
         root_layout.setContentsMargins(0, 0, 0, 0)
@@ -174,8 +193,13 @@ class MainWindow(QMainWindow):
 
         root_layout.addWidget(content, 1)
 
-        self._nav_buttons = [self._nav_nodes, self._nav_game_ctrl, self._nav_game_status, self._nav_manual]
-        self._page_titles  = ["节点监控", "游戏控制", "游戏状态", "紧急手动"]
+        self._nav_buttons = [
+            self._nav_nodes,
+            self._nav_game_ctrl,
+            self._nav_game_status,
+            self._nav_manual,
+        ]
+        self._page_titles = ["节点监控", "游戏控制", "游戏状态", "紧急手动"]
 
     def _build_sidebar(self) -> QFrame:
         sidebar = QFrame()
@@ -193,7 +217,9 @@ class MainWindow(QMainWindow):
         # Logo
         logo = QFrame()
         logo.setFixedHeight(64)
-        logo.setStyleSheet(f"border-bottom: 1px solid {C_BORDER}; background: transparent;")
+        logo.setStyleSheet(
+            f"border-bottom: 1px solid {C_BORDER}; background: transparent;"
+        )
         logo_row = QHBoxLayout(logo)
         logo_row.setContentsMargins(18, 0, 18, 0)
         lbl = QLabel("◈  CLUSTER")
@@ -231,7 +257,9 @@ class MainWindow(QMainWindow):
 
         # 底部连接状态 + 关机
         bottom = QFrame()
-        bottom.setStyleSheet(f"border-top: 1px solid {C_BORDER}; background: transparent;")
+        bottom.setStyleSheet(
+            f"border-top: 1px solid {C_BORDER}; background: transparent;"
+        )
         bottom_col = QVBoxLayout(bottom)
         bottom_col.setContentsMargins(18, 12, 18, 12)
         bottom_col.setSpacing(8)
@@ -239,7 +267,9 @@ class MainWindow(QMainWindow):
         conn_row = QHBoxLayout()
         self._conn_dot = StatusDot()
         self._conn_label = QLabel("等待连接")
-        self._conn_label.setStyleSheet(f"color: {C_TEXT_SEC}; font-size: 11px; background: transparent;")
+        self._conn_label.setStyleSheet(
+            f"color: {C_TEXT_SEC}; font-size: 11px; background: transparent;"
+        )
         conn_row.addWidget(self._conn_dot)
         conn_row.addSpacing(6)
         conn_row.addWidget(self._conn_label)
@@ -292,7 +322,9 @@ class MainWindow(QMainWindow):
         row.addWidget(self._page_title)
         row.addStretch()
         self._status_label = QLabel("等待连接...")
-        self._status_label.setStyleSheet(f"color: {C_TEXT_SEC}; font-size: 12px; background: transparent;")
+        self._status_label.setStyleSheet(
+            f"color: {C_TEXT_SEC}; font-size: 12px; background: transparent;"
+        )
         row.addWidget(self._status_label)
         return bar
 
@@ -308,9 +340,9 @@ class MainWindow(QMainWindow):
         # 统计卡片行
         stats_row = QHBoxLayout()
         stats_row.setSpacing(12)
-        self._stat_val_total   = self._stat_card(stats_row, "总节点",  "0", C_PRIMARY)
-        self._stat_val_online  = self._stat_card(stats_row, "在线",    "0", C_SUCCESS)
-        self._stat_val_offline = self._stat_card(stats_row, "离线",    "0", C_DANGER)
+        self._stat_val_total = self._stat_card(stats_row, "总节点", "0", C_PRIMARY)
+        self._stat_val_online = self._stat_card(stats_row, "在线", "0", C_SUCCESS)
+        self._stat_val_offline = self._stat_card(stats_row, "离线", "0", C_DANGER)
         stats_row.addStretch()
         layout.addLayout(stats_row)
 
@@ -336,16 +368,22 @@ class MainWindow(QMainWindow):
 
         return page
 
-    def _stat_card(self, parent_layout: QHBoxLayout, label: str, value: str, color: str) -> QLabel:
+    def _stat_card(
+        self, parent_layout: QHBoxLayout, label: str, value: str, color: str
+    ) -> QLabel:
         card = Card()
         card.setFixedSize(130, 76)
         cl = QVBoxLayout(card)
         cl.setContentsMargins(16, 10, 16, 10)
         cl.setSpacing(2)
         val_lbl = QLabel(value)
-        val_lbl.setStyleSheet(f"color: {color}; font-size: 26px; font-weight: bold; background: transparent;")
+        val_lbl.setStyleSheet(
+            f"color: {color}; font-size: 26px; font-weight: bold; background: transparent;"
+        )
         txt_lbl = QLabel(label)
-        txt_lbl.setStyleSheet(f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;")
+        txt_lbl.setStyleSheet(
+            f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;"
+        )
         cl.addWidget(val_lbl)
         cl.addWidget(txt_lbl)
         parent_layout.addWidget(card)
@@ -423,12 +461,18 @@ class MainWindow(QMainWindow):
         for label, attr, items in [
             ("装弹方", "_bomb_attacker_combo", ["A", "B", "C", "D"]),
             ("拆弹方", "_bomb_defender_combo", ["A", "B", "C", "D"]),
-            ("炸弹节点", "_bomb_node_input", ["DET01","DET02","DET03","DET04","DET05","DET06"]),
+            (
+                "炸弹节点",
+                "_bomb_node_input",
+                ["DET01", "DET02", "DET03", "DET04", "DET05", "DET06"],
+            ),
         ]:
             col = QVBoxLayout()
             col.setSpacing(4)
             col_lbl = QLabel(label)
-            col_lbl.setStyleSheet(f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;")
+            col_lbl.setStyleSheet(
+                f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;"
+            )
             combo = QComboBox()
             combo.addItems(items)
             combo.setFixedWidth(130)
@@ -527,7 +571,9 @@ class MainWindow(QMainWindow):
             row = QHBoxLayout()
             lbl = QLabel(f"队伍 {team}")
             lbl.setFixedWidth(56)
-            lbl.setStyleSheet(f"color: {TEAM_COLORS[team]}; font-size: 12px; font-weight: bold; background: transparent;")
+            lbl.setStyleSheet(
+                f"color: {TEAM_COLORS[team]}; font-size: 12px; font-weight: bold; background: transparent;"
+            )
             bar = QProgressBar()
             bar.setRange(0, 100)
             bar.setValue(0)
@@ -554,7 +600,9 @@ class MainWindow(QMainWindow):
         )
         self._bomb_unit_label = QLabel("秒")
         self._bomb_unit_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._bomb_unit_label.setStyleSheet(f"color: {C_TEXT_MUTED}; font-size: 14px; background: transparent;")
+        self._bomb_unit_label.setStyleSheet(
+            f"color: {C_TEXT_MUTED}; font-size: 14px; background: transparent;"
+        )
         self._bomb_progress = QProgressBar()
         self._bomb_progress.setRange(0, 40)
         self._bomb_progress.setValue(40)
@@ -608,43 +656,62 @@ class MainWindow(QMainWindow):
         """)
         warn_row = QHBoxLayout(warn_card)
         warn_row.setContentsMargins(16, 12, 16, 12)
-        warn_lbl = QLabel("⚠  紧急手动模式 — 点击任意按钮将立即中断当前音效队列并播放所选音效")
-        warn_lbl.setStyleSheet(f"color: {C_WARNING}; font-size: 12px; background: transparent;")
+        warn_lbl = QLabel(
+            "⚠  紧急手动模式 — 点击任意按钮将立即中断当前音效队列并播放所选音效"
+        )
+        warn_lbl.setStyleSheet(
+            f"color: {C_WARNING}; font-size: 12px; background: transparent;"
+        )
         warn_row.addWidget(warn_lbl)
         layout.addWidget(warn_card)
 
         # 按音效分组，每组一张卡
         groups = [
-            ("系统", [
-                ("sys_online",  "系统上线"),
-                ("sys_offline", "系统下线"),
-                ("game_started","游戏开始"),
-                ("game_stopped","游戏结束"),
-            ]),
-            ("队伍就绪", [
-                ("activated_A", "A 队就绪"),
-                ("activated_B", "B 队就绪"),
-                ("activated_C", "C 队就绪"),
-                ("activated_D", "D 队就绪"),
-            ]),
-            ("队伍淘汰", [
-                ("eliminated_A", "A 队淘汰"),
-                ("eliminated_B", "B 队淘汰"),
-                ("eliminated_C", "C 队淘汰"),
-                ("eliminated_D", "D 队淘汰"),
-            ]),
-            ("队伍胜利", [
-                ("victory_A",  "A 队胜利"),
-                ("victory_B",  "B 队胜利"),
-                ("victory_C",  "C 队胜利"),
-                ("victory_D",  "D 队胜利"),
-                ("victory_T",  "T 队胜利"),
-                ("victory_CT", "CT 队胜利"),
-            ]),
-            ("炸弹", [
-                ("bomb_activated", "炸弹激活"),
-                ("bomb_defused",   "炸弹拆除"),
-            ]),
+            (
+                "系统",
+                [
+                    ("sys_online", "系统上线"),
+                    ("sys_offline", "系统下线"),
+                    ("game_started", "游戏开始"),
+                    ("game_stopped", "游戏结束"),
+                ],
+            ),
+            (
+                "队伍就绪",
+                [
+                    ("activated_A", "A 队就绪"),
+                    ("activated_B", "B 队就绪"),
+                    ("activated_C", "C 队就绪"),
+                    ("activated_D", "D 队就绪"),
+                ],
+            ),
+            (
+                "队伍淘汰",
+                [
+                    ("eliminated_A", "A 队淘汰"),
+                    ("eliminated_B", "B 队淘汰"),
+                    ("eliminated_C", "C 队淘汰"),
+                    ("eliminated_D", "D 队淘汰"),
+                ],
+            ),
+            (
+                "队伍胜利",
+                [
+                    ("victory_A", "A 队胜利"),
+                    ("victory_B", "B 队胜利"),
+                    ("victory_C", "C 队胜利"),
+                    ("victory_D", "D 队胜利"),
+                    ("victory_T", "T 队胜利"),
+                    ("victory_CT", "CT 队胜利"),
+                ],
+            ),
+            (
+                "炸弹",
+                [
+                    ("bomb_activated", "炸弹激活"),
+                    ("bomb_defused", "炸弹拆除"),
+                ],
+            ),
         ]
 
         for group_name, items in groups:
@@ -693,6 +760,7 @@ class MainWindow(QMainWindow):
     @Slot()
     def _on_shutdown_clicked(self) -> None:
         from PySide6.QtWidgets import QApplication
+
         self._audio_player._queue.clear()
         self._audio_player.play_sys_offline()
         # 等音效播完再退出：监听 playing 结束
@@ -700,6 +768,7 @@ class MainWindow(QMainWindow):
         self._audio_player._effects  # 确保已加载
         # 用单次定时器轮询，避免在音效结束前退出
         from PySide6.QtCore import QTimer
+
         self._shutdown_timer = QTimer(self)
         self._shutdown_timer.setInterval(200)
         self._shutdown_timer.timeout.connect(self._check_shutdown)
@@ -709,6 +778,7 @@ class MainWindow(QMainWindow):
         if self._audio_player._current is None and not self._audio_player._queue:
             self._shutdown_timer.stop()
             from PySide6.QtWidgets import QApplication
+
             QApplication.quit()
 
     def _make_team_card(self, team: str, row: QHBoxLayout) -> dict:
@@ -723,7 +793,9 @@ class MainWindow(QMainWindow):
         dot = QLabel("●")
         dot.setStyleSheet(f"color: {color}; font-size: 16px; background: transparent;")
         name = QLabel(f"队伍 {team}")
-        name.setStyleSheet(f"color: {C_TEXT}; font-size: 14px; font-weight: bold; background: transparent;")
+        name.setStyleSheet(
+            f"color: {C_TEXT}; font-size: 14px; font-weight: bold; background: transparent;"
+        )
         name_row.addWidget(dot)
         name_row.addSpacing(4)
         name_row.addWidget(name)
@@ -731,21 +803,27 @@ class MainWindow(QMainWindow):
         fl.addLayout(name_row)
 
         status_lbl = QLabel("待机")
-        status_lbl.setStyleSheet(f"color: {C_TEXT_MUTED}; font-size: 12px; background: transparent;")
+        status_lbl.setStyleSheet(
+            f"color: {C_TEXT_MUTED}; font-size: 12px; background: transparent;"
+        )
         fl.addWidget(status_lbl)
         fl.addStretch()
 
         row.addWidget(frame)
         return {"frame": frame, "status_lbl": status_lbl, "color": color}
 
-    def _update_team_card(self, team: str, status_text: str, eliminated: bool = False) -> None:
+    def _update_team_card(
+        self, team: str, status_text: str, eliminated: bool = False
+    ) -> None:
         if team not in self._team_cards:
             return
         d = self._team_cards[team]
         lbl: QLabel = d["status_lbl"]
         if eliminated:
             lbl.setText("已淘汰")
-            lbl.setStyleSheet(f"color: {C_DANGER}; font-size: 12px; background: transparent;")
+            lbl.setStyleSheet(
+                f"color: {C_DANGER}; font-size: 12px; background: transparent;"
+            )
             d["frame"].setStyleSheet(f"""
                 QFrame {{
                     background-color: {C_CARD};
@@ -755,7 +833,9 @@ class MainWindow(QMainWindow):
             """)
         else:
             lbl.setText(status_text)
-            lbl.setStyleSheet(f"color: {d['color']}; font-size: 12px; background: transparent;")
+            lbl.setStyleSheet(
+                f"color: {d['color']}; font-size: 12px; background: transparent;"
+            )
             d["frame"].setStyleSheet(f"""
                 QFrame {{
                     background-color: {C_CARD};
@@ -768,7 +848,11 @@ class MainWindow(QMainWindow):
         if not self._game_manager:
             return
         nodes = self._node_manager.get_all_nodes()
-        online_det = sum(1 for nid, s in nodes.items() if nid.startswith("DET") and s.status == OnlineStatus.ONLINE)
+        online_det = sum(
+            1
+            for nid, s in nodes.items()
+            if nid.startswith("DET") and s.status == OnlineStatus.ONLINE
+        )
         if online_det == 0:
             return
         det_map: dict[str, str] = getattr(self._game_manager, "_det_activation", {})
@@ -1027,16 +1111,21 @@ class MainWindow(QMainWindow):
         self._status_label.setText(f"节点 {node_id} 激活 → 队伍 {team}")
         if self._game_manager:
             from game_manager import GameState
+
             if node_id.startswith("STA"):
                 was_idle = self._game_manager.game_state == GameState.IDLE
                 if was_idle:
                     self._audio_player.play_activated(team)
-                self._game_manager.on_sta_activated(node_id, team, self._node_manager.get_all_nodes())
+                self._game_manager.on_sta_activated(
+                    node_id, team, self._node_manager.get_all_nodes()
+                )
                 if was_idle:
                     self._update_team_card(team, "已激活")
             elif node_id.startswith("DET"):
                 self._audio_player.play_activated(team)
-                self._game_manager.on_det_activated(node_id, team, self._node_manager.get_all_nodes())
+                self._game_manager.on_det_activated(
+                    node_id, team, self._node_manager.get_all_nodes()
+                )
                 self._update_occupy_bars()
         else:
             self._audio_player.play_activated(team)
@@ -1103,7 +1192,11 @@ class MainWindow(QMainWindow):
     def _on_bomb_tick(self, remaining: int) -> None:
         self._bomb_timer_label.setText(str(remaining))
         self._bomb_progress.setValue(remaining)
-        color = C_DANGER if remaining <= 10 else (C_WARNING if remaining <= 20 else C_WARNING)
+        color = (
+            C_DANGER
+            if remaining <= 10
+            else (C_WARNING if remaining <= 20 else C_WARNING)
+        )
         self._bomb_timer_label.setStyleSheet(
             f"color: {color}; font-size: 56px; font-weight: bold; background: transparent;"
         )
@@ -1119,7 +1212,11 @@ class MainWindow(QMainWindow):
     def _on_start_game_clicked(self) -> None:
         from game_manager import GameManager, GameMode, BombConfig
 
-        mode_map = {"征服": GameMode.CONQUEST, "占领": GameMode.OCCUPY, "爆破": GameMode.BOMB}
+        mode_map = {
+            "征服": GameMode.CONQUEST,
+            "占领": GameMode.OCCUPY,
+            "爆破": GameMode.BOMB,
+        }
         mode = mode_map.get(self._current_mode, GameMode.CONQUEST)
         team_count = self._current_team_count
         participating_teams = [chr(ord("A") + i) for i in range(team_count)]
@@ -1133,7 +1230,9 @@ class MainWindow(QMainWindow):
                 self._bomb_node_input.currentText(),
             )
 
-        self._game_manager = GameManager(mode, team_count, participating_teams, self._event_bus, bomb_config)
+        self._game_manager = GameManager(
+            mode, team_count, participating_teams, self._event_bus, bomb_config
+        )
 
         for team in ["A", "B", "C", "D"]:
             if team in participating_teams:
