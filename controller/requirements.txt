@@ -1,4 +1,0 @@
-aiomqtt>=2.3.0
-amqtt>=0.11.0
-qasync>=0.27.1
-PySide6>=6.7.0

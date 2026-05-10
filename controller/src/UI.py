@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QFrame, QSizePolicy, QProgressBar,
 )
 
-from node_manager import OnlineStatus
+from .node_manager import OnlineStatus
 
 if TYPE_CHECKING:
     from node_manager import NodeManager, NodeState
