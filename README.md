@@ -73,28 +73,21 @@
 ## 快速开始
 
 ### 环境要求
-- Python 3.10+
+- Python 3.12+
 - PySide6 >= 6.7.0
 - aiomqtt >= 2.3.0
 - amqtt >= 0.11.0
 - qasync >= 0.27.1
 
-### 安装依赖
-```bash
-cd controller
-pip install -r requirements.txt
-```
-
 ### 运行
 ```bash
-cd controller/src
-python main.py
+uv run controller
 ```
 
 ### 测试消息
 ```bash
 cd controller
-python test/send_test_message.py
+uv run test/send_test_message.py
 ```
 
 ## 消息格式
@@ -135,7 +128,6 @@ Cluster/
 ├── mcu/                            # ESP8266 固件代码
 ├── README.md                       # 本文件
 ├── LICENSE                         # 开源协议
-└── .gitignore                      # Git 忽略规则
 ```
 
 ## 配置说明

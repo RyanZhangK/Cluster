@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import aiomqtt
 
-from config import MQTT_BROKER, MQTT_PORT, MQTT_QOS, MQTT_TOPIC_SUB, MSG_LENGTH, NODE_ID_LENGTH
+from .config import MQTT_BROKER, MQTT_PORT, MQTT_QOS, MQTT_TOPIC_SUB, MSG_LENGTH, NODE_ID_LENGTH
 
 if TYPE_CHECKING:
     from node_manager import NodeManager

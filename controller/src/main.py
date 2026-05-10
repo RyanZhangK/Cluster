@@ -7,13 +7,13 @@ from pathlib import Path
 import qasync
 from PySide6.QtWidgets import QApplication
 
-from config import LOG_DIR, EMBEDDED_BROKER
-from event_bus import EventBus
-from node_manager import NodeManager
-from mqtt_client import MQTTClient
-from audio_player import AudioPlayer
-from embedded_broker import EmbeddedBroker
-from UI import MainWindow
+from .config import LOG_DIR, EMBEDDED_BROKER
+from .event_bus import EventBus
+from .node_manager import NodeManager
+from .mqtt_client import MQTTClient
+from .audio_player import AudioPlayer
+from .embedded_broker import EmbeddedBroker
+from .UI import MainWindow
 
 
 def setup_logging() -> None:
