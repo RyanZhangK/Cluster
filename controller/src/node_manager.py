@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from config import HEARTBEAT_TIMEOUT, WATCHDOG_INTERVAL
+from .config import HEARTBEAT_TIMEOUT, WATCHDOG_INTERVAL
 
 logger = logging.getLogger(__name__)
 

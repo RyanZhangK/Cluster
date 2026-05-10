@@ -5,7 +5,7 @@ from pathlib import Path
 from PySide6.QtCore import QUrl, QObject, Slot
 from PySide6.QtMultimedia import QSoundEffect
 
-from config import AUDIO_DIR, AUDIO_FILES
+from .config import AUDIO_DIR, AUDIO_FILES
 
 logger = logging.getLogger(__name__)
 

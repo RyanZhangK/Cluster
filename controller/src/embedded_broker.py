@@ -3,7 +3,7 @@ import logging
 
 from amqtt.broker import Broker
 
-from config import BROKER_BIND_HOST, BROKER_BIND_PORT
+from .config import BROKER_BIND_HOST, BROKER_BIND_PORT
 
 logger = logging.getLogger(__name__)
 
