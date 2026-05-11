@@ -1,6 +1,6 @@
 PKG_NAME        := cluster
 PKG_VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || uv run python -c "import toml; print(\"v%s\" % (toml.load('pyproject.toml')['project']['version']))")
-PKG_VERSION     ?= 0.1.0
+PKG_VERSION     ?= v0.1.0
 PKG_MAINTAINER  := "RyanZ <ryanzzzz@foxmail.com>"
 PKG_DESCRIPTION := "MQTT 节点管理与游戏控制系统（征服/占领/爆破三模式）"
 PKG_URL         := "https://github.com/RyanZhangK/Cluster"

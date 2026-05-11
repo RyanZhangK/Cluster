@@ -48,7 +48,6 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-          # 去掉 tag 前缀 v
           export VERSION="${VERSION#v}"
           bash build/build.sh
 

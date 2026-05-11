@@ -1,8 +1,8 @@
 import logging
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, Slot, QPropertyAnimation, QEasingCurve, QSize
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -17,16 +17,13 @@ from PySide6.QtWidgets import (
     QComboBox,
     QStackedWidget,
     QFrame,
-    QSizePolicy,
     QProgressBar,
 )
 
 from .node_manager import OnlineStatus
 
 if TYPE_CHECKING:
-    from node_manager import NodeManager, NodeState
-    from event_bus import EventBus
-    from audio_player import AudioPlayer
+    from node_manager import NodeState
     from game_manager import GameManager
 
 logger = logging.getLogger(__name__)
@@ -759,7 +756,6 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_shutdown_clicked(self) -> None:
-        from PySide6.QtWidgets import QApplication
 
         self._audio_player._queue.clear()
         self._audio_player.play_sys_offline()

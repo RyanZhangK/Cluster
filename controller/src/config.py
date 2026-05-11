@@ -1,3 +1,5 @@
+from pathlib import Path as _Path
+
 # MQTT 配置
 MQTT_BROKER = "127.0.0.1"
 MQTT_PORT = 1883
@@ -19,8 +21,6 @@ WATCHDOG_INTERVAL = 30  # 秒，看门狗检查间隔
 MSG_LENGTH = 7
 NODE_ID_LENGTH = 5
 
-from pathlib import Path as _Path
-import os as _os
 
 # 路径：已安装时用系统路径，开发环境用相对路径
 _INSTALLED_AUDIO = _Path("/usr/share/cluster/audio")
