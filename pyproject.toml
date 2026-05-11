@@ -20,3 +20,6 @@ package = true
 
 [tool.setuptools.packages.find]
 include = ["controller"]
+
+[tool.pyright]
+extraPaths = ["controller/src"]

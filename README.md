@@ -86,8 +86,7 @@ uv run controller
 
 ### 测试消息
 ```bash
-cd controller
-uv run test/send_test_message.py
+uv run controller/test/send_test_message.py
 ```
 
 ## 消息格式
@@ -123,8 +122,7 @@ Cluster/
 │   │   │   └── audio/              # 音效文件目录
 │   │   └── log/                    # 日志输出目录
 │   ├── test/
-│   │   └── send_test_message.py    # MQTT 测试脚本
-│   └── requirements.txt            # Python 依赖
+│       └── send_test_message.py    # MQTT 测试脚本
 ├── mcu/                            # ESP8266 固件代码
 ├── README.md                       # 本文件
 ├── LICENSE                         # 开源协议
