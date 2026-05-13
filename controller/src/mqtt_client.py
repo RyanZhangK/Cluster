@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import aiomqtt
 
 from .config import (
+    BROKER_READY,
     MQTT_BROKER,
     MQTT_PORT,
     MQTT_QOS,
@@ -14,8 +15,8 @@ from .config import (
 )
 
 if TYPE_CHECKING:
-    from node_manager import NodeManager
     from event_bus import EventBus
+    from node_manager import NodeManager
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,12 @@ class MQTTClient:
         主循环：连接 Broker → 订阅 → 持续接收消息。
         连接失败时等待 5 秒后重试，永不退出。
         """
+        try:
+            async with asyncio.timeout(5):
+               await BROKER_READY.wait()
+        except TimeoutError:
+            pass
+
         while True:
             try:
                 async with aiomqtt.Client(MQTT_BROKER, MQTT_PORT) as client:

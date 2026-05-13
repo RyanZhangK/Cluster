@@ -1,3 +1,4 @@
+from asyncio import Event
 from pathlib import Path as _Path
 
 # MQTT 配置
@@ -21,6 +22,7 @@ WATCHDOG_INTERVAL = 30  # 秒，看门狗检查间隔
 MSG_LENGTH = 7
 NODE_ID_LENGTH = 5
 
+BROKER_READY = Event()
 
 # 路径：已安装时用系统路径，开发环境用相对路径
 _INSTALLED_AUDIO = _Path("/usr/share/cluster/audio")
