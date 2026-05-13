@@ -3,7 +3,7 @@ import logging
 
 from amqtt.broker import Broker
 
-from .config import BROKER_BIND_HOST, BROKER_BIND_PORT
+from .config import BROKER_BIND_HOST, BROKER_BIND_PORT, BROKER_READY
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ class EmbeddedBroker:
         self._broker = Broker(config)
         try:
             await self._broker.start()
+            BROKER_READY.set()
             logger.info(
                 f"内嵌 MQTT Broker 已启动: {BROKER_BIND_HOST}:{BROKER_BIND_PORT}"
             )
@@ -56,6 +57,7 @@ class EmbeddedBroker:
             logger.error(f"内嵌 Broker 启动失败: {e}")
             raise
         finally:
+            BROKER_READY.clear()
             if self._broker is not None:
                 try:
                     await self._broker.shutdown()
