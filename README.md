@@ -73,11 +73,7 @@
 ## 快速开始
 
 ### 环境要求
-- Python 3.12+
-- PySide6 >= 6.7.0
-- aiomqtt >= 2.3.0
-- amqtt >= 0.11.0
-- qasync >= 0.27.1
+Python 3.12+
 
 ### 运行
 ```bash
