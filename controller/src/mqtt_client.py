@@ -75,9 +75,9 @@ class MQTTClient:
         """
         try:
             async with asyncio.timeout(5):
-               await BROKER_READY.wait()
-        except TimeoutError:
-            pass
+                await BROKER_READY.wait()
+        except TimeoutError as e:
+            logger.warning(f"MQTT 连接超时: {e}", e)
 
         while True:
             try:
