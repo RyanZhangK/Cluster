@@ -27,9 +27,11 @@ clean:
 compile: 
 	@echo "==> Nuitka 编译开始..."
 	@mkdir -p $(DIST_DIR)
-	cd $(SRC_DIR) && uvx nuitka \
+	uv sync --locked
+	cd $(SRC_DIR) && uv run python -m nuitka \
 		--enable-plugin=pyside6 \
 		--standalone \
+		--static-libpython=yes \
 		--include-package=amqtt \
 		--include-data-dir=resources/audio=resources/audio \
 		--output-dir=$(DIST_DIR) \

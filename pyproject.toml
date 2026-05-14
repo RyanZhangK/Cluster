@@ -1,6 +1,6 @@
 [project]
 name = "Cluster"
-version = "0.9.1"
+version = "0.9.2"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -23,3 +23,8 @@ include = ["controller"]
 
 [tool.pyright]
 extraPaths = ["controller/src"]
+
+[dependency-groups]
+dev = [
+    "nuitka>=4.1",
+]
