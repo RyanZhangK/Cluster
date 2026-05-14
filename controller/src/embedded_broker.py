@@ -18,12 +18,13 @@ def _build_config() -> dict:
                 "max_connections": 100,
             }
         },
-        "sys_interval": 0,
-        "auth": {
-            "allow-anonymous": True,
-        },
-        "topic-check": {
-            "enabled": False,
+        "plugins": {
+            "amqtt.plugins.authentication.AnonymousAuthPlugin": {
+                "allow_anonymous": True
+            },
+            "amqtt.plugins.sys.broker.BrokerSysPlugin": {
+                "sys_interval": 0,
+            },
         },
     }
 
