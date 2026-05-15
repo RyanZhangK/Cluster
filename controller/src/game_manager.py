@@ -61,7 +61,7 @@ class GameManager(QObject):
             f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}"
         )
 
-    def on_sta_activated(self, node_id: str, team: str, nodes: dict) -> None:
+    def on_sta_activated(self, node_id: str, team: str, _: dict) -> None:
         """STA 节点激活时调用。"""
         if self._game_state == GameState.IDLE:
             # 开始阶段：记录节点↔队伍映射
@@ -96,6 +96,7 @@ class GameManager(QObject):
             self._check_occupy_victory(nodes)
 
         elif self.mode == GameMode.BOMB:
+            assert self.bomb_config is not None
             # 爆破模式：检查是否是炸弹节点
             if node_id == self.bomb_config.bomb_node_id:
                 if team == self.bomb_config.attacker_team:
@@ -105,12 +106,13 @@ class GameManager(QObject):
                     # 拆弹方拆除炸弹
                     self._defuse_bomb()
 
-    def on_node_went_offline(self, node_id: str, state: "NodeState") -> None:
+    def on_node_went_offline(self, node_id: str, _: "NodeState") -> None:
         """节点离线时调用。"""
         if self._game_state != GameState.RUNNING:
             return
 
         # 爆破模式：如果炸弹节点离线，取消倒计时
+        assert self.bomb_config is not None
         if self.mode == GameMode.BOMB and node_id == self.bomb_config.bomb_node_id:
             if self._bomb_task and not self._bomb_task.done():
                 self._bomb_task.cancel()
@@ -151,7 +153,7 @@ class GameManager(QObject):
 
         # 统计各队伍激活的 DET 节点数
         team_det_count = {}
-        for node_id, team in self._det_activation.items():
+        for _, team in self._det_activation.items():
             team_det_count[team] = team_det_count.get(team, 0) + 1
 
         # 检查是否有队伍超过半数
@@ -183,6 +185,7 @@ class GameManager(QObject):
             # 倒计时结束，T 队胜利
             logger.info("炸弹倒计时结束，T 队胜利")
             self._event_bus.bomb_exploded.emit()
+            assert self.bomb_config is not None
             self._end_game(self.bomb_config.attacker_team)
         except asyncio.CancelledError:
             logger.info("炸弹倒计时已取消")
@@ -194,6 +197,7 @@ class GameManager(QObject):
             self._bomb_task = None
         logger.info("炸弹已拆除，CT 队胜利")
         self._event_bus.bomb_defused.emit()
+        assert self.bomb_config is not None
         self._end_game(self.bomb_config.defender_team)
 
     def _end_game(self, winner: str) -> None:

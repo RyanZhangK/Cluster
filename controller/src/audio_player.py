@@ -2,7 +2,7 @@ import logging
 from collections import deque
 from pathlib import Path
 
-from PySide6.QtCore import QUrl, QObject
+from PySide6.QtCore import QObject, QUrl
 from PySide6.QtMultimedia import QSoundEffect
 
 from .config import AUDIO_DIR, AUDIO_FILES

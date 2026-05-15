@@ -5,8 +5,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from .event_bus import EventBus
 from .config import HEARTBEAT_TIMEOUT, WATCHDOG_INTERVAL
+from .event_bus import EventBus
 
 logger = logging.getLogger(__name__)
 
