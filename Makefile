@@ -13,6 +13,10 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 NUITKA_OUT      := $(DIST_DIR)/main.dist
 
+ARCH_NAME := $(shell uname -m)
+DEB_ARCH   := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
+PAC_ARCH   := $(ARCH_NAME)
+
 INSTALL_BIN     := /usr/local/bin/$(PKG_NAME)
 INSTALL_SHARE   := /usr/local/share/$(PKG_NAME)
 INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
@@ -70,18 +74,21 @@ stage:
 FPM_OPTS := -s dir -C $(STAGE_DIR) -n $(PKG_NAME) -v $(PKG_VERSION) \
             --maintainer $(PKG_MAINTAINER) --description $(PKG_DESCRIPTION) \
             --url $(PKG_URL) --prefix /
+
 deb: 
 	@echo "==> 构建 DEB 包..."
 	@mkdir -p $(PKG_DIR)
 	fpm $(FPM_OPTS) -t deb \
 		--depends libgl1 --depends libegl1 --depends libasound2 \
 		--deb-no-default-config-files \
-		-p $(PKG_DIR)/$(PKG_NAME)_$(PKG_VERSION)_amd64.deb .
+		-p $(PKG_DIR)/$(PKG_NAME)_$(PKG_VERSION)_$(DEB_ARCH).deb .
+
 pacman: 
 	@echo "==> 构建 Pacman 包..."
 	@mkdir -p $(PKG_DIR)
 	fpm $(FPM_OPTS) -t pacman \
 		--depends qt6-base --depends alsa-lib \
-		-p $(PKG_DIR)/$(PKG_NAME)-$(PKG_VERSION)-1-x86_64.pkg.tar.zst .
+		-p $(PKG_DIR)/$(PKG_NAME)-$(PKG_VERSION)-1-$(PAC_ARCH).pkg.tar.zst .
+
 help: 
 	@grep -E '^[a-zA-Z_-]+:.*?
