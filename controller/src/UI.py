@@ -4,27 +4,27 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTableWidget,
-    QTableWidgetItem,
-    QPushButton,
-    QLabel,
-    QHeaderView,
     QAbstractItemView,
     QComboBox,
-    QStackedWidget,
     QFrame,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
     QProgressBar,
+    QPushButton,
+    QStackedWidget,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
 
 from .node_manager import OnlineStatus
 
 if TYPE_CHECKING:
-    from node_manager import NodeState
     from game_manager import GameManager
+    from node_manager import NodeState
 
 logger = logging.getLogger(__name__)
 
@@ -150,6 +150,10 @@ class MainWindow(QMainWindow):
         self._current_mode = "征服"
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
+
+        self._bomb_attacker_combo = QComboBox()
+        self._bomb_defender_combo = QComboBox()
+        self._bomb_node_input = QComboBox()
 
         self.setWindowTitle("Cluster 节点管理系统")
         self.setGeometry(100, 100, 1320, 800)
@@ -760,7 +764,7 @@ class MainWindow(QMainWindow):
         self._audio_player._queue.clear()
         self._audio_player.play_sys_offline()
         # 等音效播完再退出：监听 playing 结束
-        self.__shutdown_pending = True
+        # self.__shutdown_pending = True
         self._audio_player._effects  # 确保已加载
         # 用单次定时器轮询，避免在音效结束前退出
         from PySide6.QtCore import QTimer
@@ -1206,7 +1210,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_start_game_clicked(self) -> None:
-        from game_manager import GameManager, GameMode, BombConfig
+        from game_manager import BombConfig, GameManager, GameMode
 
         mode_map = {
             "征服": GameMode.CONQUEST,
