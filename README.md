@@ -111,6 +111,7 @@ MQTT 消息格式：7 字节 ASCII
 ```
 Cluster/
 ├── controller/
+│   ├── log/                        # 日志输出目录
 │   ├── src/
 │   │   ├── main.py                 # 应用入口
 │   │   ├── UI.py                   # PySide6 UI 界面
@@ -120,10 +121,9 @@ Cluster/
 │   │   ├── embedded_broker.py      # 内嵌 MQTT Broker
 │   │   ├── audio_player.py         # 音效播放队列
 │   │   ├── event_bus.py            # 信号总线
-│   │   ├── config.py               # 配置文件
+│   │   ├── config.py               # Controller配置
 │   │   ├── resources/
-│   │   │   └── audio/              # 音效文件目录
-│   │   └── log/                    # 日志输出目录
+│   │       └── audio/              # 音效文件目录
 │   ├── test/
 │       └── send_test_message.py    # MQTT 测试脚本
 ├── mcu/                            # ESP8266 固件代码
@@ -133,7 +133,7 @@ Cluster/
 
 ## 配置说明
 
-编辑 `controller/src/config.py`：
+编辑 `config.toml`：
 
 ```python
 # MQTT 配置
@@ -153,7 +153,7 @@ WATCHDOG_INTERVAL = 30   # 秒
 
 ## 日志
 
-日志文件位于 `controller/src/log/controller.log`，按天滚动保留 7 天。
+日志文件位于 `controller/log/controller.log.*`，按天滚动保留 7 天。
 
 ## 开发指南
 
