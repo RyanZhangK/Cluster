@@ -1,3 +1,5 @@
+import logging
+import tomllib
 from asyncio import Event
 from pathlib import Path as _Path
 
@@ -65,3 +67,22 @@ AUDIO_FILES = {
     "bomb_activated": "BOOM_PLANTED.wav",
     "bomb_defused": "BOOM_DEFUSED.wav",
 }
+
+_LOCAL_CONFIG_PATH = _Path(__file__).parent.parent.parent / "config.toml"
+logger = logging.getLogger(__name__)
+
+if _LOCAL_CONFIG_PATH.exists() and tomllib:
+    try:
+        with open(_LOCAL_CONFIG_PATH, "rb") as f:
+            _local_data = tomllib.load(f)
+        _current_globals = globals()
+        for _key, _value in _local_data.items():
+            if _key in _current_globals and _key.isupper():
+                if isinstance(_current_globals[_key], dict) and isinstance(
+                    _value, dict
+                ):
+                    _current_globals[_key].update(_value)
+                else:
+                    _current_globals[_key] = _value
+    except Exception as e:
+        logger.warning(f"config.toml解析失败: {e}")

@@ -18,7 +18,7 @@ from .UI import MainWindow
 
 def setup_logging() -> None:
     """配置日志：TimedRotatingFileHandler 写入 log/ 目录，按天滚动。"""
-    log_dir = Path(__file__).parent / LOG_DIR
+    log_dir = Path(__file__).parent.parent / LOG_DIR
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / "controller.log"
 
