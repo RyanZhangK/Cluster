@@ -4,31 +4,38 @@
 
 ## 系统架构
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Controller (主控)                     │
-├─────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  MQTT Broker │  │ Node Manager │  │ Game Manager │  │
-│  │  (amqtt)     │  │  (内存缓存)   │  │  (状态机)    │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-│         ↑                  ↑                  ↑          │
-│         └──────────────────┴──────────────────┘          │
-│                    EventBus (信号总线)                   │
-│         ┌──────────────────┬──────────────────┐          │
-│         ↓                  ↓                  ↓          │
-│    ┌─────────┐        ┌─────────┐      ┌──────────┐    │
-│    │   UI    │        │  Audio  │      │   MQTT   │    │
-│    │(PySide6)│        │ Player  │      │  Client  │    │
-│    └─────────┘        └─────────┘      └──────────┘    │
-└─────────────────────────────────────────────────────────┘
-         ↓                                      ↓
-    ┌─────────────────────────────────────────────────┐
-    │         ESP8266 节点网络 (MQTT)                 │
-    │  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-    │  │  STA01   │  │  STA02   │  │  DET01   │ ...  │
-    │  └──────────┘  └──────────┘  └──────────┘      │
-    └─────────────────────────────────────────────────┘
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+graph TD
+    %% 去掉你原来的 classDef，或者改成深色系
+    subgraph Controller ["Controller (主控)"]
+        MQTT_B["MQTT Broker<br>(amqtt)"]
+        Node_M["Node Manager<br>(内存缓存)"]
+        Game_M["Game Manager<br>(状态机)"]
+        
+        EventBus{{"EventBus (信号总线)"}}
+        
+        UI["UI<br>(PySide6)"]
+        Audio["Audio<br>Player"]
+        MQTT_C["MQTT<br>Client"]
+        
+        MQTT_B & Node_M & Game_M <--> EventBus
+        EventBus <--> UI & Audio & MQTT_C
+    end
+
+    subgraph ESP ["ESP8266 节点网络 (MQTT)"]
+        direction LR
+
+        STA01["STA01"]
+        STA02["STA02"]
+        DET01["DET01"]
+        More["..."]
+
+        STA01 --- STA02 --- DET01 --- More
+    end
+
+    UI --> ESP
+    MQTT_C --> ESP
 ```
 
 ## 功能特性
@@ -174,3 +181,4 @@ WATCHDOG_INTERVAL = 30   # 秒
 
 - 项目维护者：RyanZ
 - 邮箱：[ryanzzzz@foxmail.com]
+
