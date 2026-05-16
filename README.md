@@ -165,7 +165,7 @@ WATCHDOG_INTERVAL = 30   # 秒
 
 ### 添加新的音效
 
-1. 将音效文件放入 `controller/src/resources/audio/`
+1. 将音效文件放入 `controller/resources/audio/`
 2. 在 `config.py` 的 `AUDIO_FILES` 中添加映射
 3. 在 `audio_player.py` 中添加对应的 `play_*()` 方法
 

@@ -39,7 +39,7 @@ compile:
 		--standalone \
 		--static-libpython=yes \
 		--include-package=amqtt \
-		--include-data-dir=resources/audio=resources/audio \
+		--include-data-dir=../resources/audio=resources/audio \
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \

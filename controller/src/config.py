@@ -33,7 +33,7 @@ if _INSTALLED_AUDIO.exists():
     # 已安装：日志写到用户家目录
     LOG_DIR = str(_Path.home() / ".local" / "share" / "cluster" / "log")
 else:
-    AUDIO_DIR = str(_Path(__file__).parent / "resources" / "audio")
+    AUDIO_DIR = str(_Path(__file__).parent.parent / "resources" / "audio")
     # 开发环境：日志写到相对路径
     LOG_DIR = "log"
 
