@@ -13,9 +13,9 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 NUITKA_OUT      := $(DIST_DIR)/main.dist
 
-ARCH_NAME := $(shell uname -m)
-DEB_ARCH   := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
-PAC_ARCH   := $(ARCH_NAME)
+ARCH_NAME       := $(shell uname -m)
+DEB_ARCH        := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
+PAC_ARCH        := $(ARCH_NAME)
 
 INSTALL_BIN     := /usr/local/bin/$(PKG_NAME)
 INSTALL_SHARE   := /usr/local/share/$(PKG_NAME)
@@ -23,11 +23,13 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all clean compile stage deb pacman help
+.PHONY: all clean compile stage deb pacman
 all: clean compile stage deb pacman 
+
 clean: 
 	@echo "==> 清理旧产物..."
 	rm -rf $(BUILD_DIR)
+
 compile: 
 	@echo "==> Nuitka 编译开始..."
 	@mkdir -p $(DIST_DIR)
@@ -42,6 +44,7 @@ compile:
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
 		main.py
+
 stage: 
 	@echo "==> 组装 Stage 目录..."
 	@rm -rf $(STAGE_DIR)
@@ -89,6 +92,3 @@ pacman:
 	fpm $(FPM_OPTS) -t pacman \
 		--depends qt6-base --depends alsa-lib \
 		-p $(PKG_DIR)/$(PKG_NAME)-$(PKG_VERSION)-1-$(PAC_ARCH).pkg.tar.zst .
-
-help: 
-	@grep -E '^[a-zA-Z_-]+:.*?

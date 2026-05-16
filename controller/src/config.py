@@ -25,7 +25,7 @@ NODE_ID_LENGTH = 5
 BROKER_READY = Event()
 
 # 路径：已安装时用系统路径，开发环境用相对路径
-_INSTALLED_AUDIO = _Path("/usr/share/cluster/audio")
+_INSTALLED_AUDIO = _Path("/usr/local/share/cluster/audio")
 if _INSTALLED_AUDIO.exists():
     AUDIO_DIR = str(_INSTALLED_AUDIO)
     # 已安装：日志写到用户家目录
