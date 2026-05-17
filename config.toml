@@ -1,19 +1,20 @@
-[mqtt]
-broker = "127.0.0.1"
-port = 1883
-qos = 1
-topic_sub = "node/status"
-topic_pub = "node/{node_id}/status"
+# [mqtt]
+# broker = "127.0.0.1"
+# port = 1883
+# qos = 1
+# topic_sub = "node/status"
+# topic_pub = "node/{node_id}/status"
 
-[broker]
-enabled = true
-bind_host = "0.0.0.0"
-bind_port = 1883
+# [broker]
+# enabled = true
+# bind_host = "0.0.0.0"
+# bind_port = 1883
 
-[game]
-heartbeat_timeout = 600
-watchdog_interval = 30
+# [game]
+# heartbeat_timeout = 600
+# watchdog_interval = 30
+# ui_hot_reload = false
 
-[message]
-msg_length = 7
-node_id_length = 5
+# [message]
+# msg_length = 7
+# node_id_length = 5
