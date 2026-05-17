@@ -13,6 +13,7 @@ dist/
 *.swp
 *.swo
 .DS_Store
+.claude
 
 # controller
 controller/log/

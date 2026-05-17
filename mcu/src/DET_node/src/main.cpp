@@ -21,12 +21,12 @@ byte colPins[COLS] = {D5, D6, D7, D8}; // 列引脚(输入，内部上拉)
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /******************** 网络配置 ********************/
-#define WIFI_SSID "AL210#AuTHoR"
-#define WIFI_PASSWORD "11110000"
+#define WIFI_SSID "208207"
+#define WIFI_PASSWORD "1234567890"
 
 /******************** MQTT配置 ********************/
-#define MQTT_SERVER "broker.hivemq.com"
-#define MQTT_PORT 1883
+#define MQTT_SERVER "182.92.87.183"
+#define MQTT_PORT 9000  
 #define MQTT_TOPIC "node/status"
 #define MQTT_USER "nodeuser"
 #define MQTT_PASSWORD "nodeuserpassword"
@@ -37,7 +37,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /******************** 报文配置 ********************/
 #define HEARTBEAT_CODE "H0"  // 心跳报文后缀
-#define ACTIVATION_CODE "7355608" // 激活验证码
+#define ACTIVATION_CODE "000" // 激活验证码
 
 // 全局变量
 WiFiClient espClient;
