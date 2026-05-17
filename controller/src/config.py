@@ -36,7 +36,6 @@ class GameSettings(BaseSettings):
 
     heartbeat_timeout: int = 600  # 秒，节点心跳超时时间
     watchdog_interval: int = 30  # 秒，看门狗检查间隔
-    ui_hot_reload: bool = True
 
 
 class MessageSettings(BaseSettings):
@@ -61,7 +60,6 @@ class Settings(BaseSettings):
         toml_file="config.toml",
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False,
     )
 
     @classmethod
@@ -101,7 +99,6 @@ BROKER_BIND_PORT = settings.broker.bind_port
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = settings.game.heartbeat_timeout
 WATCHDOG_INTERVAL = settings.game.watchdog_interval
-UI_HOT_RELOAD = settings.game.ui_hot_reload
 
 # 消息格式
 MSG_LENGTH = settings.message.msg_length

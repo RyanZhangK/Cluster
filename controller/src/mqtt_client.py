@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import aiomqtt
 
-from .config import (
+from controller.src.config import (
     BROKER_READY,
     MQTT_BROKER,
     MQTT_PORT,
