@@ -23,8 +23,14 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all clean compile stage deb pacman
+.PHONY: all dev lint clean compile stage deb pacman bump
 all: clean compile stage deb pacman 
+
+dev:
+	uv run controller
+
+lint:
+	uvx ruff check . && uvx ruff format --check .
 
 clean: 
 	@echo "==> 清理旧产物..."
@@ -92,3 +98,6 @@ pacman:
 	fpm $(FPM_OPTS) -t pacman \
 		--depends qt6-base --depends alsa-lib \
 		-p $(PKG_DIR)/$(PKG_NAME)-$(PKG_VERSION)-1-$(PAC_ARCH).pkg.tar.zst .
+
+bump:
+	uvx bump-my-version bump patch
