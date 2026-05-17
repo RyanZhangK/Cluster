@@ -13,7 +13,6 @@
 # [game]
 # heartbeat_timeout = 600
 # watchdog_interval = 30
-# ui_hot_reload = false
 
 # [message]
 # msg_length = 7

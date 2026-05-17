@@ -23,7 +23,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all dev lint hot clean compile stage deb pacman bump
+.PHONY: all dev lint clean compile stage deb pacman bump
 all: clean compile stage deb pacman 
 
 dev:
@@ -32,27 +32,26 @@ dev:
 lint:
 	uvx ruff check . && uvx ruff format --check .
 
-hot:
-	CLUSTER_GAME__UI_HOT_RELOAD=true uv run controller
-
 clean: 
 	@echo "==> 清理旧产物..."
 	rm -rf $(BUILD_DIR)
 
-compile: 
+compile:
 	@echo "==> Nuitka 编译开始..."
 	@mkdir -p $(DIST_DIR)
 	uv sync --locked
-	cd $(SRC_DIR) && uv run python -m nuitka \
+	PYTHONPATH=$(shell pwd) uv run python -m nuitka \
 		--enable-plugin=pyside6 \
 		--standalone \
 		--static-libpython=yes \
 		--include-package=amqtt \
-		--include-data-dir=../resources/audio=resources/audio \
+		--include-package=controller \
+		--follow-imports \
+		--include-data-dir=$(SRC_DIR)/../resources/audio=resources/audio \
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
-		--main=main.py
+		--main=$(SRC_DIR)/main.py
 
 stage: 
 	@echo "==> 组装 Stage 目录..."
