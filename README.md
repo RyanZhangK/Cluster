@@ -84,12 +84,18 @@ Python 3.12+
 
 ### 运行
 ```bash
-uv run controller
+make dev # uv run controller
 ```
 
 ### 测试消息
 ```bash
 uv run controller/test/send_test_message.py
+```
+
+### Pre-Commit安装
+```bash
+uv sync
+uv run pre-commit install
 ```
 
 ## 消息格式
@@ -133,7 +139,7 @@ Cluster/
 
 ## 配置说明
 
-编辑 `config.toml`：
+编辑 `config.toml` （支持.env和系统环境变量）：
 
 ```python
 # MQTT 配置
