@@ -76,7 +76,7 @@ stage:
 	@echo "[Desktop Entry]" > $(STAGE_DIR)$(INSTALL_DESKTOP)
 	@echo "Name=Cluster" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
 	@echo "Comment=$(PKG_DESCRIPTION)" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
-	@echo "Exec=$(PKG_NAME)" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
+	@echo "Exec=bash -c \"$(INSTALL_BIN) &\"" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
 	@echo "Icon=$(PKG_NAME)" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
 	@echo "Terminal=false" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
 	@echo "Type=Application" >> $(STAGE_DIR)$(INSTALL_DESKTOP)
