@@ -1,32 +1,111 @@
 import logging
-import tomllib
 from asyncio import Event
 from pathlib import Path as _Path
 
+from pydantic import Field
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class MQTTSettings(BaseSettings):
+    """MQTT 配置"""
+
+    broker: str = "127.0.0.1"
+    port: int = 1883
+    qos: int = 1
+    topic_sub: str = "node/status"
+    topic_pub: str = "node/{node_id}/status"
+
+
+class BrokerSettings(BaseSettings):
+    """内嵌 Broker 配置"""
+
+    # 业务环境同样启用，外部访问通过 frp 反代实现
+    enabled: bool = True
+    bind_host: str = "0.0.0.0"  # 监听所有网卡，便于 frp 反代和局域网访问
+    bind_port: int = 1883
+
+
+class GameSettings(BaseSettings):
+    """心跳与看门狗"""
+
+    heartbeat_timeout: int = 600  # 秒，节点心跳超时时间
+    watchdog_interval: int = 30  # 秒，看门狗检查间隔
+
+
+class MessageSettings(BaseSettings):
+    """消息格式"""
+
+    msg_length: int = 7
+    node_id_length: int = 5
+
+
+class Settings(BaseSettings):
+    """Cluster 主配置类"""
+
+    mqtt: MQTTSettings = Field(default_factory=MQTTSettings)
+    broker: BrokerSettings = Field(default_factory=BrokerSettings)
+    game: GameSettings = Field(default_factory=GameSettings)
+    message: MessageSettings = Field(default_factory=MessageSettings)
+
+    model_config = SettingsConfigDict(
+        env_prefix="CLUSTER_",
+        env_nested_delimiter="__",
+        extra="ignore",
+        toml_file="config.toml",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        from pydantic_settings import TomlConfigSettingsSource
+
+        return (
+            init_settings,  # 默认值
+            TomlConfigSettingsSource(settings_cls),
+            env_settings,  # config.toml
+            dotenv_settings,  # .env
+            file_secret_settings,
+        )
+
+
+settings = Settings()
+
 # MQTT 配置
-MQTT_BROKER = "127.0.0.1"
-MQTT_PORT = 1883
-MQTT_QOS = 1
-MQTT_TOPIC_SUB = "node/status"
-MQTT_TOPIC_PUB = "node/{node_id}/status"
+MQTT_BROKER = settings.mqtt.broker
+MQTT_PORT = settings.mqtt.port
+MQTT_QOS = settings.mqtt.qos
+MQTT_TOPIC_SUB = settings.mqtt.topic_sub
+MQTT_TOPIC_PUB = settings.mqtt.topic_pub
 
 # 内嵌 Broker 配置
-# 业务环境同样启用，外部访问通过 frp 反代实现
-EMBEDDED_BROKER = True
-BROKER_BIND_HOST = "0.0.0.0"  # 监听所有网卡，便于 frp 反代和局域网访问
-BROKER_BIND_PORT = 1883
+EMBEDDED_BROKER = settings.broker.enabled
+BROKER_BIND_HOST = settings.broker.bind_host
+BROKER_BIND_PORT = settings.broker.bind_port
 
 # 心跳与看门狗
-HEARTBEAT_TIMEOUT = 600  # 秒，节点心跳超时时间
-WATCHDOG_INTERVAL = 30  # 秒，看门狗检查间隔
+HEARTBEAT_TIMEOUT = settings.game.heartbeat_timeout
+WATCHDOG_INTERVAL = settings.game.watchdog_interval
 
 # 消息格式
-MSG_LENGTH = 7
-NODE_ID_LENGTH = 5
+MSG_LENGTH = settings.message.msg_length
+NODE_ID_LENGTH = settings.message.node_id_length
 
 BROKER_READY = Event()
 
-# 路径：已安装时用系统路径，开发环境用相对路径
 _INSTALLED_AUDIO = _Path("/usr/local/share/cluster/audio")
 if _INSTALLED_AUDIO.exists():
     AUDIO_DIR = str(_INSTALLED_AUDIO)
@@ -37,7 +116,7 @@ else:
     # 开发环境：日志写到相对路径
     LOG_DIR = "log"
 
-# 音频文件映射
+
 AUDIO_FILES = {
     # 系统上下线语音播报
     "sys_online": "SYS_ONLINE.wav",
@@ -68,21 +147,22 @@ AUDIO_FILES = {
     "bomb_defused": "BOOM_DEFUSED.wav",
 }
 
-_LOCAL_CONFIG_PATH = _Path(__file__).parent.parent.parent / "config.toml"
-logger = logging.getLogger(__name__)
-
-if _LOCAL_CONFIG_PATH.exists() and tomllib:
-    try:
-        with open(_LOCAL_CONFIG_PATH, "rb") as f:
-            _local_data = tomllib.load(f)
-        _current_globals = globals()
-        for _key, _value in _local_data.items():
-            if _key in _current_globals and _key.isupper():
-                if isinstance(_current_globals[_key], dict) and isinstance(
-                    _value, dict
-                ):
-                    _current_globals[_key].update(_value)
-                else:
-                    _current_globals[_key] = _value
-    except Exception as e:
-        logger.warning(f"config.toml解析失败: {e}")
+__all__ = [
+    "settings",
+    "MQTT_BROKER",
+    "MQTT_PORT",
+    "MQTT_QOS",
+    "MQTT_TOPIC_SUB",
+    "MQTT_TOPIC_PUB",
+    "EMBEDDED_BROKER",
+    "BROKER_BIND_HOST",
+    "BROKER_BIND_PORT",
+    "HEARTBEAT_TIMEOUT",
+    "WATCHDOG_INTERVAL",
+    "MSG_LENGTH",
+    "NODE_ID_LENGTH",
+    "AUDIO_DIR",
+    "LOG_DIR",
+    "AUDIO_FILES",
+    "BROKER_READY",
+]

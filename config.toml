@@ -1,15 +1,19 @@
-# MQTT_BROKER = "127.0.0.1"                # 外部 MQTT 服务器 IP
-# MQTT_PORT = 1883                         # 外部 MQTT 服务器端口
-# MQTT_QOS = 1                             # 消息服务质量 (0, 1, 2)
-# MQTT_TOPIC_SUB = "node/status"           # 节点订阅的 Topic
-# MQTT_TOPIC_PUB = "node/{node_id}/status" # 节点发布状态的 Topic
+[mqtt]
+broker = "127.0.0.1"
+port = 1883
+qos = 1
+topic_sub = "node/status"
+topic_pub = "node/{node_id}/status"
 
-# EMBEDDED_BROKER = true                   # 是否在程序内启动内嵌 MQTT Broker
-# BROKER_BIND_HOST = "0.0.0.0"             # 内嵌 Broker 监听地址 (0.0.0.0 表示允许外网/局域网访问)
-# BROKER_BIND_PORT = 1883                  # 内嵌 Broker 监听端口 (如遇端口冲突可在此修改)
+[broker]
+enabled = true
+bind_host = "0.0.0.0"
+bind_port = 1883
 
-# HEARTBEAT_TIMEOUT = 600                  # 秒，节点心跳超时时间
-# WATCHDOG_INTERVAL = 30                   # 秒，看门狗检查间隔时间
+[game]
+heartbeat_timeout = 600
+watchdog_interval = 30
 
-# MSG_LENGTH = 7                           # 基础消息字节长度
-# NODE_ID_LENGTH = 5                       # 节点 ID 字符串长度
+[message]
+msg_length = 7
+node_id_length = 5
