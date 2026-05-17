@@ -42,3 +42,4 @@ venv/
 env/
 DevVENV/
 .vscode-ctags
+CLAUDE.md

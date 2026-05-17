@@ -8,3 +8,9 @@ repos:
       args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v22.1.5  # Use the latest version available
+  hooks:
+  - id: clang-format
+    # Optional: restrict to specific languages
+    types_or: [c++]
