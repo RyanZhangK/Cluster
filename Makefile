@@ -52,8 +52,7 @@ compile:
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
-		--include-package=. \
-		main.py
+		--main=main.py
 
 stage: 
 	@echo "==> 组装 Stage 目录..."
