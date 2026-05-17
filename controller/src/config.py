@@ -75,9 +75,9 @@ class Settings(BaseSettings):
 
         return (
             init_settings,  # 默认值
-            TomlConfigSettingsSource(settings_cls),
-            env_settings,  # config.toml
+            TomlConfigSettingsSource(settings_cls),  # config.toml
             dotenv_settings,  # .env
+            env_settings,  # 系统环境变量
             file_secret_settings,
         )
 

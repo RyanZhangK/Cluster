@@ -28,4 +28,5 @@ extraPaths = ["controller/src"]
 [dependency-groups]
 dev = [
     "nuitka>=4.1",
+    "pre-commit>=4.6.0",
 ]
