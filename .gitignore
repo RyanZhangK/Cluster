@@ -41,3 +41,4 @@ mcu/*/.vscode/
 venv/
 env/
 DevVENV/
+.vscode-ctags

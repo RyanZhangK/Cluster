@@ -42,7 +42,7 @@ jobs:
             libarchive-tools \
             libgl1 \
             libegl1 \
-            libasound2t64 \
+            libasound2 \
             libglib2.0-0 \
             libdbus-1-3 \
             libxcb-cursor0 \
