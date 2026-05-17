@@ -62,8 +62,8 @@ class NavButton(QPushButton):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._refresh()
 
-    def setChecked(self, checked: bool) -> None:
-        super().setChecked(checked)
+    def setChecked(self, arg__1: bool) -> None:
+        super().setChecked(arg__1)
         self._refresh()
 
     def _refresh(self) -> None:
