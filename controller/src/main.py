@@ -1,6 +1,7 @@
 import asyncio
 import importlib
 import logging
+import os
 import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
@@ -8,13 +9,21 @@ from pathlib import Path
 import qasync
 from PySide6.QtWidgets import QApplication
 
-from . import UI
 from .audio_player import AudioPlayer
 from .config import EMBEDDED_BROKER, LOG_DIR, settings
 from .embedded_broker import EmbeddedBroker
 from .event_bus import EventBus
 from .mqtt_client import MQTTClient
 from .node_manager import NodeManager
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+try:
+    from . import UI
+except (ImportError, ValueError):
+    import UI
 
 
 def setup_logging() -> None:
