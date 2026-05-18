@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from controller.src.node_manager import OnlineStatus
+from .node_manager import OnlineStatus
 
 if TYPE_CHECKING:
     from game_manager import GameManager
