@@ -150,6 +150,7 @@ class MainWindow(QMainWindow):
         self._current_mode = "征服"
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
+        self._node_to_row: dict[str, int] = {}
 
         self._bomb_attacker_combo = QComboBox()
         self._bomb_defender_combo = QComboBox()
@@ -1031,16 +1032,15 @@ class MainWindow(QMainWindow):
     def _populate_table(self) -> None:
         nodes = self._node_manager.get_all_nodes()
         self._table.setRowCount(len(nodes))
+        self._node_to_row.clear()
+
         for row, (node_id, state) in enumerate(nodes.items()):
             self._update_row_at(row, node_id, state)
+            self._node_to_row[node_id] = row
         self._update_stats()
 
     def _find_row(self, node_id: str) -> int:
-        for row in range(self._table.rowCount()):
-            item = self._table.item(row, self.COL_NODE_ID)
-            if item and item.text() == node_id:
-                return row
-        return -1
+        return self._node_to_row.get(node_id, -1)
 
     def _update_row_at(self, row: int, node_id: str, state: "NodeState") -> None:
         is_online = state.status == OnlineStatus.ONLINE
@@ -1068,6 +1068,7 @@ class MainWindow(QMainWindow):
         if row == -1:
             row = self._table.rowCount()
             self._table.insertRow(row)
+            self._node_to_row[node_id] = row
         self._update_row_at(row, node_id, state)
         self._update_stats()
 
