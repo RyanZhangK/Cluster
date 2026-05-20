@@ -5,8 +5,8 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from audio_player import AudioPlayer
-from event_bus import EventBus
+from .audio_player import AudioPlayer
+from .event_bus import EventBus
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import (
