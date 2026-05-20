@@ -49,6 +49,7 @@ compile:
 		--static-libpython=yes \
 		--include-package=amqtt \
 		--include-data-dir=../resources/audio=resources/audio \
+		--include-data-dir=../resources/frpc=resources/frpc \
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
@@ -68,6 +69,7 @@ stage:
 	install -m755 $(NUITKA_OUT)/$(PKG_NAME) $(STAGE_DIR)$(INSTALL_SHARE)/lib/$(PKG_NAME)
 	
 	cp $(NUITKA_OUT)/resources/audio/*.wav $(STAGE_DIR)$(INSTALL_SHARE)/audio/ 2>/dev/null || true
+	cp -r $(NUITKA_OUT)/resources/frpc $(STAGE_DIR)$(INSTALL_SHARE)/frpc
 	
 	@echo ''
 	@echo 'SHARE=$(INSTALL_SHARE)' >> $(STAGE_DIR)$(INSTALL_BIN)

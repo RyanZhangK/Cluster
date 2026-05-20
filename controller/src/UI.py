@@ -1,11 +1,14 @@
+import json
 import logging
+import tomllib
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from .audio_player import AudioPlayer
 from .event_bus import EventBus
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -13,19 +16,24 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QProgressBar,
     QPushButton,
+    QSpinBox,
     QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
+from .config import FRPC_AUTH_TOKEN, FRPC_PROXIES, FRPC_SERVER_ADDR, FRPC_SERVER_PORT
 from .node_manager import NodeManager, OnlineStatus
 
 if TYPE_CHECKING:
+    from frpc_manager import FrpcManager
     from game_manager import GameManager
     from node_manager import NodeState
 
@@ -153,12 +161,14 @@ class MainWindow(QMainWindow):
         node_manager: "NodeManager",
         event_bus: "EventBus",
         audio_player: "AudioPlayer",
+        frpc_manager: "FrpcManager | None" = None,
         parent: "QMainWindow | None" = None,
     ) -> None:
         super().__init__(parent)
         self._node_manager = node_manager
         self._event_bus = event_bus
         self._audio_player = audio_player
+        self._frpc_manager: "FrpcManager | None" = frpc_manager
         self._game_manager: "GameManager | None" = None
         self._current_mode = "征服"
         self._current_team_count = 2
@@ -204,6 +214,7 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._build_game_ctrl_page())
         self._stack.addWidget(self._build_game_status_page())
         self._stack.addWidget(self._build_manual_page())
+        self._stack.addWidget(self._build_frpc_page())
         content_layout.addWidget(self._stack)
 
         root_layout.addWidget(content, 1)
@@ -213,8 +224,15 @@ class MainWindow(QMainWindow):
             self._nav_game_ctrl,
             self._nav_game_status,
             self._nav_manual,
+            self._nav_frpc,
         ]
-        self._page_titles = ["节点监控", "游戏控制", "游戏状态", "紧急手动"]
+        self._page_titles = [
+            "节点监控",
+            "游戏控制",
+            "游戏状态",
+            "紧急手动",
+            "Frpc管理",
+        ]
 
     def _build_sidebar(self) -> QFrame:
         sidebar = QFrame()
@@ -267,6 +285,10 @@ class MainWindow(QMainWindow):
         self._nav_manual = NavButton("⚡", "紧急手动")
         self._nav_manual.clicked.connect(lambda: self._switch_page(3))
         layout.addWidget(self._nav_manual)
+
+        self._nav_frpc = NavButton("⇄", "Frpc管理")
+        self._nav_frpc.clicked.connect(lambda: self._switch_page(4))
+        layout.addWidget(self._nav_frpc)
 
         layout.addStretch()
 
@@ -772,6 +794,361 @@ class MainWindow(QMainWindow):
         self._audio_player._current = None  # pyright: ignore[reportPrivateUsage]
         self._audio_player._play(key)  # pyright: ignore[reportPrivateUsage]
 
+    # ── Frpc 管理页 ─────────────────────────────────────────────────────────────
+
+    def _build_frpc_page(self) -> QWidget:
+        page = QWidget()
+        page.setStyleSheet(f"background-color: {C_BG};")
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(28, 24, 28, 24)
+        layout.setSpacing(16)
+
+        # 状态卡片
+        status_card = Card()
+        sc_layout = QVBoxLayout(status_card)
+        sc_layout.setContentsMargins(20, 16, 20, 18)
+        sc_layout.setSpacing(12)
+
+        status_row = QHBoxLayout()
+        self._frpc_status_dot = StatusDot(C_TEXT_MUTED)
+        self._frpc_status_label = QLabel("FRPC 已停止")
+        self._frpc_status_label.setStyleSheet(
+            f"color: {C_TEXT_SEC}; font-size: 15px; font-weight: bold; background: transparent;"
+        )
+        status_row.addWidget(self._frpc_status_dot)
+        status_row.addSpacing(10)
+        status_row.addWidget(self._frpc_status_label)
+        status_row.addStretch()
+        sc_layout.addLayout(status_row)
+
+        btn_row = QHBoxLayout()
+        btn_row.setSpacing(10)
+        self._frpc_start_btn = QPushButton("启动")
+        self._frpc_start_btn.setFixedSize(100, 38)
+        self._frpc_start_btn.setStyleSheet(self._btn_style(C_SUCCESS))
+        self._frpc_start_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._frpc_start_btn.clicked.connect(self._on_frpc_start)
+        self._frpc_stop_btn = QPushButton("停止")
+        self._frpc_stop_btn.setFixedSize(100, 38)
+        self._frpc_stop_btn.setStyleSheet(self._btn_style(C_DANGER))
+        self._frpc_stop_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._frpc_stop_btn.clicked.connect(self._on_frpc_stop)
+        self._frpc_stop_btn.setEnabled(False)
+        btn_row.addWidget(self._frpc_start_btn)
+        btn_row.addWidget(self._frpc_stop_btn)
+        btn_row.addStretch()
+        sc_layout.addLayout(btn_row)
+        layout.addWidget(status_card)
+
+        # 服务器配置卡
+        server_card = Card()
+        svl = QVBoxLayout(server_card)
+        svl.setContentsMargins(20, 16, 20, 18)
+        svl.setSpacing(12)
+        self._card_section_label(svl, "服务器配置")
+
+        form_grid = QVBoxLayout()
+        form_grid.setSpacing(8)
+
+        for label, widget in [
+            ("服务器地址", "_frpc_server_addr"),
+            ("认证令牌", "_frpc_auth_token"),
+        ]:
+            row = QHBoxLayout()
+            row.setSpacing(12)
+            lbl = QLabel(label)
+            lbl.setFixedWidth(72)
+            lbl.setStyleSheet(
+                f"color: {C_TEXT_SEC}; font-size: 12px; background: transparent;"
+            )
+            edit = QLineEdit()
+            edit.setStyleSheet(self._input_style())
+            setattr(self, widget, edit)
+            row.addWidget(lbl)
+            row.addWidget(edit)
+            form_grid.addLayout(row)
+
+        port_row = QHBoxLayout()
+        port_row.setSpacing(12)
+        port_lbl = QLabel("服务器端口")
+        port_lbl.setFixedWidth(72)
+        port_lbl.setStyleSheet(
+            f"color: {C_TEXT_SEC}; font-size: 12px; background: transparent;"
+        )
+        self._frpc_server_port = QSpinBox()
+        self._frpc_server_port.setRange(1, 65535)
+        self._frpc_server_port.setValue(7000)
+        self._frpc_server_port.setStyleSheet(self._spinbox_style())
+        port_row.addWidget(port_lbl)
+        port_row.addWidget(self._frpc_server_port)
+        port_row.addStretch()
+        form_grid.addLayout(port_row)
+
+        svl.addLayout(form_grid)
+        layout.addWidget(server_card)
+
+        # 代理列表卡
+        proxy_card = Card()
+        pvl = QVBoxLayout(proxy_card)
+        pvl.setContentsMargins(20, 16, 20, 18)
+        pvl.setSpacing(12)
+        self._card_section_label(pvl, "代理列表")
+
+        # 代理表格
+        self._proxy_table = QTableWidget()
+        self._proxy_table.setColumnCount(5)
+        self._proxy_table.setHorizontalHeaderLabels(
+            ["名称", "类型", "本地地址", "本地端口", "远程端口"]
+        )
+        self._proxy_table.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows
+        )
+        self._proxy_table.setSelectionMode(
+            QAbstractItemView.SelectionMode.SingleSelection
+        )
+        self._proxy_table.setStyleSheet(self._table_style())
+        self._proxy_table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
+        self._proxy_table.setShowGrid(False)
+        self._proxy_table.verticalHeader().setVisible(False)
+        self._proxy_table.setMaximumHeight(200)
+        pvl.addWidget(self._proxy_table)
+
+        # 添加代理表单
+        add_row = QHBoxLayout()
+        add_row.setSpacing(8)
+        self._proxy_name_input = QLineEdit()
+        self._proxy_name_input.setPlaceholderText("名称")
+        self._proxy_name_input.setStyleSheet(self._input_style())
+        self._proxy_type_combo = QComboBox()
+        self._proxy_type_combo.addItems(["tcp", "udp"])
+        self._proxy_type_combo.setStyleSheet(self._combo_style())
+        self._proxy_type_combo.setFixedWidth(80)
+        self._proxy_local_ip = QLineEdit()
+        self._proxy_local_ip.setPlaceholderText("127.0.0.1")
+        self._proxy_local_ip.setStyleSheet(self._input_style())
+        self._proxy_local_port = QSpinBox()
+        self._proxy_local_port.setRange(1, 65535)
+        self._proxy_local_port.setValue(80)
+        self._proxy_local_port.setStyleSheet(self._spinbox_style())
+        self._proxy_remote_port = QSpinBox()
+        self._proxy_remote_port.setRange(1, 65535)
+        self._proxy_remote_port.setValue(8080)
+        self._proxy_remote_port.setStyleSheet(self._spinbox_style())
+        add_row.addWidget(self._proxy_name_input)
+        add_row.addWidget(self._proxy_type_combo)
+        add_row.addWidget(self._proxy_local_ip)
+        add_row.addWidget(self._proxy_local_port)
+        add_row.addWidget(self._proxy_remote_port)
+        pvl.addLayout(add_row)
+
+        proxy_btn_row = QHBoxLayout()
+        proxy_btn_row.setSpacing(10)
+        add_proxy_btn = QPushButton("+ 添加代理")
+        add_proxy_btn.setFixedHeight(34)
+        add_proxy_btn.setStyleSheet(self._btn_style(C_PRIMARY))
+        add_proxy_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        add_proxy_btn.clicked.connect(self._on_add_proxy)
+        del_proxy_btn = QPushButton("删除选中")
+        del_proxy_btn.setFixedHeight(34)
+        del_proxy_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        del_proxy_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        del_proxy_btn.clicked.connect(self._on_delete_proxy)
+        proxy_btn_row.addWidget(add_proxy_btn)
+        proxy_btn_row.addWidget(del_proxy_btn)
+        proxy_btn_row.addStretch()
+        pvl.addLayout(proxy_btn_row)
+
+        layout.addWidget(proxy_card)
+
+        # 日志输出卡
+        log_card = Card()
+        ll = QVBoxLayout(log_card)
+        ll.setContentsMargins(20, 16, 20, 18)
+        ll.setSpacing(10)
+        self._card_section_label(ll, "日志输出")
+
+        self._frpc_log = QTextEdit()
+        self._frpc_log.setReadOnly(True)
+        self._frpc_log.setFont(QFont("Consolas, monospace", 9))
+        self._frpc_log.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {C_SIDEBAR};
+                color: {C_TEXT};
+                border: 1px solid {C_BORDER};
+                border-radius: 6px;
+                padding: 10px;
+                font-family: 'Consolas', 'Monaco', monospace;
+            }}
+            QScrollBar:vertical {{
+                background: {C_BG};
+                width: 6px;
+                border-radius: 3px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {C_BORDER};
+                border-radius: 3px;
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0; }}
+        """)
+        ll.addWidget(self._frpc_log)
+
+        clear_btn_row = QHBoxLayout()
+        clear_log_btn = QPushButton("清空日志")
+        clear_log_btn.setFixedHeight(34)
+        clear_log_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        clear_log_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        clear_log_btn.clicked.connect(self._frpc_log.clear)
+        clear_btn_row.addWidget(clear_log_btn)
+        clear_btn_row.addStretch()
+        ll.addLayout(clear_btn_row)
+
+        layout.addWidget(log_card, 1)
+
+        # 加载已保存的配置
+        self._load_frpc_config()
+        return page
+
+    def _load_frpc_config(self) -> None:
+        """从上次生成的 frpc.toml 恢复配置，fallback 到 pydantic settings。"""
+        frpc_toml = Path(__file__).parent.parent / "frpc.toml"
+        if frpc_toml.exists():
+            try:
+                data = tomllib.loads(frpc_toml.read_text(encoding="utf-8"))
+                self._frpc_server_addr.setText(data.get("serverAddr", ""))
+                self._frpc_server_port.setValue(
+                    data.get("serverPort", FRPC_SERVER_PORT)
+                )
+                auth = data.get("auth", {})
+                if isinstance(auth, dict):
+                    self._frpc_auth_token.setText(auth.get("token", ""))
+                proxies = data.get("proxies", FRPC_PROXIES)
+                if isinstance(proxies, str):
+                    proxies = json.loads(proxies)
+                self._populate_proxy_table(proxies)
+                return
+            except (tomllib.TOMLDecodeError, OSError):
+                pass
+
+        self._frpc_server_addr.setText(FRPC_SERVER_ADDR)
+        self._frpc_server_port.setValue(FRPC_SERVER_PORT)
+        self._frpc_auth_token.setText(FRPC_AUTH_TOKEN)
+        try:
+            proxies = json.loads(FRPC_PROXIES)
+        except (json.JSONDecodeError, TypeError):
+            proxies = []
+        self._populate_proxy_table(proxies)
+
+    def _collect_frpc_config(self) -> dict:
+        """从 UI 表单收集 frpc 配置。"""
+        proxies = []
+        for row in range(self._proxy_table.rowCount()):
+            name = self._proxy_table.item(row, 0)
+            ptype = self._proxy_table.item(row, 1)
+            lip = self._proxy_table.item(row, 2)
+            lport = self._proxy_table.item(row, 3)
+            rport = self._proxy_table.item(row, 4)
+            if name and ptype and lip and lport and rport:
+                proxies.append(
+                    {
+                        "name": name.text(),
+                        "type": ptype.text(),
+                        "local_ip": lip.text(),
+                        "local_port": int(lport.text()),
+                        "remote_port": int(rport.text()),
+                    }
+                )
+        return {
+            "server_addr": self._frpc_server_addr.text(),
+            "server_port": self._frpc_server_port.value(),
+            "auth_token": self._frpc_auth_token.text(),
+            "proxies": proxies,
+        }
+
+    def _populate_proxy_table(self, proxies: list) -> None:
+        """将代理列表填充到表格。"""
+        self._proxy_table.setRowCount(0)
+        for row, p in enumerate(proxies):
+            self._proxy_table.insertRow(row)
+            for col, key in enumerate(
+                ["name", "type", "local_ip", "local_port", "remote_port"]
+            ):
+                val = str(p.get(key, ""))
+                item = QTableWidgetItem(val)
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                item.setForeground(QColor(C_TEXT))
+                self._proxy_table.setItem(row, col, item)
+            self._proxy_table.setRowHeight(row, 32)
+
+    @Slot()
+    def _on_frpc_start(self) -> None:
+        if self._frpc_manager is None:
+            return
+        config = self._collect_frpc_config()
+        self._frpc_manager.start(config)
+
+    @Slot()
+    def _on_frpc_stop(self) -> None:
+        if self._frpc_manager is None:
+            return
+        self._frpc_manager.stop()
+
+    @Slot()
+    def _on_add_proxy(self) -> None:
+        name = self._proxy_name_input.text().strip()
+        if not name:
+            return
+        row = self._proxy_table.rowCount()
+        self._proxy_table.insertRow(row)
+        data = [
+            name,
+            self._proxy_type_combo.currentText(),
+            self._proxy_local_ip.text().strip() or "127.0.0.1",
+            str(self._proxy_local_port.value()),
+            str(self._proxy_remote_port.value()),
+        ]
+        for col, val in enumerate(data):
+            item = QTableWidgetItem(val)
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            item.setForeground(QColor(C_TEXT))
+            self._proxy_table.setItem(row, col, item)
+        self._proxy_table.setRowHeight(row, 32)
+        self._proxy_name_input.clear()
+
+    @Slot()
+    def _on_delete_proxy(self) -> None:
+        selected = self._proxy_table.selectedIndexes()
+        if not selected:
+            return
+        self._proxy_table.removeRow(selected[0].row())
+
+    @Slot(bool)
+    def _on_frpc_status_changed(self, running: bool) -> None:
+        if running:
+            self._frpc_status_dot.set_color(C_SUCCESS)
+            self._frpc_status_label.setText("FRPC 运行中")
+            self._frpc_status_label.setStyleSheet(
+                f"color: {C_SUCCESS}; font-size: 15px; font-weight: bold; background: transparent;"
+            )
+            self._frpc_start_btn.setEnabled(False)
+            self._frpc_stop_btn.setEnabled(True)
+        else:
+            self._frpc_status_dot.set_color(C_TEXT_MUTED)
+            self._frpc_status_label.setText("FRPC 已停止")
+            self._frpc_status_label.setStyleSheet(
+                f"color: {C_TEXT_SEC}; font-size: 15px; font-weight: bold; background: transparent;"
+            )
+            self._frpc_start_btn.setEnabled(True)
+            self._frpc_stop_btn.setEnabled(False)
+
+    @Slot(str)
+    def _on_frpc_log_received(self, text: str) -> None:
+        self._frpc_log.append(text)
+        # 自动滚动到底部
+        scrollbar = self._frpc_log.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
     @Slot()
     def _on_shutdown_clicked(self) -> None:
 
@@ -956,6 +1333,48 @@ class MainWindow(QMainWindow):
             }}
         """
 
+    def _input_style(self) -> str:
+        return f"""
+            QLineEdit {{
+                background-color: {C_SURFACE};
+                color: {C_TEXT};
+                border: 1px solid {C_BORDER};
+                border-radius: 6px;
+                padding: 6px 10px;
+                font-size: 12px;
+            }}
+            QLineEdit:focus {{ border-color: {C_PRIMARY}; }}
+            QLineEdit::placeholder {{ color: {C_TEXT_MUTED}; }}
+        """
+
+    def _spinbox_style(self) -> str:
+        return f"""
+            QSpinBox {{
+                background-color: {C_SURFACE};
+                color: {C_TEXT};
+                border: 1px solid {C_BORDER};
+                border-radius: 6px;
+                padding: 6px 10px;
+                font-size: 12px;
+            }}
+            QSpinBox:focus {{ border-color: {C_PRIMARY}; }}
+            QSpinBox::up-button, QSpinBox::down-button {{
+                background-color: {C_CARD};
+                border: none;
+                width: 16px;
+            }}
+            QSpinBox::up-arrow {{
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 5px solid {C_TEXT};
+            }}
+            QSpinBox::down-arrow {{
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 5px solid {C_TEXT};
+            }}
+        """
+
     def _table_style(self) -> str:
         return f"""
             QTableWidget {{
@@ -1044,6 +1463,10 @@ class MainWindow(QMainWindow):
         self._event_bus.bomb_activated.connect(self._on_bomb_activated)
         self._event_bus.bomb_tick.connect(self._on_bomb_tick)
         self._event_bus.bomb_defused.connect(self._on_bomb_defused)
+        if self._frpc_manager:
+            self._frpc_manager.status_changed.connect(self._on_frpc_status_changed)
+            self._frpc_manager.log_received.connect(self._on_frpc_log_received)
+            self._frpc_manager.error_occurred.connect(self._on_frpc_log_received)
 
     def _populate_table(self) -> None:
         nodes = self._node_manager.get_all_nodes()

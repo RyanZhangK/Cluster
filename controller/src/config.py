@@ -46,6 +46,15 @@ class MessageSettings(BaseSettings):
     node_id_length: int = 5
 
 
+class FrpcSettings(BaseSettings):
+    """frpc 内网穿透客户端配置"""
+
+    server_addr: str = ""
+    server_port: int = 7000
+    auth_token: str = ""
+    proxies: str = "[]"
+
+
 class Settings(BaseSettings):
     """Cluster 主配置类"""
 
@@ -53,6 +62,7 @@ class Settings(BaseSettings):
     broker: BrokerSettings = Field(default_factory=BrokerSettings)
     game: GameSettings = Field(default_factory=GameSettings)
     message: MessageSettings = Field(default_factory=MessageSettings)
+    frpc: FrpcSettings = Field(default_factory=FrpcSettings)
 
     model_config = SettingsConfigDict(
         env_prefix="CLUSTER_",
@@ -152,6 +162,12 @@ AUDIO_FILES = {
     "bomb_defused": "BOOM_DEFUSED.wav",
 }
 
+# frpc 配置
+FRPC_SERVER_ADDR = settings.frpc.server_addr
+FRPC_SERVER_PORT = settings.frpc.server_port
+FRPC_AUTH_TOKEN = settings.frpc.auth_token
+FRPC_PROXIES = settings.frpc.proxies
+
 __all__ = [
     "settings",
     "MQTT_BROKER",
@@ -170,4 +186,8 @@ __all__ = [
     "LOG_DIR",
     "AUDIO_FILES",
     "BROKER_READY",
+    "FRPC_SERVER_ADDR",
+    "FRPC_SERVER_PORT",
+    "FRPC_AUTH_TOKEN",
+    "FRPC_PROXIES",
 ]
