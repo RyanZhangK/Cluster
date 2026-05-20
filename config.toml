@@ -18,3 +18,9 @@
 # [message]
 # msg_length = 7
 # node_id_length = 5
+
+# [frpc]
+# server_addr = ""
+# server_port = 7000
+# auth_token = ""
+# proxies = "[]"

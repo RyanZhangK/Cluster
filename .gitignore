@@ -19,6 +19,7 @@ typings/
 # controller
 controller/log/
 controller/src/log/
+controller/frpc.toml
 controller/resources/tts_cache/
 controller/resources/tts_temp/
 *.db
