@@ -1,10 +1,10 @@
 import asyncio
 import importlib
 import logging
+import signal
 import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
-from typing import Any, Callable
 
 import qasync
 from PySide6.QtWidgets import QApplication
@@ -17,21 +17,6 @@ from controller.src.event_bus import EventBus
 from controller.src.frpc_manager import FrpcManager
 from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
-
-
-async def listen_terminal_eof(on_eof_cb: Callable[..., Any]):
-    """异步监听终端的 Ctrl+D (EOF)"""
-    loop = asyncio.get_running_loop()
-    reader = asyncio.StreamReader()
-    protocol = asyncio.StreamReaderProtocol(reader)
-
-    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
-
-    while True:
-        line = await reader.readline()
-        if not line:
-            on_eof_cb()
-            break
 
 
 def setup_logging() -> None:
@@ -137,16 +122,14 @@ def main() -> None:
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
 
-    def at_exit(reason: str):
-        logger.info(f"接收到终端退出指令 ({reason})，正在关闭程序...")
+    def at_exit(signum: int, _):
+        logger.info(f"接收到终端退出指令{{{signum}}}，正在关闭程序...")
         app.quit()
 
-    with loop:
-        loop.create_task(
-            listen_terminal_eof(lambda: at_exit("Ctrl+D")),
-            name="terminal_eof_watcher",
-        )
+    signal.signal(signal.SIGINT, at_exit)
+    signal.signal(signal.SIGTERM, at_exit)
 
+    with loop:
         # 内嵌 Broker 优先启动，让客户端连接时已可用
         if EMBEDDED_BROKER:
             broker = EmbeddedBroker()
