@@ -92,6 +92,13 @@ deb:
 	@mkdir -p $(PKG_DIR)
 	fpm $(FPM_OPTS) -t deb \
 		--depends libgl1 --depends libegl1 --depends libasound2 \
+		--depends libxcb-cursor0 --depends libxcb-icccm4 \
+		--depends libxcb-image0 --depends libxcb-keysyms1 \
+		--depends libxcb-randr0 --depends libxcb-render-util0 \
+		--depends libxcb-shape0 --depends libxcb-shm0 \
+		--depends libxcb-sync1 --depends libxcb-xfixes0 \
+		--depends libxcb-xkb1 --depends libxcb-util1 \
+		--depends libxkbcommon0 --depends libxkbcommon-x11-0 \
 		--deb-no-default-config-files \
 		-p $(PKG_DIR)/$(PKG_NAME)_$(PKG_VERSION)_$(DEB_ARCH).deb .
 
