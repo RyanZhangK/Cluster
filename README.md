@@ -73,9 +73,16 @@ graph TD
 
 ### UI 设计
 - **深蓝管理风格**：专业后端管理界面配色
-- **多页面分层**：节点监控 / 游戏控制 / 游戏状态 / 紧急手动
+- **多页面分层**：节点监控 / 游戏控制 / 游戏状态 / 紧急手动 / Frpc管理
 - **实时反馈**：游戏状态横幅、队伍卡片、倒计时进度条
 - **响应式布局**：自适应窗口大小
+
+### Frpc 内网穿透
+
+- **进程管理**：启动 / 停止 frpc 客户端
+- **配置界面**：服务器地址、端口、认证令牌、代理列表可视化编辑
+- **实时日志**：frpc 进程 stdout 输出
+- **配置持久化**：上次运行配置自动恢复
 
 ## 快速开始
 
@@ -127,9 +134,11 @@ Cluster/
 │   │   ├── embedded_broker.py      # 内嵌 MQTT Broker
 │   │   ├── audio_player.py         # 音效播放队列
 │   │   ├── event_bus.py            # 信号总线
+│   │   ├── frpc_manager.py         # Frpc 进程管理
 │   │   ├── config.py               # Controller配置
 │   │   ├── resources/
-│   │       └── audio/              # 音效文件目录
+│   │   │   ├── audio/              # 音效文件目录
+│   │       └── frpc/               # Frpc 二进制 (amd64/arm64)
 │   ├── test/
 │       └── send_test_message.py    # MQTT 测试脚本
 ├── mcu/                            # ESP8266 固件代码
@@ -155,6 +164,11 @@ BROKER_BIND_PORT = 1883
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = 600  # 秒
 WATCHDOG_INTERVAL = 30   # 秒
+
+# Frpc 内网穿透 (config.toml 仅作默认值，运行时配置持久化在 controller/frpc.toml)
+FRPC_SERVER_ADDR = ""
+FRPC_SERVER_PORT = 7000
+FRPC_AUTH_TOKEN = ""
 ```
 
 ## 日志

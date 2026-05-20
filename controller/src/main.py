@@ -14,6 +14,7 @@ from controller.src.audio_player import AudioPlayer
 from controller.src.config import EMBEDDED_BROKER, LOG_DIR, settings
 from controller.src.embedded_broker import EmbeddedBroker
 from controller.src.event_bus import EventBus
+from controller.src.frpc_manager import FrpcManager
 from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
 
@@ -55,7 +56,10 @@ def setup_logging() -> None:
 
 
 async def ui_hot_reload_watcher(
-    node_manager: NodeManager, event_bus: EventBus, audio_player: AudioPlayer
+    node_manager: NodeManager,
+    event_bus: EventBus,
+    audio_player: AudioPlayer,
+    frpc_manager: "FrpcManager",
 ):
     """每秒检查一次 UI.py 的修改时间"""
     logger = logging.getLogger("HotReload")
@@ -99,7 +103,9 @@ async def ui_hot_reload_watcher(
                     _window.close()
                     _window.deleteLater()
 
-                new_window = UI.MainWindow(node_manager, event_bus, audio_player)
+                new_window = UI.MainWindow(
+                    node_manager, event_bus, audio_player, frpc_manager
+                )
 
                 if geometry:
                     new_window.setGeometry(geometry)
@@ -121,9 +127,10 @@ def main() -> None:
     node_manager = NodeManager(event_bus)
     audio_player = AudioPlayer()
     mqtt_client = MQTTClient(node_manager, event_bus)
+    frpc_manager = FrpcManager()
 
     # 创建并展示主窗口
-    window = UI.MainWindow(node_manager, event_bus, audio_player)
+    window = UI.MainWindow(node_manager, event_bus, audio_player, frpc_manager)
     window.show()
 
     # qasync：将 asyncio 事件循环与 Qt 事件循环融合
@@ -151,7 +158,9 @@ def main() -> None:
         loop.create_task(node_manager.heartbeat_watchdog(), name="heartbeat_watchdog")
         if settings.game.ui_hot_reload:
             loop.create_task(
-                ui_hot_reload_watcher(node_manager, event_bus, audio_player),
+                ui_hot_reload_watcher(
+                    node_manager, event_bus, audio_player, frpc_manager
+                ),
                 name="ui_hot_reload",
             )
         logger.info("Controller started. Listening on node/status ...")
