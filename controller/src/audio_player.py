@@ -1,6 +1,7 @@
 import logging
 from collections import deque
 from pathlib import Path
+from typing import Any
 
 from PySide6.QtCore import QObject, QUrl
 from PySide6.QtMultimedia import QSoundEffect
@@ -22,6 +23,23 @@ class AudioPlayer(QObject):
         self._effects: dict[str, QSoundEffect] = {}
         self._queue: deque[str] = deque()
         self._current: QSoundEffect | None = None
+        self._method_cache = {}
+
+    def __getattr__(self, name: str) -> Any:
+        if name in self._method_cache:
+            return self._method_cache[name]
+        if name.startswith("play_"):
+            action = name[len("play_") :]
+
+            def wrapper(*args):
+                key = f"{action}_{args[0]}" if args else action
+                self._play(key)
+
+            self._method_cache[name] = wrapper
+            return wrapper
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
 
     # ── 加载 ──────────────────────────────────────────────
 
@@ -74,32 +92,3 @@ class AudioPlayer(QObject):
         if effect is self._current and not effect.isPlaying():
             self._current = None
             self._play_next()
-
-    # ── 公开接口 ──────────────────────────────────────────
-
-    def play_sys_online(self) -> None:
-        self._play("sys_online")
-
-    def play_sys_offline(self) -> None:
-        self._play("sys_offline")
-
-    def play_activated(self, team: str) -> None:
-        self._play(f"activated_{team}")
-
-    def play_game_started(self) -> None:
-        self._play("game_started")
-
-    def play_game_stopped(self) -> None:
-        self._play("game_stopped")
-
-    def play_team_eliminated(self, team: str) -> None:
-        self._play(f"eliminated_{team}")
-
-    def play_team_victory(self, team: str) -> None:
-        self._play(f"victory_{team}")
-
-    def play_bomb_activated(self) -> None:
-        self._play("bomb_activated")
-
-    def play_bomb_defused(self) -> None:
-        self._play("bomb_defused")
