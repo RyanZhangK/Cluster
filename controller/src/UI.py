@@ -1,6 +1,9 @@
 import logging
-from typing import TYPE_CHECKING
+from functools import partial
+from typing import TYPE_CHECKING, Any
 
+from audio_player import AudioPlayer
+from event_bus import EventBus
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
@@ -20,7 +23,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .node_manager import OnlineStatus
+from .node_manager import NodeManager, OnlineStatus
 
 if TYPE_CHECKING:
     from game_manager import GameManager
@@ -52,7 +55,9 @@ TEAM_COLORS = {"A": "#ef4444", "B": "#3b82f6", "C": "#22c55e", "D": "#f59e0b"}
 
 
 class NavButton(QPushButton):
-    def __init__(self, icon_text: str, label: str, parent=None) -> None:
+    def __init__(
+        self, icon_text: str, label: str, parent: "QWidget | None" = None
+    ) -> None:
         super().__init__(parent)
         self._icon_text = icon_text
         self._label = label
@@ -93,7 +98,9 @@ class NavButton(QPushButton):
 
 
 class StatusDot(QLabel):
-    def __init__(self, color: str = C_TEXT_MUTED, parent=None) -> None:
+    def __init__(
+        self, color: str = C_TEXT_MUTED, parent: "QLabel | None" = None
+    ) -> None:
         super().__init__(parent)
         self.setFixedSize(8, 8)
         self._set(color)
@@ -106,7 +113,7 @@ class StatusDot(QLabel):
 
 
 class Card(QFrame):
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent: "QFrame | None" = None) -> None:
         super().__init__(parent)
         self.setStyleSheet(f"""
             QFrame {{
@@ -118,7 +125,7 @@ class Card(QFrame):
 
 
 class SectionLabel(QLabel):
-    def __init__(self, text: str, parent=None) -> None:
+    def __init__(self, text: str, parent: "QLabel | None" = None) -> None:
         super().__init__(text, parent)
         self.setStyleSheet(f"""
             color: {C_TEXT_MUTED};
@@ -141,7 +148,13 @@ class MainWindow(QMainWindow):
     COL_HEARTBEAT = 4
     COLUMN_HEADERS = ["节点ID", "类型", "在线状态", "激活队伍", "最后心跳"]
 
-    def __init__(self, node_manager, event_bus, audio_player, parent=None) -> None:
+    def __init__(
+        self,
+        node_manager: "NodeManager",
+        event_bus: "EventBus",
+        audio_player: "AudioPlayer",
+        parent: "QMainWindow | None" = None,
+    ) -> None:
         super().__init__(parent)
         self._node_manager = node_manager
         self._event_bus = event_bus
@@ -423,7 +436,7 @@ class MainWindow(QMainWindow):
             btn.setFixedSize(96, 38)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setStyleSheet(self._toggle_btn_style(mode == "征服"))
-            btn.clicked.connect(lambda _, m=mode: self._on_mode_btn_clicked(m))
+            btn.clicked.connect(partial(self._on_mode_btn_clicked, mode))
             self._mode_btns[mode] = btn
             mode_row.addWidget(btn)
         mode_row.addStretch()
@@ -445,7 +458,7 @@ class MainWindow(QMainWindow):
             btn.setFixedSize(80, 38)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.setStyleSheet(self._toggle_btn_style(n == 2))
-            btn.clicked.connect(lambda _, count=n: self._on_team_count_clicked(count))
+            btn.clicked.connect(partial(self._on_team_count_clicked, n))
             self._team_count_btns[n] = btn
             team_row.addWidget(btn)
         team_row.addStretch()
@@ -556,7 +569,7 @@ class MainWindow(QMainWindow):
 
         teams_row = QHBoxLayout()
         teams_row.setSpacing(12)
-        self._team_cards: dict[str, dict] = {}
+        self._team_cards: dict[str, dict[Any, Any]] = {}
         for team in ["A", "B", "C", "D"]:
             self._team_cards[team] = self._make_team_card(team, teams_row)
         teams_row.addStretch()
@@ -745,7 +758,7 @@ class MainWindow(QMainWindow):
                     }}
                     QPushButton:pressed {{ background-color: {C_PRIMARY}44; }}
                 """)
-                btn.clicked.connect(lambda _, k=key: self._on_manual_play(k))
+                btn.clicked.connect(partial(self._on_manual_play, key))
                 btn_row.addWidget(btn)
             btn_row.addStretch()
             cl.addLayout(btn_row)
@@ -755,18 +768,18 @@ class MainWindow(QMainWindow):
         return page
 
     def _on_manual_play(self, key: str) -> None:
-        self._audio_player._queue.clear()
-        self._audio_player._current = None
-        self._audio_player._play(key)
+        self._audio_player._queue.clear()  # pyright: ignore[reportPrivateUsage]
+        self._audio_player._current = None  # pyright: ignore[reportPrivateUsage]
+        self._audio_player._play(key)  # pyright: ignore[reportPrivateUsage]
 
     @Slot()
     def _on_shutdown_clicked(self) -> None:
 
-        self._audio_player._queue.clear()
+        self._audio_player._queue.clear()  # pyright: ignore[reportPrivateUsage]
         self._audio_player.play_sys_offline()
         # 等音效播完再退出：监听 playing 结束
         # self.__shutdown_pending = True
-        self._audio_player._effects  # 确保已加载
+        self._audio_player._effects  # 确保已加载  # pyright: ignore[reportPrivateUsage]
         # 用单次定时器轮询，避免在音效结束前退出
         from PySide6.QtCore import QTimer
 
@@ -776,13 +789,16 @@ class MainWindow(QMainWindow):
         self._shutdown_timer.start()
 
     def _check_shutdown(self) -> None:
-        if self._audio_player._current is None and not self._audio_player._queue:
+        if (
+            self._audio_player._current is None  # pyright: ignore[reportPrivateUsage]
+            and not self._audio_player._queue  # pyright: ignore[reportPrivateUsage]
+        ):
             self._shutdown_timer.stop()
             from PySide6.QtWidgets import QApplication
 
             QApplication.quit()
 
-    def _make_team_card(self, team: str, row: QHBoxLayout) -> dict:
+    def _make_team_card(self, team: str, row: QHBoxLayout) -> dict[str, Any]:
         color = TEAM_COLORS[team]
         frame = Card()
         frame.setFixedSize(150, 110)

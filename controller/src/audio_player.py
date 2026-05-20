@@ -18,7 +18,7 @@ class AudioPlayer(QObject):
     继承 QObject 以支持 sender() 和 Slot。
     """
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent: "QObject | None" = None) -> None:
         super().__init__(parent)
         self._effects: dict[str, QSoundEffect] = {}
         self._queue: deque[str] = deque()
@@ -31,7 +31,7 @@ class AudioPlayer(QObject):
         if name.startswith("play_"):
             action = name[len("play_") :]
 
-            def wrapper(*args):
+            def wrapper(*args: Any):
                 key = f"{action}_{args[0]}" if args else action
                 self._play(key)
 
