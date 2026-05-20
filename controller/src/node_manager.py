@@ -3,7 +3,6 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 from PySide6.QtCore import QObject, Signal
 
@@ -30,8 +29,8 @@ class NodeState:
     node_type: NodeType
     status: OnlineStatus = OnlineStatus.OFFLINE
     active_team: str = ""  # "" 未激活，"A"-"D" 表示队伍
-    last_heartbeat: Optional[datetime] = None
-    last_activated: Optional[datetime] = None
+    last_heartbeat: "datetime | None" = None
+    last_activated: "datetime | None" = None
 
 
 class NodeManager(QObject):
@@ -131,7 +130,7 @@ class NodeManager(QObject):
 
         return state
 
-    def get_node(self, node_id: str) -> Optional[NodeState]:
+    def get_node(self, node_id: str) -> "NodeState | None":
         return self._nodes.get(node_id)
 
     def get_all_nodes(self) -> dict[str, NodeState]:

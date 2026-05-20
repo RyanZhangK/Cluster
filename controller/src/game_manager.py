@@ -2,7 +2,7 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from PySide6.QtCore import QObject
 
@@ -54,14 +54,14 @@ class GameManager(QObject):
         self._sta_team_mapping: dict[str, str] = {}  # node_id → team（开始时记录）
         self._eliminated_teams: set[str] = set()
         self._det_activation: dict[str, str] = {}  # node_id → team（占领模式）
-        self._bomb_task: asyncio.Task | None = None
+        self._bomb_task: asyncio.Task[Any] | None = None
         self._bomb_remaining: int = 0
 
         logger.info(
             f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}"
         )
 
-    def on_sta_activated(self, node_id: str, team: str, _: dict) -> None:
+    def on_sta_activated(self, node_id: str, team: str, _) -> None:
         """STA 节点激活时调用。"""
         if self._game_state == GameState.IDLE:
             # 开始阶段：记录节点↔队伍映射
@@ -85,7 +85,9 @@ class GameManager(QObject):
                 # 爆破模式：STA 激活可能触发炸弹激活或拆除
                 pass
 
-    def on_det_activated(self, node_id: str, team: str, nodes: dict) -> None:
+    def on_det_activated(
+        self, node_id: str, team: str, nodes: dict[str, "NodeState"]
+    ) -> None:
         """DET 节点激活时调用。"""
         if self._game_state != GameState.RUNNING:
             return
@@ -138,7 +140,7 @@ class GameManager(QObject):
             winner = (self.participating_teams - self._eliminated_teams).pop()
             self._end_game(winner)
 
-    def _check_occupy_victory(self, nodes: dict) -> None:
+    def _check_occupy_victory(self, nodes: dict[str, "NodeState"]) -> None:
         """检查占领模式胜利条件。"""
         # 统计在线 DET 节点总数
         online_det_count = sum(

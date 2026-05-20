@@ -4,6 +4,7 @@ import logging
 import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
+from typing import Any, Callable
 
 import qasync
 from PySide6.QtWidgets import QApplication
@@ -17,7 +18,7 @@ from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
 
 
-async def listen_terminal_eof(on_eof_cb):
+async def listen_terminal_eof(on_eof_cb: Callable[..., Any]):
     """异步监听终端的 Ctrl+D (EOF)"""
     loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
@@ -53,7 +54,9 @@ def setup_logging() -> None:
     )
 
 
-async def ui_hot_reload_watcher(node_manager, event_bus, audio_player):
+async def ui_hot_reload_watcher(
+    node_manager: NodeManager, event_bus: EventBus, audio_player: AudioPlayer
+):
     """每秒检查一次 UI.py 的修改时间"""
     logger = logging.getLogger("HotReload")
 
