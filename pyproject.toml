@@ -24,6 +24,16 @@ include = ["controller"]
 
 [tool.pyright]
 extraPaths = ["controller/src"]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "strict"
+reportAny = "none"
+reportUnannotatedClassAttribute = "none"
+reportUnknownVariableType = "none"
+reportUnknownParameterType = "none"
+reportUnknownMemberType = "none"
+reportUnknownArgumentType = "none"
+reportImplicitStringConcatenation = "none"
 
 [dependency-groups]
 dev = [

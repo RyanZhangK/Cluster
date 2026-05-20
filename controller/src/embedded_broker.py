@@ -8,7 +8,7 @@ from .config import BROKER_BIND_HOST, BROKER_BIND_PORT, BROKER_READY
 logger = logging.getLogger(__name__)
 
 
-def _build_config() -> dict:
+def _build_config():
     """构建 amqtt Broker 配置字典。"""
     return {
         "listeners": {
@@ -59,9 +59,8 @@ class EmbeddedBroker:
             raise
         finally:
             BROKER_READY.clear()
-            if self._broker is not None:
-                try:
-                    await self._broker.shutdown()
-                    logger.info("内嵌 Broker 已关闭")
-                except Exception as e:
-                    logger.error(f"内嵌 Broker 关闭时出错: {e}")
+            try:
+                await self._broker.shutdown()
+                logger.info("内嵌 Broker 已关闭")
+            except Exception as e:
+                logger.error(f"内嵌 Broker 关闭时出错: {e}")
