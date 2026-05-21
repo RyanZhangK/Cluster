@@ -1,0 +1,4 @@
+{
+    "amd64": "https://github.com/fatedier/frp/releases/download/v0.68.1/frp_0.68.1_linux_amd64.tar.gz",
+    "arm64": "https://github.com/fatedier/frp/releases/download/v0.68.1/frp_0.68.1_linux_arm64.tar.gz"
+}

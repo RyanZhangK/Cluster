@@ -36,7 +36,11 @@ class GameSettings(BaseSettings):
 
     heartbeat_timeout: int = 600  # 秒，节点心跳超时时间
     watchdog_interval: int = 30  # 秒，看门狗检查间隔
-    ui_hot_reload: bool = True
+
+
+class ControllerSettings(BaseSettings):
+    dev: bool = False
+    ui_hot_reload: bool = False
 
 
 class MessageSettings(BaseSettings):
@@ -61,6 +65,7 @@ class Settings(BaseSettings):
     mqtt: MQTTSettings = Field(default_factory=MQTTSettings)
     broker: BrokerSettings = Field(default_factory=BrokerSettings)
     game: GameSettings = Field(default_factory=GameSettings)
+    controller: ControllerSettings = Field(default_factory=ControllerSettings)
     message: MessageSettings = Field(default_factory=MessageSettings)
     frpc: FrpcSettings = Field(default_factory=FrpcSettings)
 
@@ -111,7 +116,9 @@ BROKER_BIND_PORT = settings.broker.bind_port
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = settings.game.heartbeat_timeout
 WATCHDOG_INTERVAL = settings.game.watchdog_interval
-UI_HOT_RELOAD = settings.game.ui_hot_reload
+
+DEV = settings.controller.dev
+UI_HOT_RELOAD = settings.controller.ui_hot_reload
 
 # 消息格式
 MSG_LENGTH = settings.message.msg_length
@@ -180,6 +187,8 @@ __all__ = [
     "BROKER_BIND_PORT",
     "HEARTBEAT_TIMEOUT",
     "WATCHDOG_INTERVAL",
+    "DEV",
+    "UI_HOT_RELOAD",
     "MSG_LENGTH",
     "NODE_ID_LENGTH",
     "AUDIO_DIR",

@@ -28,6 +28,7 @@ controller/resources/tts_temp/
 build/dist/
 build/stage/
 build/pkg/
+.deps
 
 # PlatformIO
 mcu/*/piolibdeps/

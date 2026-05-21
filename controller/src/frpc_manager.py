@@ -7,6 +7,8 @@ from typing import Any
 
 from PySide6.QtCore import QObject, Signal
 
+from .config import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,9 +27,10 @@ def _frpc_binary_path() -> Path | None:
     if installed.exists():
         return installed / arch_dir / "frpc"
 
-    dev = Path(__file__).parent.parent / "resources" / "frpc" / arch_dir / "frpc"
-    if dev.exists():
-        return dev
+    if settings.controller.dev:
+        dev = Path(__file__).parent.parent / "resources" / "frpc" / arch_dir / "frpc"
+        if dev.exists():
+            return dev
 
     return None
 

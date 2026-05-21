@@ -139,7 +139,7 @@ def main() -> None:
 
         loop.create_task(mqtt_client.run(), name="mqtt_client")
         loop.create_task(node_manager.heartbeat_watchdog(), name="heartbeat_watchdog")
-        if settings.game.ui_hot_reload:
+        if settings.controller.ui_hot_reload:
             loop.create_task(
                 ui_hot_reload_watcher(
                     node_manager, event_bus, audio_player, frpc_manager
