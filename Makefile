@@ -23,17 +23,20 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all dev lint hot clean compile stage deb pacman bump
-all: clean compile stage deb pacman 
+.PHONY: all deps dev lint hot clean compile stage deb pacman bump
+all: clean deps compile stage deb pacman 
+
+deps: scripts/install_deps.py
+	uv run scripts/install_deps.py
 
 dev:
-	uv run controller
+	CLUSTER_CONTROLLER__DEV=true uv run controller
 
 lint:
 	uvx ruff check . && uvx ruff format --check .
 
 hot:
-	CLUSTER_GAME__UI_HOT_RELOAD=true uv run controller
+	CLUSTER_CONTROLLER__UI_HOT_RELOAD=true uv run controller
 
 clean: 
 	@echo "==> 清理旧产物..."
@@ -49,7 +52,7 @@ compile:
 		--static-libpython=yes \
 		--include-package=amqtt \
 		--include-data-dir=../resources/audio=resources/audio \
-		--include-data-dir=../resources/frpc=resources/frpc \
+		--include-data-dir=../resources/frpc=resources/frpc/$(DEB_ARCH) \
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
