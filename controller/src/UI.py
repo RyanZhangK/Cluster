@@ -3,7 +3,7 @@ import logging
 import tomllib
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QColor, QFont
@@ -173,7 +173,6 @@ class MainWindow(QMainWindow):
         self._current_mode = "征服"
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
-        self._node_to_row: dict[str, int] = {}
 
         self._bomb_attacker_combo = QComboBox()
         self._bomb_defender_combo = QComboBox()
@@ -793,9 +792,7 @@ class MainWindow(QMainWindow):
         return page
 
     def _on_manual_play(self, key: str) -> None:
-        self._audio_player._queue.clear()  # pyright: ignore[reportPrivateUsage]
-        self._audio_player._current = None  # pyright: ignore[reportPrivateUsage]
-        self._audio_player._play(key)  # pyright: ignore[reportPrivateUsage]
+        self._audio_player.play_immediate(key)
 
     # ── Frpc 管理页 ─────────────────────────────────────────────────────────────
 
@@ -1025,11 +1022,13 @@ class MainWindow(QMainWindow):
                 )
                 auth = data.get("auth", {})
                 if isinstance(auth, dict):
-                    self._frpc_auth_token.setText(auth.get("token", ""))
+                    token: str = cast(dict[str, str], auth).get("token", "")
+                    self._frpc_auth_token.setText(token)
                 proxies = data.get("proxies", FRPC_PROXIES)
                 if isinstance(proxies, str):
                     proxies = json.loads(proxies)
-                self._populate_proxy_table(proxies)
+                assert isinstance(proxies, list)
+                self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
                 return
             except (tomllib.TOMLDecodeError, OSError):
                 pass
@@ -1041,11 +1040,12 @@ class MainWindow(QMainWindow):
             proxies = json.loads(FRPC_PROXIES)
         except (json.JSONDecodeError, TypeError):
             proxies = []
-        self._populate_proxy_table(proxies)  # pyright: ignore[reportArgumentType]
+        assert isinstance(proxies, list)
+        self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
 
     def _collect_frpc_config(self) -> dict[str, Any]:
         """从 UI 表单收集 frpc 配置。"""
-        proxies = []
+        proxies: list[dict[str, Any]] = []
         for row in range(self._proxy_table.rowCount()):
             name = self._proxy_table.item(row, 0)
             ptype = self._proxy_table.item(row, 1)
@@ -1071,7 +1071,7 @@ class MainWindow(QMainWindow):
 
     def _populate_proxy_table(
         self,
-        proxies: dict,  # pyright: ignore[reportMissingTypeArgument]
+        proxies: list[dict[str, Any]],
     ) -> None:
         """将代理列表填充到表格。"""
         self._proxy_table.setRowCount(0)
@@ -1157,13 +1157,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_shutdown_clicked(self) -> None:
-
-        self._audio_player._queue.clear()  # pyright: ignore[reportPrivateUsage]
-        self._audio_player.play_sys_offline()
-        # 等音效播完再退出：监听 playing 结束
-        # self.__shutdown_pending = True
-        self._audio_player._effects  # 确保已加载  # pyright: ignore[reportPrivateUsage]
-        # 用单次定时器轮询，避免在音效结束前退出
+        self._audio_player.play_immediate("sys_offline")
         from PySide6.QtCore import QTimer
 
         self._shutdown_timer = QTimer(self)
@@ -1172,10 +1166,7 @@ class MainWindow(QMainWindow):
         self._shutdown_timer.start()
 
     def _check_shutdown(self) -> None:
-        if (
-            self._audio_player._current is None  # pyright: ignore[reportPrivateUsage]
-            and not self._audio_player._queue  # pyright: ignore[reportPrivateUsage]
-        ):
+        if self._audio_player.is_idle:
             self._shutdown_timer.stop()
             from PySide6.QtWidgets import QApplication
 
@@ -1421,29 +1412,16 @@ class MainWindow(QMainWindow):
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0; }}
         """
 
-    def _progress_style(self, color: str) -> str:
+    def _progress_style(self, color: str, radius: int = 4) -> str:
         return f"""
             QProgressBar {{
                 background-color: {C_BORDER};
-                border-radius: 4px;
+                border-radius: {radius}px;
                 border: none;
             }}
             QProgressBar::chunk {{
                 background-color: {color};
-                border-radius: 4px;
-            }}
-        """
-
-    def _bomb_progress_style(self, color: str) -> str:
-        return f"""
-            QProgressBar {{
-                background-color: {C_BORDER};
-                border-radius: 5px;
-                border: none;
-            }}
-            QProgressBar::chunk {{
-                background-color: {color};
-                border-radius: 5px;
+                border-radius: {radius}px;
             }}
         """
 
@@ -1477,15 +1455,17 @@ class MainWindow(QMainWindow):
     def _populate_table(self) -> None:
         nodes = self._node_manager.get_all_nodes()
         self._table.setRowCount(len(nodes))
-        self._node_to_row.clear()
 
         for row, (node_id, state) in enumerate(nodes.items()):
             self._update_row_at(row, node_id, state)
-            self._node_to_row[node_id] = row
         self._update_stats()
 
     def _find_row(self, node_id: str) -> int:
-        return self._node_to_row.get(node_id, -1)
+        for row in range(self._table.rowCount()):
+            item = self._table.item(row, self.COL_NODE_ID)
+            if item and item.text() == node_id:
+                return row
+        return -1
 
     def _update_row_at(self, row: int, node_id: str, state: "NodeState") -> None:
         is_online = state.status == OnlineStatus.ONLINE
@@ -1513,7 +1493,6 @@ class MainWindow(QMainWindow):
         if row == -1:
             row = self._table.rowCount()
             self._table.insertRow(row)
-            self._node_to_row[node_id] = row
         self._update_row_at(row, node_id, state)
         self._update_stats()
 
@@ -1646,7 +1625,7 @@ class MainWindow(QMainWindow):
         self._bomb_timer_label.setStyleSheet(
             f"color: {color}; font-size: 56px; font-weight: bold; background: transparent;"
         )
-        self._bomb_progress.setStyleSheet(self._bomb_progress_style(color))
+        self._bomb_progress.setStyleSheet(self._progress_style(color, 5))
 
     @Slot()
     def _on_bomb_defused(self) -> None:

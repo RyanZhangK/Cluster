@@ -6,11 +6,11 @@ PKG_DESCRIPTION := "MQTT 节点管理与游戏控制系统（征服/占领/爆�
 PKG_URL         := "https://github.com/RyanZhangK/Cluster"
 
 ROOT_DIR        := $(shell pwd)
-SRC_DIR         := $(ROOT_DIR)/controller/src
 BUILD_DIR       := $(ROOT_DIR)/build
 DIST_DIR        := $(BUILD_DIR)/dist
 STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
+SRC_DIR         := $(ROOT_DIR)/controller/src
 NUITKA_OUT      := $(DIST_DIR)/main.dist
 
 ARCH_NAME       := $(shell uname -m)
@@ -23,7 +23,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all deps dev lint hot clean compile stage deb pacman bump
+.PHONY: all deps dev lint hot clean clean-compile clean-stage compile stage deb pacman bump
 all: clean deps compile stage deb pacman 
 
 deps: scripts/install_deps.py
@@ -36,13 +36,19 @@ lint:
 	uvx ruff check . && uvx ruff format --check .
 
 hot:
-	CLUSTER_CONTROLLER__UI_HOT_RELOAD=true uv run controller
+	CLUSTER_CONTROLLER__UI_HOT_RELOAD=true CLUSTER_CONTROLLER__DEV=true uv run controller
 
-clean: 
+clean-compile:
+	@rm -rf $(DIST_DIR)
+
+clean-stage:
+	@rm -rf $(STAGE_DIR)
+
+clean: clean-compile clean-stage
 	@echo "==> 清理旧产物..."
-	rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 
-compile:
+compile: clean-compile
 	@echo "==> Nuitka 编译开始..."
 	@mkdir -p $(DIST_DIR)
 	uv sync --locked
@@ -58,9 +64,8 @@ compile:
 		--assume-yes-for-downloads \
 		--main=main.py
 
-stage: 
+stage: clean-stage
 	@echo "==> 组装 Stage 目录..."
-	@rm -rf $(STAGE_DIR)
 	
 	install -dm755 $(STAGE_DIR)$(INSTALL_SHARE)/lib
 	install -dm755 $(STAGE_DIR)$(INSTALL_SHARE)/audio
@@ -92,7 +97,7 @@ FPM_OPTS := -s dir -C $(STAGE_DIR) -n $(PKG_NAME) -v $(PKG_VERSION) \
             --maintainer $(PKG_MAINTAINER) --description $(PKG_DESCRIPTION) \
             --url $(PKG_URL) --prefix /
 
-deb: 
+deb:
 	@echo "==> 构建 DEB 包..."
 	@mkdir -p $(PKG_DIR)
 	fpm $(FPM_OPTS) -t deb \
@@ -107,7 +112,7 @@ deb:
 		--deb-no-default-config-files \
 		-p $(PKG_DIR)/$(PKG_NAME)_$(PKG_VERSION)_$(DEB_ARCH).deb .
 
-pacman: 
+pacman:
 	@echo "==> 构建 Pacman 包..."
 	@mkdir -p $(PKG_DIR)
 	fpm $(FPM_OPTS) -t pacman \

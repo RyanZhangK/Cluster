@@ -68,6 +68,15 @@ class AudioPlayer(QObject):
         if self._current is None:
             self._play_next()
 
+    def play_immediate(self, key: str) -> None:
+        self._queue.clear()
+        self._current = None
+        self._play(key)
+
+    @property
+    def is_idle(self) -> bool:
+        return self._current is None and not self._queue
+
     def _play_next(self) -> None:
         while self._queue:
             key = self._queue.popleft()

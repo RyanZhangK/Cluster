@@ -61,7 +61,7 @@ class GameManager(QObject):
             f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}"
         )
 
-    def on_sta_activated(self, node_id: str, team: str, _) -> None:
+    def on_sta_activated(self, node_id: str, team: str, _: object) -> None:
         """STA 节点激活时调用。"""
         if self._game_state == GameState.IDLE:
             # 开始阶段：记录节点↔队伍映射
