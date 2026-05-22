@@ -5,6 +5,7 @@ import platform
 from pathlib import Path
 from typing import Any
 
+import toml
 from PySide6.QtCore import QObject, Signal
 
 from .config import settings
@@ -37,15 +38,6 @@ def _frpc_binary_path() -> Path | None:
 
 def _build_frpc_config(config: dict[Any, Any]) -> str:
     """从配置字典生成 frpc.toml 内容。"""
-    lines = [
-        f'serverAddr = "{config.get("server_addr", "")}"',
-        f"serverPort = {config.get('server_port', 7000)}",
-    ]
-    token = config.get("auth_token", "")
-    if token:
-        lines.append(f'auth.token = "{token}"')
-    lines.append("")
-
     proxies = config.get("proxies", [])
     if isinstance(proxies, str):
         try:
@@ -53,16 +45,27 @@ def _build_frpc_config(config: dict[Any, Any]) -> str:
         except (json.JSONDecodeError, TypeError):
             proxies = []
 
-    for p in proxies:
-        lines.append("[[proxies]]")
-        lines.append(f'name = "{p.get("name", "")}"')
-        lines.append(f'type = "{p.get("type", "tcp")}"')
-        lines.append(f'localIP = "{p.get("local_ip", "127.0.0.1")}"')
-        lines.append(f"localPort = {p.get('local_port', 80)}")
-        lines.append(f"remotePort = {p.get('remote_port', 8080)}")
-        lines.append("")
+    data: dict[str, Any] = {
+        "serverAddr": config.get("server_addr", ""),
+        "serverPort": config.get("server_port", 7000),
+    }
+    token = config.get("auth_token", "")
+    if token:
+        data["auth"] = {"token": token}
 
-    return "\n".join(lines)
+    if proxies:
+        data["proxies"] = [
+            {
+                "name": p.get("name", ""),
+                "type": p.get("type", "tcp"),
+                "localIP": p.get("local_ip", "127.0.0.1"),
+                "localPort": p.get("local_port", 80),
+                "remotePort": p.get("remote_port", 8080),
+            }
+            for p in proxies
+        ]
+
+    return toml.dumps(data)
 
 
 class FrpcManager(QObject):
@@ -72,20 +75,20 @@ class FrpcManager(QObject):
     log_received = Signal(str)
     error_occurred = Signal(str)
 
-    def __init__(self, parent: "QObject | None" = None) -> None:
+    def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._process: asyncio.subprocess.Process | None = None
-        self._running = False
+        self._task: asyncio.Task[None] | None = None
         self._config_path: Path = Path(__file__).parent.parent / "frpc.toml"
 
     @property
     def is_running(self) -> bool:
-        return self._running
+        return self._process is not None and self._process.returncode is None
 
     def start(self, config: dict[Any, Any]) -> None:
         """写入配置文件并启动 frpc。"""
-        if self._running:
-            logger.warning("frpc 已在运行中")
+        if self.is_running or (self._task is not None and not self._task.done()):
+            logger.warning("frpc 已在正在启动中")
             return
 
         binary = _frpc_binary_path()
@@ -112,21 +115,17 @@ class FrpcManager(QObject):
             return
 
         logger.info(f"frpc 配置已写入: {self._config_path}")
-        self._running = True
-        self.status_changed.emit(True)
 
-        task = asyncio.create_task(self._run_process(binary))
-        self._task = task
+        self._task = asyncio.create_task(self._run(binary))
 
     def stop(self) -> None:
         """终止 frpc 进程。"""
-        if not self._running or self._process is None:
+        if not self.is_running or self._process is None:
             return
         logger.info("正在停止 frpc...")
         self._process.terminate()
-        # 不在这里设置 _running = False，由 _run_process 的 finally 处理
 
-    async def _run_process(self, binary: Path) -> None:
+    async def _run(self, binary: Path) -> None:
         """异步子进程，读取 frpc 的 stdout/stderr。"""
         try:
             self._process = await asyncio.create_subprocess_exec(
@@ -137,6 +136,7 @@ class FrpcManager(QObject):
                 stderr=asyncio.subprocess.STDOUT,
             )
             self.log_received.emit(f"[系统] frpc 已启动，PID: {self._process.pid}")
+            self.status_changed.emit(True)
 
             assert self._process.stdout is not None
             while True:
@@ -167,6 +167,5 @@ class FrpcManager(QObject):
             self.error_occurred.emit(f"frpc 运行时错误: {e}")
             logger.error(f"frpc 运行时错误: {e}", exc_info=True)
         finally:
-            self._running = False
             self._process = None
             self.status_changed.emit(False)
