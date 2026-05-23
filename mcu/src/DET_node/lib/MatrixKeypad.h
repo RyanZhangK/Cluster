@@ -1,7 +1,8 @@
+#pragma once
+
 /**
  * Node MCU 4×4矩阵键盘驱动
  * 使用所有支持内部上拉的GPIO引脚，避免外部电阻
- * 作者：基于用户需求定制
  */
 
 #include <Arduino.h>
@@ -242,60 +243,3 @@ private:
     }
   }
 };
-
-// 全局键盘对象
-MatrixKeypad keypad;
-
-void
-setup()
-{
-  Serial.begin(115200);
-  delay(1000); // 等待串口初始化
-
-  Serial.println("\n=== Node MCU 4×4矩阵键盘驱动 ===");
-
-  // 初始化键盘
-  keypad.begin();
-
-  // 显示使用说明
-  Serial.println("使用说明:");
-  Serial.println("1. 输入数字进行测试");
-  Serial.println("2. 按'*'进入调试模式");
-  Serial.println("3. 按'A'开始密码输入演示");
-  Serial.println("4. 按'D'显示引脚映射");
-  Serial.println("==============================\n");
-}
-
-void
-loop()
-{
-  char key = keypad.getKey();
-
-  if (key != '\0') {
-    Serial.printf("按键: '%c'\n", key);
-
-    // 特殊功能键处理
-    switch (key) {
-      case '*':
-        keypad.debugMode();
-        break;
-
-      case 'A': {
-        char password[20];
-        int len = keypad.readPassword(password, sizeof(password));
-        if (len > 0) {
-          Serial.printf("输入的密码长度: %d\n", len);
-        }
-      } break;
-
-      case 'D':
-        keypad.printPinMapping();
-        break;
-    }
-
-    // 等待按键释放
-    keypad.waitForKeyRelease(key);
-  }
-
-  delay(10); // 主循环延时
-}

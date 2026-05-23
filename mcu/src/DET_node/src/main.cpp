@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include <Ticker.h>
 
 #include <Keypad.h>
 
@@ -40,7 +39,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 // 全局变量
 WiFiClient espClient;
 PubSubClient client(espClient);
-Ticker watchdogTicker;
+
 unsigned long lastHeartbeat = 0;
 String inputBuffer;
 bool isRecording = false;
@@ -71,13 +70,6 @@ setupWiFi()
   Serial.println("\n[网络] WiFi已连接");
   Serial.print("[网络] IP地址: ");
   Serial.println(WiFi.localIP());
-}
-
-// 看门狗喂食
-void
-feedWatchdog()
-{
-  ESP.wdtFeed();
 }
 
 /**
@@ -241,9 +233,8 @@ setup()
   // Keypad库自动初始化键盘引脚
   Serial.println("[硬件] 键盘初始化完成");
 
-  // 初始化看门狗
-  ESP.wdtEnable(8000);                    // 8秒超时
-  watchdogTicker.attach(5, feedWatchdog); // 每5秒喂狗
+  // 初始化看门狗（8秒超时，loop()中手动喂狗）
+  ESP.wdtEnable(8000);
   Serial.println("[系统] 看门狗已启用");
 
   // 网络连接

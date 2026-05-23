@@ -1617,11 +1617,7 @@ class MainWindow(QMainWindow):
     def _on_bomb_tick(self, remaining: int) -> None:
         self._bomb_timer_label.setText(str(remaining))
         self._bomb_progress.setValue(remaining)
-        color = (
-            C_DANGER
-            if remaining <= 10
-            else (C_WARNING if remaining <= 20 else C_WARNING)
-        )
+        color = C_DANGER if remaining <= 10 else C_WARNING
         self._bomb_timer_label.setStyleSheet(
             f"color: {color}; font-size: 56px; font-weight: bold; background: transparent;"
         )

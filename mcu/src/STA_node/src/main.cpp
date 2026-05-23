@@ -61,6 +61,11 @@ void
 reconnect()
 {
   while (!client.connected()) {
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("WiFi 断开，先重连 WiFi...");
+      setup_wifi();
+    }
+
     Serial.print("Connecting to MQTT ");
     Serial.print(MQTT_SERVER);
     Serial.print(":");
@@ -74,9 +79,12 @@ reconnect()
       int state = client.state();
       Serial.print("failed, rc=");
       Serial.print(state);
-      Serial.println(", retry in 5s");
-      blinkLED(5, 200);
-      delay(5000);
+      Serial.println(", retry in 500ms");
+      blinkLED(1, 100);
+      for (int i = 0; i < 10; i++) {
+        delay(50);
+        client.loop();
+      }
     }
   }
 }
