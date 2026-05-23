@@ -6,10 +6,14 @@ on:
       - "v*"
   workflow_dispatch:
     inputs:
+      commit_sha:
+        description: 'Specific commit SHA to build (leave empty for branch HEAD)'
+        required: false
+        default: ''
       tag_name:
-        description: 'Release Tag'
-        required: true
-        default: 'test'
+        description: 'Release tag (leave empty for auto-generate from commit SHA)'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -23,9 +27,30 @@ jobs:
           - arch: arm64
             runner: ubuntu-22.04-arm
 
+    outputs:
+      tag_name: ${{ steps.version.outputs.tag_name }}
+      commit_sha: ${{ steps.version.outputs.commit_sha }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit_sha || github.ref }}
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            TAG="${{ github.ref_name }}"
+          elif [[ -n "${{ inputs.tag_name }}" ]]; then
+            TAG="${{ inputs.tag_name }}"
+          else
+            SHORT_SHA="$(git rev-parse --short HEAD)"
+            TAG="build-${SHORT_SHA}"
+          fi
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "Using tag: ${TAG}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -60,10 +85,8 @@ jobs:
 
       - name: Build packages
         env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          export VERSION="${VERSION#v}"
-          make all
+          PKG_VERSION: ${{ steps.version.outputs.tag_name }}
+        run: make all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -89,9 +112,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "Cluster ${{ github.ref_name }}"
+          tag_name: ${{ needs.build.outputs.tag_name }}
+          name: "Cluster ${{ needs.build.outputs.tag_name }}"
           generate_release_notes: true
+          target_commitish: ${{ needs.build.outputs.commit_sha }}
           files: |
             artifacts/*.deb
             artifacts/*.pkg.tar.zst
