@@ -52,6 +52,7 @@ class GameManager(QObject):
 
         self._game_state = GameState.IDLE
         self._sta_team_mapping: dict[str, str] = {}  # node_id → team（开始时记录）
+        self._activated_teams: set[str] = set()  # 已激活的队伍（去重）
         self._eliminated_teams: set[str] = set()
         self._det_activation: dict[str, str] = {}  # node_id → team（占领模式）
         self._bomb_task: asyncio.Task[Any] | None = None
@@ -66,10 +67,11 @@ class GameManager(QObject):
         if self._game_state == GameState.IDLE:
             # 开始阶段：记录节点↔队伍映射
             self._sta_team_mapping[node_id] = team
+            self._activated_teams.add(team)
             logger.info(f"记录 STA 节点: {node_id} → 队伍 {team}")
 
-            # 检查开始条件
-            if len(self._sta_team_mapping) == self.team_count:
+            # 检查开始条件（按队伍去重，同队重复激活不计数）
+            if len(self._activated_teams) == self.team_count:
                 self._start_game()
 
         elif self._game_state == GameState.RUNNING:
@@ -114,8 +116,11 @@ class GameManager(QObject):
             return
 
         # 爆破模式：如果炸弹节点离线，取消倒计时
-        assert self.bomb_config is not None
-        if self.mode == GameMode.BOMB and node_id == self.bomb_config.bomb_node_id:
+        if (
+            self.mode == GameMode.BOMB
+            and self.bomb_config is not None
+            and node_id == self.bomb_config.bomb_node_id
+        ):
             if self._bomb_task and not self._bomb_task.done():
                 self._bomb_task.cancel()
                 self._bomb_task = None
@@ -218,6 +223,7 @@ class GameManager(QObject):
             self._bomb_task.cancel()
         self._game_state = GameState.IDLE
         self._sta_team_mapping.clear()
+        self._activated_teams.clear()
         self._eliminated_teams.clear()
         self._det_activation.clear()
         self._bomb_task = None

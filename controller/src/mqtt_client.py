@@ -43,8 +43,8 @@ def parse_message(raw: str) -> tuple[str, str, int]:
         raise MessageParseError(f"消息长度错误: 期望 {MSG_LENGTH}，实际 {len(raw)}")
 
     node_id = raw[:NODE_ID_LENGTH]
-    action_type = raw[5]
-    extra_info = raw[6]
+    action_type = raw[NODE_ID_LENGTH]
+    extra_info = raw[NODE_ID_LENGTH + 1]
 
     if action_type not in ("H", "A"):
         raise MessageParseError(f"无效的动作类型: {action_type!r}")
@@ -110,7 +110,6 @@ class MQTTClient:
                 self._event_bus.node_status_changed.emit(node_id, state)
                 if came_online:
                     logger.info(f"节点 {node_id} 上线")
-                    self._event_bus.node_came_online.emit(node_id, state)
 
             elif action_type == "A":
                 state = self._node_manager.handle_activation(node_id, team_or_zero)
