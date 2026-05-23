@@ -1,6 +1,6 @@
 import pytest
 
-from controller.src.mqtt_client import parse_message, MessageParseError
+from controller.src.mqtt_client import MessageParseError, parse_message
 
 
 def test_heartbeat() -> None:
