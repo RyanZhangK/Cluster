@@ -31,6 +31,29 @@ from .audio_player import AudioPlayer
 from .config import FRPC_AUTH_TOKEN, FRPC_PROXIES, FRPC_SERVER_ADDR, FRPC_SERVER_PORT
 from .event_bus import EventBus
 from .node_manager import NodeManager, OnlineStatus
+from .styles import (
+    C_BG,
+    C_BORDER,
+    C_CARD,
+    C_DANGER,
+    C_PRIMARY,
+    C_SIDEBAR,
+    C_SUCCESS,
+    C_SURFACE,
+    C_TEXT,
+    C_TEXT_MUTED,
+    C_TEXT_SEC,
+    C_WARNING,
+    TEAM_COLORS,
+    btn_style,
+    combo_style,
+    input_style,
+    progress_style,
+    spinbox_style,
+    table_style,
+    toggle_btn_style,
+)
+from .widgets import Card, NavButton, SectionLabel, StatusDot, add_section_label
 
 if TYPE_CHECKING:
     from frpc_manager import FrpcManager
@@ -38,111 +61,6 @@ if TYPE_CHECKING:
     from node_manager import NodeState
 
 logger = logging.getLogger(__name__)
-
-# ─── 色彩系统 ─────────────────────────────────────────────────────────────────
-C_BG = "#0f1117"
-C_SURFACE = "#161b27"
-C_CARD = "#1e2435"
-C_BORDER = "#2a3045"
-C_PRIMARY = "#4f6ef7"
-C_PRIMARY_H = "#6b84f8"
-C_SUCCESS = "#22c55e"
-C_DANGER = "#ef4444"
-C_WARNING = "#f59e0b"
-C_TEXT = "#e2e8f0"
-C_TEXT_SEC = "#8b95b0"
-C_TEXT_MUTED = "#4a5270"
-C_SIDEBAR = "#0c0f1a"
-C_NAV_HOVER = "#181d2e"
-C_NAV_ACTIVE = "#1e2a4a"
-
-TEAM_COLORS = {"A": "#ef4444", "B": "#3b82f6", "C": "#22c55e", "D": "#f59e0b"}
-
-
-# ─── 复用组件 ─────────────────────────────────────────────────────────────────
-
-
-class NavButton(QPushButton):
-    def __init__(
-        self, icon_text: str, label: str, parent: "QWidget | None" = None
-    ) -> None:
-        super().__init__(parent)
-        self._icon_text = icon_text
-        self._label = label
-        self.setText(f"  {icon_text}  {label}")
-        self.setCheckable(True)
-        self.setFixedHeight(42)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._refresh()
-
-    def setChecked(self, arg__1: bool) -> None:
-        super().setChecked(arg__1)
-        self._refresh()
-
-    def _refresh(self) -> None:
-        checked = self.isChecked()
-        left = (
-            f"border-left: 3px solid {C_PRIMARY};"
-            if checked
-            else "border-left: 3px solid transparent;"
-        )
-        bg = C_NAV_ACTIVE if checked else "transparent"
-        color = C_TEXT if checked else C_TEXT_SEC
-        self.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {bg};
-                color: {color};
-                border: none;
-                {left}
-                padding: 0 18px;
-                text-align: left;
-                font-size: 13px;
-            }}
-            QPushButton:hover {{
-                background-color: {C_NAV_HOVER};
-                color: {C_TEXT};
-            }}
-        """)
-
-
-class StatusDot(QLabel):
-    def __init__(
-        self, color: str = C_TEXT_MUTED, parent: "QLabel | None" = None
-    ) -> None:
-        super().__init__(parent)
-        self.setFixedSize(8, 8)
-        self._set(color)
-
-    def set_color(self, color: str) -> None:
-        self._set(color)
-
-    def _set(self, color: str) -> None:
-        self.setStyleSheet(f"background-color: {color}; border-radius: 4px;")
-
-
-class Card(QFrame):
-    def __init__(self, parent: "QFrame | None" = None) -> None:
-        super().__init__(parent)
-        self.setStyleSheet(f"""
-            QFrame {{
-                background-color: {C_CARD};
-                border: 1px solid {C_BORDER};
-                border-radius: 8px;
-            }}
-        """)
-
-
-class SectionLabel(QLabel):
-    def __init__(self, text: str, parent: "QLabel | None" = None) -> None:
-        super().__init__(text, parent)
-        self.setStyleSheet(f"""
-            color: {C_TEXT_MUTED};
-            font-size: 10px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            padding: 14px 18px 4px 18px;
-            background: transparent;
-        """)
 
 
 # ─── 主窗口 ───────────────────────────────────────────────────────────────────
@@ -389,7 +307,7 @@ class MainWindow(QMainWindow):
         act_row = QHBoxLayout()
         self._reset_btn = QPushButton("重置选中节点")
         self._reset_btn.setFixedHeight(36)
-        self._reset_btn.setStyleSheet(self._btn_style(C_PRIMARY))
+        self._reset_btn.setStyleSheet(btn_style(C_PRIMARY))
         self._reset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._reset_btn.clicked.connect(self._on_reset_btn_clicked)
         act_row.addWidget(self._reset_btn)
@@ -402,7 +320,7 @@ class MainWindow(QMainWindow):
         self._table.setHorizontalHeaderLabels(self.COLUMN_HEADERS)
         self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self._table.setStyleSheet(self._table_style())
+        self._table.setStyleSheet(table_style())
         layout.addWidget(self._table)
 
         return page
@@ -450,7 +368,7 @@ class MainWindow(QMainWindow):
         ml = QVBoxLayout(mode_card)
         ml.setContentsMargins(20, 16, 20, 18)
         ml.setSpacing(12)
-        self._card_section_label(ml, "游戏模式")
+        add_section_label(ml, "游戏模式")
         mode_row = QHBoxLayout()
         mode_row.setSpacing(8)
         self._mode_btns: dict[str, QPushButton] = {}
@@ -459,7 +377,7 @@ class MainWindow(QMainWindow):
             btn.setCheckable(True)
             btn.setFixedSize(96, 38)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.setStyleSheet(self._toggle_btn_style(mode == "征服"))
+            btn.setStyleSheet(toggle_btn_style(mode == "征服"))
             btn.clicked.connect(partial(self._on_mode_btn_clicked, mode))
             self._mode_btns[mode] = btn
             mode_row.addWidget(btn)
@@ -472,7 +390,7 @@ class MainWindow(QMainWindow):
         tl = QVBoxLayout(team_card)
         tl.setContentsMargins(20, 16, 20, 18)
         tl.setSpacing(12)
-        self._card_section_label(tl, "参与队伍数")
+        add_section_label(tl, "参与队伍数")
         team_row = QHBoxLayout()
         team_row.setSpacing(8)
         self._team_count_btns: dict[int, QPushButton] = {}
@@ -481,7 +399,7 @@ class MainWindow(QMainWindow):
             btn.setCheckable(True)
             btn.setFixedSize(80, 38)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.setStyleSheet(self._toggle_btn_style(n == 2))
+            btn.setStyleSheet(toggle_btn_style(n == 2))
             btn.clicked.connect(partial(self._on_team_count_clicked, n))
             self._team_count_btns[n] = btn
             team_row.addWidget(btn)
@@ -494,7 +412,7 @@ class MainWindow(QMainWindow):
         bl = QVBoxLayout(self._bomb_card)
         bl.setContentsMargins(20, 16, 20, 18)
         bl.setSpacing(12)
-        self._card_section_label(bl, "爆破配置")
+        add_section_label(bl, "爆破配置")
         bomb_row = QHBoxLayout()
         bomb_row.setSpacing(20)
         for label, attr, items in [
@@ -515,7 +433,7 @@ class MainWindow(QMainWindow):
             combo = QComboBox()
             combo.addItems(items)
             combo.setFixedWidth(130)
-            combo.setStyleSheet(self._combo_style())
+            combo.setStyleSheet(combo_style())
             setattr(self, attr, combo)
             col.addWidget(col_lbl)
             col.addWidget(combo)
@@ -531,12 +449,12 @@ class MainWindow(QMainWindow):
         act_row.setSpacing(10)
         self._start_game_btn = QPushButton("启动游戏")
         self._start_game_btn.setFixedSize(120, 42)
-        self._start_game_btn.setStyleSheet(self._btn_style(C_SUCCESS))
+        self._start_game_btn.setStyleSheet(btn_style(C_SUCCESS))
         self._start_game_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._start_game_btn.clicked.connect(self._on_start_game_clicked)
         self._reset_game_btn = QPushButton("重置游戏")
         self._reset_game_btn.setFixedSize(120, 42)
-        self._reset_game_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        self._reset_game_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
         self._reset_game_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._reset_game_btn.clicked.connect(self._on_reset_game_clicked)
         act_row.addWidget(self._start_game_btn)
@@ -551,14 +469,14 @@ class MainWindow(QMainWindow):
         self._current_mode = mode
         for m, btn in self._mode_btns.items():
             btn.setChecked(m == mode)
-            btn.setStyleSheet(self._toggle_btn_style(m == mode))
+            btn.setStyleSheet(toggle_btn_style(m == mode))
         self._bomb_card.setVisible(mode == "爆破")
 
     def _on_team_count_clicked(self, count: int) -> None:
         self._current_team_count = count
         for n, btn in self._team_count_btns.items():
             btn.setChecked(n == count)
-            btn.setStyleSheet(self._toggle_btn_style(n == count))
+            btn.setStyleSheet(toggle_btn_style(n == count))
 
     # ── 游戏状态页 ─────────────────────────────────────────────────────────────
 
@@ -604,7 +522,7 @@ class MainWindow(QMainWindow):
         ol = QVBoxLayout(self._occupy_card)
         ol.setContentsMargins(20, 16, 20, 18)
         ol.setSpacing(10)
-        self._card_section_label(ol, "DET 节点占领进度")
+        add_section_label(ol, "DET 节点占领进度")
         self._occupy_bars: dict[str, QProgressBar] = {}
         for team in ["A", "B", "C", "D"]:
             row = QHBoxLayout()
@@ -618,7 +536,7 @@ class MainWindow(QMainWindow):
             bar.setValue(0)
             bar.setFixedHeight(8)
             bar.setTextVisible(False)
-            bar.setStyleSheet(self._progress_style(TEAM_COLORS[team]))
+            bar.setStyleSheet(progress_style(TEAM_COLORS[team]))
             self._occupy_bars[team] = bar
             row.addWidget(lbl)
             row.addWidget(bar)
@@ -631,7 +549,7 @@ class MainWindow(QMainWindow):
         btl = QVBoxLayout(self._bomb_status_card)
         btl.setContentsMargins(20, 16, 20, 20)
         btl.setSpacing(10)
-        self._card_section_label(btl, "炸弹倒计时")
+        add_section_label(btl, "炸弹倒计时")
         self._bomb_timer_label = QLabel("40")
         self._bomb_timer_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._bomb_timer_label.setStyleSheet(
@@ -647,7 +565,7 @@ class MainWindow(QMainWindow):
         self._bomb_progress.setValue(40)
         self._bomb_progress.setFixedHeight(10)
         self._bomb_progress.setTextVisible(False)
-        self._bomb_progress.setStyleSheet(self._progress_style(C_WARNING))
+        self._bomb_progress.setStyleSheet(progress_style(C_WARNING))
         btl.addWidget(self._bomb_timer_label)
         btl.addWidget(self._bomb_unit_label)
         btl.addWidget(self._bomb_progress)
@@ -661,12 +579,12 @@ class MainWindow(QMainWindow):
         over_row.setSpacing(10)
         self._back_to_config_btn = QPushButton("返回配置")
         self._back_to_config_btn.setFixedSize(120, 42)
-        self._back_to_config_btn.setStyleSheet(self._btn_style(C_PRIMARY))
+        self._back_to_config_btn.setStyleSheet(btn_style(C_PRIMARY))
         self._back_to_config_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._back_to_config_btn.clicked.connect(lambda: self._switch_page(1))
         self._reset_from_status_btn = QPushButton("重置游戏")
         self._reset_from_status_btn.setFixedSize(120, 42)
-        self._reset_from_status_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        self._reset_from_status_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
         self._reset_from_status_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._reset_from_status_btn.clicked.connect(self._on_reset_game_clicked)
         over_row.addWidget(self._back_to_config_btn)
@@ -758,14 +676,14 @@ class MainWindow(QMainWindow):
             cl = QVBoxLayout(card)
             cl.setContentsMargins(20, 14, 20, 16)
             cl.setSpacing(10)
-            self._card_section_label(cl, group_name)
+            add_section_label(cl, group_name)
             btn_row = QHBoxLayout()
             btn_row.setSpacing(8)
             for key, label in items:
                 btn = QPushButton(label)
                 btn.setFixedHeight(34)
                 btn.setCursor(Qt.CursorShape.PointingHandCursor)
-                btn.setStyleSheet(self._btn_style(C_CARD).replace(C_CARD, C_SURFACE))
+                btn.setStyleSheet(btn_style(C_CARD).replace(C_CARD, C_SURFACE))
                 btn.setStyleSheet(f"""
                     QPushButton {{
                         background-color: {C_SURFACE};
@@ -825,12 +743,12 @@ class MainWindow(QMainWindow):
         btn_row.setSpacing(10)
         self._frpc_start_btn = QPushButton("启动")
         self._frpc_start_btn.setFixedSize(100, 38)
-        self._frpc_start_btn.setStyleSheet(self._btn_style(C_SUCCESS))
+        self._frpc_start_btn.setStyleSheet(btn_style(C_SUCCESS))
         self._frpc_start_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._frpc_start_btn.clicked.connect(self._on_frpc_start)
         self._frpc_stop_btn = QPushButton("停止")
         self._frpc_stop_btn.setFixedSize(100, 38)
-        self._frpc_stop_btn.setStyleSheet(self._btn_style(C_DANGER))
+        self._frpc_stop_btn.setStyleSheet(btn_style(C_DANGER))
         self._frpc_stop_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._frpc_stop_btn.clicked.connect(self._on_frpc_stop)
         self._frpc_stop_btn.setEnabled(False)
@@ -845,7 +763,7 @@ class MainWindow(QMainWindow):
         svl = QVBoxLayout(server_card)
         svl.setContentsMargins(20, 16, 20, 18)
         svl.setSpacing(12)
-        self._card_section_label(svl, "服务器配置")
+        add_section_label(svl, "服务器配置")
 
         form_grid = QVBoxLayout()
         form_grid.setSpacing(8)
@@ -862,7 +780,7 @@ class MainWindow(QMainWindow):
                 f"color: {C_TEXT_SEC}; font-size: 12px; background: transparent;"
             )
             edit = QLineEdit()
-            edit.setStyleSheet(self._input_style())
+            edit.setStyleSheet(input_style())
             setattr(self, widget, edit)
             row.addWidget(lbl)
             row.addWidget(edit)
@@ -878,7 +796,7 @@ class MainWindow(QMainWindow):
         self._frpc_server_port = QSpinBox()
         self._frpc_server_port.setRange(1, 65535)
         self._frpc_server_port.setValue(7000)
-        self._frpc_server_port.setStyleSheet(self._spinbox_style())
+        self._frpc_server_port.setStyleSheet(spinbox_style())
         port_row.addWidget(port_lbl)
         port_row.addWidget(self._frpc_server_port)
         port_row.addStretch()
@@ -892,7 +810,7 @@ class MainWindow(QMainWindow):
         pvl = QVBoxLayout(proxy_card)
         pvl.setContentsMargins(20, 16, 20, 18)
         pvl.setSpacing(12)
-        self._card_section_label(pvl, "代理列表")
+        add_section_label(pvl, "代理列表")
 
         # 代理表格
         self._proxy_table = QTableWidget()
@@ -906,7 +824,7 @@ class MainWindow(QMainWindow):
         self._proxy_table.setSelectionMode(
             QAbstractItemView.SelectionMode.SingleSelection
         )
-        self._proxy_table.setStyleSheet(self._table_style())
+        self._proxy_table.setStyleSheet(table_style())
         self._proxy_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
@@ -920,22 +838,22 @@ class MainWindow(QMainWindow):
         add_row.setSpacing(8)
         self._proxy_name_input = QLineEdit()
         self._proxy_name_input.setPlaceholderText("名称")
-        self._proxy_name_input.setStyleSheet(self._input_style())
+        self._proxy_name_input.setStyleSheet(input_style())
         self._proxy_type_combo = QComboBox()
         self._proxy_type_combo.addItems(["tcp", "udp"])
-        self._proxy_type_combo.setStyleSheet(self._combo_style())
+        self._proxy_type_combo.setStyleSheet(combo_style())
         self._proxy_type_combo.setFixedWidth(80)
         self._proxy_local_ip = QLineEdit()
         self._proxy_local_ip.setPlaceholderText("127.0.0.1")
-        self._proxy_local_ip.setStyleSheet(self._input_style())
+        self._proxy_local_ip.setStyleSheet(input_style())
         self._proxy_local_port = QSpinBox()
         self._proxy_local_port.setRange(1, 65535)
         self._proxy_local_port.setValue(80)
-        self._proxy_local_port.setStyleSheet(self._spinbox_style())
+        self._proxy_local_port.setStyleSheet(spinbox_style())
         self._proxy_remote_port = QSpinBox()
         self._proxy_remote_port.setRange(1, 65535)
         self._proxy_remote_port.setValue(8080)
-        self._proxy_remote_port.setStyleSheet(self._spinbox_style())
+        self._proxy_remote_port.setStyleSheet(spinbox_style())
         add_row.addWidget(self._proxy_name_input)
         add_row.addWidget(self._proxy_type_combo)
         add_row.addWidget(self._proxy_local_ip)
@@ -947,12 +865,12 @@ class MainWindow(QMainWindow):
         proxy_btn_row.setSpacing(10)
         add_proxy_btn = QPushButton("+ 添加代理")
         add_proxy_btn.setFixedHeight(34)
-        add_proxy_btn.setStyleSheet(self._btn_style(C_PRIMARY))
+        add_proxy_btn.setStyleSheet(btn_style(C_PRIMARY))
         add_proxy_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         add_proxy_btn.clicked.connect(self._on_add_proxy)
         del_proxy_btn = QPushButton("删除选中")
         del_proxy_btn.setFixedHeight(34)
-        del_proxy_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        del_proxy_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
         del_proxy_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         del_proxy_btn.clicked.connect(self._on_delete_proxy)
         proxy_btn_row.addWidget(add_proxy_btn)
@@ -967,7 +885,7 @@ class MainWindow(QMainWindow):
         ll = QVBoxLayout(log_card)
         ll.setContentsMargins(20, 16, 20, 18)
         ll.setSpacing(10)
-        self._card_section_label(ll, "日志输出")
+        add_section_label(ll, "日志输出")
 
         self._frpc_log = QTextEdit()
         self._frpc_log.setReadOnly(True)
@@ -997,7 +915,7 @@ class MainWindow(QMainWindow):
         clear_btn_row = QHBoxLayout()
         clear_log_btn = QPushButton("清空日志")
         clear_log_btn.setFixedHeight(34)
-        clear_log_btn.setStyleSheet(self._btn_style(C_TEXT_MUTED))
+        clear_log_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
         clear_log_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         clear_log_btn.clicked.connect(self._frpc_log.clear)
         clear_btn_row.addWidget(clear_log_btn)
@@ -1254,177 +1172,6 @@ class MainWindow(QMainWindow):
             pct = int(team_counts.get(team, 0) / online_det * 100)
             bar.setValue(pct)
 
-    # ── 样式工厂 ───────────────────────────────────────────────────────────────
-
-    def _card_section_label(self, layout: QVBoxLayout, text: str) -> None:
-        lbl = QLabel(text.upper())
-        lbl.setStyleSheet(
-            f"color: {C_TEXT_MUTED}; font-size: 10px; font-weight: bold; letter-spacing: 1px; background: transparent;"
-        )
-        layout.addWidget(lbl)
-
-    def _btn_style(self, bg: str) -> str:
-        return f"""
-            QPushButton {{
-                background-color: {bg};
-                color: {C_TEXT};
-                border: none;
-                border-radius: 6px;
-                padding: 6px 16px;
-                font-weight: bold;
-                font-size: 12px;
-            }}
-            QPushButton:hover {{ background-color: {bg}cc; }}
-            QPushButton:pressed {{ background-color: {bg}99; }}
-            QPushButton:disabled {{
-                background-color: {C_BORDER};
-                color: {C_TEXT_MUTED};
-            }}
-        """
-
-    def _toggle_btn_style(self, active: bool) -> str:
-        if active:
-            return f"""
-                QPushButton {{
-                    background-color: {C_PRIMARY};
-                    color: {C_TEXT};
-                    border: none;
-                    border-radius: 6px;
-                    font-size: 13px;
-                    font-weight: bold;
-                }}
-                QPushButton:hover {{ background-color: {C_PRIMARY_H}; }}
-            """
-        return f"""
-            QPushButton {{
-                background-color: {C_SURFACE};
-                color: {C_TEXT_SEC};
-                border: 1px solid {C_BORDER};
-                border-radius: 6px;
-                font-size: 13px;
-            }}
-            QPushButton:hover {{
-                background-color: {C_CARD};
-                color: {C_TEXT};
-                border-color: {C_PRIMARY}88;
-            }}
-        """
-
-    def _combo_style(self) -> str:
-        return f"""
-            QComboBox {{
-                background-color: {C_SURFACE};
-                color: {C_TEXT};
-                border: 1px solid {C_BORDER};
-                border-radius: 6px;
-                padding: 6px 10px;
-                font-size: 12px;
-            }}
-            QComboBox:hover {{ border-color: {C_PRIMARY}; }}
-            QComboBox::drop-down {{ border: none; }}
-            QComboBox QAbstractItemView {{
-                background-color: {C_CARD};
-                color: {C_TEXT};
-                border: 1px solid {C_BORDER};
-                selection-background-color: {C_PRIMARY};
-            }}
-        """
-
-    def _input_style(self) -> str:
-        return f"""
-            QLineEdit {{
-                background-color: {C_SURFACE};
-                color: {C_TEXT};
-                border: 1px solid {C_BORDER};
-                border-radius: 6px;
-                padding: 6px 10px;
-                font-size: 12px;
-            }}
-            QLineEdit:focus {{ border-color: {C_PRIMARY}; }}
-            QLineEdit::placeholder {{ color: {C_TEXT_MUTED}; }}
-        """
-
-    def _spinbox_style(self) -> str:
-        return f"""
-            QSpinBox {{
-                background-color: {C_SURFACE};
-                color: {C_TEXT};
-                border: 1px solid {C_BORDER};
-                border-radius: 6px;
-                padding: 6px 10px;
-                font-size: 12px;
-            }}
-            QSpinBox:focus {{ border-color: {C_PRIMARY}; }}
-            QSpinBox::up-button, QSpinBox::down-button {{
-                background-color: {C_CARD};
-                border: none;
-                width: 16px;
-            }}
-            QSpinBox::up-arrow {{
-                border-left: 4px solid transparent;
-                border-right: 4px solid transparent;
-                border-bottom: 5px solid {C_TEXT};
-            }}
-            QSpinBox::down-arrow {{
-                border-left: 4px solid transparent;
-                border-right: 4px solid transparent;
-                border-top: 5px solid {C_TEXT};
-            }}
-        """
-
-    def _table_style(self) -> str:
-        return f"""
-            QTableWidget {{
-                background-color: {C_SURFACE};
-                gridline-color: transparent;
-                border: 1px solid {C_BORDER};
-                border-radius: 8px;
-                color: {C_TEXT};
-                font-size: 13px;
-            }}
-            QTableWidget::item {{
-                padding: 0 12px;
-                border-bottom: 1px solid {C_BORDER};
-            }}
-            QTableWidget::item:selected {{
-                background-color: {C_NAV_ACTIVE};
-                color: {C_TEXT};
-            }}
-            QHeaderView::section {{
-                background-color: {C_CARD};
-                color: {C_TEXT_MUTED};
-                padding: 8px 12px;
-                border: none;
-                border-bottom: 1px solid {C_BORDER};
-                font-size: 10px;
-                font-weight: bold;
-                letter-spacing: 1px;
-            }}
-            QScrollBar:vertical {{
-                background: {C_BG};
-                width: 6px;
-                border-radius: 3px;
-            }}
-            QScrollBar::handle:vertical {{
-                background: {C_BORDER};
-                border-radius: 3px;
-            }}
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0; }}
-        """
-
-    def _progress_style(self, color: str, radius: int = 4) -> str:
-        return f"""
-            QProgressBar {{
-                background-color: {C_BORDER};
-                border-radius: {radius}px;
-                border: none;
-            }}
-            QProgressBar::chunk {{
-                background-color: {color};
-                border-radius: {radius}px;
-            }}
-        """
-
     # ── 表格初始化 ─────────────────────────────────────────────────────────────
 
     def _setup_table(self) -> None:
@@ -1621,7 +1368,7 @@ class MainWindow(QMainWindow):
         self._bomb_timer_label.setStyleSheet(
             f"color: {color}; font-size: 56px; font-weight: bold; background: transparent;"
         )
-        self._bomb_progress.setStyleSheet(self._progress_style(color, 5))
+        self._bomb_progress.setStyleSheet(progress_style(color, 5))
 
     @Slot()
     def _on_bomb_defused(self) -> None:
