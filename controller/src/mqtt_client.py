@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import aiomqtt
@@ -102,8 +103,12 @@ class MQTTClient:
         解析失败仅记录警告，不中断循环。
         """
         try:
-            payload = message.payload.decode("utf-8")
-            node_id, action_type, team_or_zero = parse_message(payload)
+            raw_payload = message.payload.decode("utf-8", errors="replace")
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            self._event_bus.mqtt_message_received.emit(
+                MQTT_TOPIC_SUB, raw_payload, timestamp
+            )
+            node_id, action_type, team_or_zero = parse_message(raw_payload)
 
             if action_type == "H":
                 came_online, state = self._node_manager.handle_heartbeat(node_id)

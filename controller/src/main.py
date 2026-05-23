@@ -109,6 +109,27 @@ def main() -> None:
 
     # 构建依赖图（手动 DI）
     event_bus = EventBus()
+
+    # Qt 日志处理器：将日志管道接入 EventBus，供调试面板消费
+    class _QtLogHandler(logging.Handler):
+        def __init__(self) -> None:
+            super().__init__()
+            formatter = logging.Formatter(
+                "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+            )
+            self.setFormatter(formatter)
+
+        def emit(self, record: logging.LogRecord) -> None:
+            try:
+                msg = self.format(record)
+                event_bus.log_received.emit(msg, record.levelno)
+            except Exception:
+                self.handleError(record)
+
+    _qt_handler = _QtLogHandler()
+    _qt_handler.setLevel(logging.DEBUG)
+    logging.getLogger().addHandler(_qt_handler)
+
     node_manager = NodeManager(event_bus)
     audio_player = AudioPlayer()
     mqtt_client = MQTTClient(node_manager, event_bus)
