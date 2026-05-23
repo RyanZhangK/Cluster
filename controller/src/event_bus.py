@@ -39,3 +39,7 @@ class EventBus(QObject):
     bomb_defused = Signal()
     bomb_exploded = Signal()
     bomb_tick = Signal(int)  # 倒计时剩余秒数
+
+    # 调试面板信号
+    log_received = Signal(str, int)  # formatted_message, levelno
+    mqtt_message_received = Signal(str, str, str)  # topic, payload, timestamp

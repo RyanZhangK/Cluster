@@ -1,12 +1,13 @@
 import json
 import logging
 import tomllib
+from collections import deque
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtGui import QColor, QFont, QTextCursor
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -92,6 +93,16 @@ class MainWindow(QMainWindow):
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
 
+        self._filter_text = ""
+        self._filter_type = "全部类型"
+        self._filter_status = "全部状态"
+        self._filter_team = "全部队伍"
+
+        self._log_buffer: "deque[tuple[int, str]]" = deque(maxlen=500)
+        self._mqtt_buffer: "deque[str]" = deque(maxlen=500)
+        self._mqtt_pending: list[str] = []
+        self._mqtt_paused = False
+
         self._bomb_attacker_combo = QComboBox()
         self._bomb_defender_combo = QComboBox()
         self._bomb_node_input = QComboBox()
@@ -135,6 +146,7 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._build_game_status_page())
         self._stack.addWidget(self._build_manual_page())
         self._stack.addWidget(self._build_frpc_page())
+        self._stack.addWidget(self._build_debug_page())
         content_layout.addWidget(self._stack)
 
         root_layout.addWidget(content, 1)
@@ -145,6 +157,7 @@ class MainWindow(QMainWindow):
             self._nav_game_status,
             self._nav_manual,
             self._nav_frpc,
+            self._nav_debug,
         ]
         self._page_titles = [
             "节点监控",
@@ -152,6 +165,7 @@ class MainWindow(QMainWindow):
             "游戏状态",
             "紧急手动",
             "Frpc管理",
+            "调试",
         ]
 
     def _build_sidebar(self) -> QFrame:
@@ -209,6 +223,10 @@ class MainWindow(QMainWindow):
         self._nav_frpc = NavButton("⇄", "Frpc管理")
         self._nav_frpc.clicked.connect(lambda: self._switch_page(4))
         layout.addWidget(self._nav_frpc)
+
+        self._nav_debug = NavButton("⬡", "调试")
+        self._nav_debug.clicked.connect(lambda: self._switch_page(5))
+        layout.addWidget(self._nav_debug)
 
         layout.addStretch()
 
@@ -292,7 +310,7 @@ class MainWindow(QMainWindow):
         page.setStyleSheet(f"background-color: {C_BG};")
         layout = QVBoxLayout(page)
         layout.setContentsMargins(28, 24, 28, 24)
-        layout.setSpacing(16)
+        layout.setSpacing(12)
 
         # 统计卡片行
         stats_row = QHBoxLayout()
@@ -303,14 +321,71 @@ class MainWindow(QMainWindow):
         stats_row.addStretch()
         layout.addLayout(stats_row)
 
+        # 过滤行
+        filter_row = QHBoxLayout()
+        filter_row.setSpacing(8)
+        self._search_input = QLineEdit()
+        self._search_input.setPlaceholderText("搜索节点ID...")
+        self._search_input.setFixedHeight(34)
+        self._search_input.setStyleSheet(input_style())
+        self._search_input.textChanged.connect(self._on_filter_changed)
+        filter_row.addWidget(self._search_input)
+
+        self._filter_type_combo = QComboBox()
+        self._filter_type_combo.addItems(["全部类型", "STA", "DET"])
+        self._filter_type_combo.setStyleSheet(combo_style())
+        self._filter_type_combo.setFixedWidth(100)
+        self._filter_type_combo.currentTextChanged.connect(self._on_filter_changed)
+        filter_row.addWidget(self._filter_type_combo)
+
+        self._filter_status_combo = QComboBox()
+        self._filter_status_combo.addItems(["全部状态", "在线", "离线"])
+        self._filter_status_combo.setStyleSheet(combo_style())
+        self._filter_status_combo.setFixedWidth(100)
+        self._filter_status_combo.currentTextChanged.connect(self._on_filter_changed)
+        filter_row.addWidget(self._filter_status_combo)
+
+        self._filter_team_combo = QComboBox()
+        self._filter_team_combo.addItems(["全部队伍", "A", "B", "C", "D", "未激活"])
+        self._filter_team_combo.setStyleSheet(combo_style())
+        self._filter_team_combo.setFixedWidth(100)
+        self._filter_team_combo.currentTextChanged.connect(self._on_filter_changed)
+        filter_row.addWidget(self._filter_team_combo)
+
+        filter_row.addStretch()
+        layout.addLayout(filter_row)
+
         # 操作行
         act_row = QHBoxLayout()
+        act_row.setSpacing(8)
+        self._select_all_btn = QPushButton("全选")
+        self._select_all_btn.setFixedHeight(36)
+        self._select_all_btn.setStyleSheet(btn_style(C_PRIMARY))
+        self._select_all_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._select_all_btn.clicked.connect(self._on_select_all)
+        act_row.addWidget(self._select_all_btn)
+
+        self._invert_select_btn = QPushButton("反选")
+        self._invert_select_btn.setFixedHeight(36)
+        self._invert_select_btn.setStyleSheet(btn_style(C_PRIMARY))
+        self._invert_select_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._invert_select_btn.clicked.connect(self._on_invert_select)
+        act_row.addWidget(self._invert_select_btn)
+
         self._reset_btn = QPushButton("重置选中节点")
         self._reset_btn.setFixedHeight(36)
-        self._reset_btn.setStyleSheet(btn_style(C_PRIMARY))
+        self._reset_btn.setStyleSheet(btn_style(C_WARNING))
         self._reset_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._reset_btn.clicked.connect(self._on_reset_btn_clicked)
         act_row.addWidget(self._reset_btn)
+
+        self._reset_all_btn = QPushButton("重置全部")
+        self._reset_all_btn.setFixedHeight(36)
+        self._reset_all_btn.setStyleSheet(btn_style(C_DANGER))
+        self._reset_all_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._reset_all_btn.clicked.connect(self._on_reset_all_clicked)
+        act_row.addWidget(self._reset_all_btn)
+
         act_row.addStretch()
         layout.addLayout(act_row)
 
@@ -319,7 +394,7 @@ class MainWindow(QMainWindow):
         self._table.setColumnCount(len(self.COLUMN_HEADERS))
         self._table.setHorizontalHeaderLabels(self.COLUMN_HEADERS)
         self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self._table.setStyleSheet(table_style())
         layout.addWidget(self._table)
 
@@ -928,6 +1003,126 @@ class MainWindow(QMainWindow):
         self._load_frpc_config()
         return page
 
+    # ── 调试页 ─────────────────────────────────────────────────────────────────
+
+    LEVEL_MAP = {"DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40}
+    LEVEL_COLORS = {
+        10: "#888888",
+        20: "#CCCCCC",
+        30: "#FFCC00",
+        40: "#FF4444",
+        50: "#FF4444",
+    }
+
+    def _build_debug_page(self) -> QWidget:
+        page = QWidget()
+        page.setStyleSheet(f"background-color: {C_BG};")
+        layout = QHBoxLayout(page)
+        layout.setContentsMargins(28, 24, 28, 24)
+        layout.setSpacing(16)
+
+        # ── 左：系统日志 ────────────────────────────────────────────────────────
+        log_card = Card()
+        log_layout = QVBoxLayout(log_card)
+        log_layout.setContentsMargins(20, 16, 20, 18)
+        log_layout.setSpacing(10)
+        add_section_label(log_layout, "系统日志")
+
+        log_toolbar = QHBoxLayout()
+        log_toolbar.setSpacing(8)
+        self._log_level_combo = QComboBox()
+        self._log_level_combo.addItems(["DEBUG", "INFO", "WARNING", "ERROR"])
+        self._log_level_combo.setCurrentText("INFO")
+        self._log_level_combo.setStyleSheet(combo_style())
+        self._log_level_combo.setFixedWidth(110)
+        self._log_level_combo.currentTextChanged.connect(self._on_log_level_changed)
+        log_toolbar.addWidget(self._log_level_combo)
+        log_toolbar.addStretch()
+        log_clear_btn = QPushButton("清空")
+        log_clear_btn.setFixedHeight(30)
+        log_clear_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        log_clear_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
+        log_clear_btn.clicked.connect(self._on_clear_log)
+        log_toolbar.addWidget(log_clear_btn)
+        log_layout.addLayout(log_toolbar)
+
+        self._log_view = QTextEdit()
+        self._log_view.setReadOnly(True)
+        font = QFont("Consolas, Monaco, monospace")
+        font.setStyleHint(QFont.StyleHint.Monospace)
+        self._log_view.setFont(font)
+        self._log_view.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: #1a1a1a;
+                color: {C_TEXT};
+                border: 1px solid {C_BORDER};
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 12px;
+            }}
+        """)
+        log_layout.addWidget(self._log_view)
+
+        layout.addWidget(log_card, 1)
+
+        # ── 右：MQTT 消息 ──────────────────────────────────────────────────────
+        mqtt_card = Card()
+        mqtt_layout = QVBoxLayout(mqtt_card)
+        mqtt_layout.setContentsMargins(20, 16, 20, 18)
+        mqtt_layout.setSpacing(10)
+        add_section_label(mqtt_layout, "MQTT 消息")
+
+        mqtt_toolbar = QHBoxLayout()
+        mqtt_toolbar.setSpacing(8)
+        self._mqtt_pause_btn = QPushButton("暂停")
+        self._mqtt_pause_btn.setCheckable(True)
+        self._mqtt_pause_btn.setFixedHeight(30)
+        self._mqtt_pause_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._mqtt_pause_btn.setStyleSheet(toggle_btn_style(False))
+        self._mqtt_pause_btn.clicked.connect(self._on_mqtt_pause_toggle)
+        mqtt_toolbar.addWidget(self._mqtt_pause_btn)
+        self._mqtt_count_label = QLabel("0 条")
+        self._mqtt_count_label.setStyleSheet(
+            f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;"
+        )
+        mqtt_toolbar.addWidget(self._mqtt_count_label)
+        mqtt_toolbar.addStretch()
+        mqtt_clear_btn = QPushButton("清空")
+        mqtt_clear_btn.setFixedHeight(30)
+        mqtt_clear_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        mqtt_clear_btn.setStyleSheet(btn_style(C_TEXT_MUTED))
+        mqtt_clear_btn.clicked.connect(self._on_clear_mqtt)
+        mqtt_toolbar.addWidget(mqtt_clear_btn)
+        mqtt_layout.addLayout(mqtt_toolbar)
+
+        self._mqtt_view = QTextEdit()
+        self._mqtt_view.setReadOnly(True)
+        font2 = QFont("Consolas, Monaco, monospace")
+        font2.setStyleHint(QFont.StyleHint.Monospace)
+        self._mqtt_view.setFont(font2)
+        self._mqtt_view.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: #1a1a1a;
+                color: {C_TEXT};
+                border: 1px solid {C_BORDER};
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 12px;
+            }}
+        """)
+        mqtt_layout.addWidget(self._mqtt_view)
+
+        layout.addWidget(mqtt_card, 1)
+
+        from PySide6.QtCore import QTimer
+
+        self._mqtt_flush_timer = QTimer(self)
+        self._mqtt_flush_timer.setInterval(150)
+        self._mqtt_flush_timer.timeout.connect(self._flush_mqtt)
+        self._mqtt_flush_timer.start()
+
+        return page
+
     def _load_frpc_config(self) -> None:
         """从上次生成的 frpc.toml 恢复配置，fallback 到 pydantic settings。"""
         frpc_toml = Path(__file__).parent.parent / "frpc.toml"
@@ -1075,7 +1270,15 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_shutdown_clicked(self) -> None:
+        if self._frpc_manager and self._frpc_manager.is_running:
+            self._frpc_manager.stop()
+
+        if self._game_manager:
+            self._game_manager.reset()
+            self._switch_page(0)
+
         self._audio_player.play_immediate("sys_offline")
+
         from PySide6.QtCore import QTimer
 
         self._shutdown_timer = QTimer(self)
@@ -1194,6 +1397,9 @@ class MainWindow(QMainWindow):
         self._event_bus.bomb_activated.connect(self._on_bomb_activated)
         self._event_bus.bomb_tick.connect(self._on_bomb_tick)
         self._event_bus.bomb_defused.connect(self._on_bomb_defused)
+        self._event_bus.log_received.connect(self._on_log_received)
+        self._event_bus.mqtt_message_received.connect(self._on_mqtt_message)
+
         if self._frpc_manager:
             self._frpc_manager.status_changed.connect(self._on_frpc_status_changed)
             self._frpc_manager.log_received.connect(self._on_frpc_log_received)
@@ -1201,11 +1407,36 @@ class MainWindow(QMainWindow):
 
     def _populate_table(self) -> None:
         nodes = self._node_manager.get_all_nodes()
-        self._table.setRowCount(len(nodes))
+        filtered = self._apply_filters(nodes)
+        self._table.setRowCount(len(filtered))
 
-        for row, (node_id, state) in enumerate(nodes.items()):
+        for row, (node_id, state) in enumerate(filtered.items()):
             self._update_row_at(row, node_id, state)
         self._update_stats()
+
+    def _apply_filters(self, nodes: dict[str, "NodeState"]) -> dict[str, "NodeState"]:
+        filtered = {}
+        for node_id, state in nodes.items():
+            if self._filter_text and self._filter_text not in node_id.lower():
+                continue
+            if (
+                self._filter_type != "全部类型"
+                and state.node_type.value != self._filter_type
+            ):
+                continue
+            if self._filter_status == "在线" and state.status != OnlineStatus.ONLINE:
+                continue
+            if self._filter_status == "离线" and state.status != OnlineStatus.OFFLINE:
+                continue
+            if self._filter_team == "未激活" and state.active_team:
+                continue
+            if (
+                self._filter_team not in ("全部队伍", "未激活")
+                and state.active_team != self._filter_team
+            ):
+                continue
+            filtered[node_id] = state
+        return filtered
 
     def _find_row(self, node_id: str) -> int:
         for row in range(self._table.rowCount()):
@@ -1254,12 +1485,12 @@ class MainWindow(QMainWindow):
     # ── Node Slots ─────────────────────────────────────────────────────────────
 
     @Slot(str, object)
-    def _on_status_changed(self, node_id: str, state: "NodeState") -> None:
-        self._update_row(node_id, state)
+    def _on_status_changed(self, _node_id: str, _state: "NodeState") -> None:
+        self._populate_table()
 
     @Slot(str, object)
-    def _on_node_came_online(self, node_id: str, state: "NodeState") -> None:
-        self._update_row(node_id, state)
+    def _on_node_came_online(self, node_id: str, _state: "NodeState") -> None:
+        self._populate_table()
         self._status_label.setText(f"节点 {node_id} 上线")
         self._conn_dot.set_color(C_SUCCESS)
         self._conn_label.setText("节点在线")
@@ -1272,14 +1503,14 @@ class MainWindow(QMainWindow):
 
     @Slot(str, object)
     def _on_node_went_offline(self, node_id: str, state: "NodeState") -> None:
-        self._update_row(node_id, state)
+        self._populate_table()
         self._status_label.setText(f"节点 {node_id} 离线")
         if self._game_manager:
             self._game_manager.on_node_went_offline(node_id, state)
 
-    @Slot(str, int, object)
-    def _on_node_activated(self, node_id: str, team: str, state: "NodeState") -> None:
-        self._update_row(node_id, state)
+    @Slot(str, str, object)
+    def _on_node_activated(self, node_id: str, team: str, _state: "NodeState") -> None:
+        self._populate_table()
         self._status_label.setText(f"节点 {node_id} 激活 → 队伍 {team}")
         if self._game_manager:
             from game_manager import GameState
@@ -1303,21 +1534,63 @@ class MainWindow(QMainWindow):
             self._audio_player.play_activated(team)
 
     @Slot(str, object)
-    def _on_node_reset(self, node_id: str, state: "NodeState") -> None:
-        self._update_row(node_id, state)
+    def _on_node_reset(self, node_id: str, _state: "NodeState") -> None:
+        self._populate_table()
         self._status_label.setText(f"节点 {node_id} 已重置")
 
     @Slot()
+    def _on_filter_changed(self) -> None:
+        self._filter_text = self._search_input.text().strip().lower()
+        self._filter_type = self._filter_type_combo.currentText()
+        self._filter_status = self._filter_status_combo.currentText()
+        self._filter_team = self._filter_team_combo.currentText()
+        self._populate_table()
+
+    @Slot()
+    def _on_select_all(self) -> None:
+        self._table.selectAll()
+
+    @Slot()
+    def _on_invert_select(self) -> None:
+        from PySide6.QtCore import QItemSelectionModel
+
+        sm = self._table.selectionModel()
+        fl = QItemSelectionModel.SelectionFlag
+        for row in range(self._table.rowCount()):
+            idx = self._table.model().index(row, 0)
+            sm.select(idx, fl.Toggle | fl.Rows)
+
+    @Slot()
+    def _on_reset_all_clicked(self) -> None:
+        from PySide6.QtWidgets import QMessageBox
+
+        reply = QMessageBox.warning(
+            self,
+            "确认重置",
+            "确定要重置所有节点的激活状态吗？",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+        for node_id in list(self._node_manager.get_all_nodes().keys()):
+            state = self._node_manager.reset_node(node_id)
+            self._event_bus.node_reset.emit(node_id, state)
+
+    @Slot()
     def _on_reset_btn_clicked(self) -> None:
-        selected = self._table.selectedIndexes()
-        if not selected:
+        selected_rows: set[int] = set()
+        for index in self._table.selectedIndexes():
+            selected_rows.add(index.row())
+        if not selected_rows:
             return
-        node_id_item = self._table.item(selected[0].row(), self.COL_NODE_ID)
-        if not node_id_item:
-            return
-        node_id = node_id_item.text()
-        state = self._node_manager.reset_node(node_id)
-        self._event_bus.node_reset.emit(node_id, state)
+        for row in selected_rows:
+            node_id_item = self._table.item(row, self.COL_NODE_ID)
+            if not node_id_item:
+                continue
+            node_id = node_id_item.text()
+            state = self._node_manager.reset_node(node_id)
+            self._event_bus.node_reset.emit(node_id, state)
 
     # ── Game Slots ─────────────────────────────────────────────────────────────
 
@@ -1439,3 +1712,77 @@ class MainWindow(QMainWindow):
                 self._update_team_card(team, "等待激活")
             else:
                 self._update_team_card(team, "未参与")
+
+    # ── Debug Slots ───────────────────────────────────────────────────────────
+
+    @Slot(str, int)
+    def _on_log_received(self, message: str, levelno: int) -> None:
+        self._log_buffer.append((levelno, message))
+        min_level = self.LEVEL_MAP.get(self._log_level_combo.currentText(), 20)
+        if levelno >= min_level:
+            color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
+            escaped = (
+                message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            )
+            self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
+            scrollbar = self._log_view.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
+
+    @Slot()
+    def _on_log_level_changed(self) -> None:
+        min_level = self.LEVEL_MAP.get(self._log_level_combo.currentText(), 20)
+        self._log_view.clear()
+        for levelno, msg in self._log_buffer:
+            if levelno >= min_level:
+                color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
+                escaped = (
+                    msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                )
+                self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
+        scrollbar = self._log_view.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    @Slot()
+    def _on_clear_log(self) -> None:
+        self._log_buffer.clear()
+        self._log_view.clear()
+
+    @Slot(str, str, str)
+    def _on_mqtt_message(self, topic: str, payload: str, timestamp: str) -> None:
+        html = (
+            f'<span style="color: #66ccff">{timestamp}</span>'
+            f'  <span style="color: #888888">{topic}</span>'
+            f'  ←  <span style="color: {C_TEXT}">{payload}</span>'
+        )
+        self._mqtt_buffer.append(f"{timestamp}  {topic}  ←  {payload}")
+        self._mqtt_pending.append(html)
+
+    @Slot()
+    def _flush_mqtt(self) -> None:
+        if self._mqtt_paused or not self._mqtt_pending:
+            return
+        cursor = self._mqtt_view.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        for html in self._mqtt_pending:
+            cursor.insertHtml(html + "<br>")
+        self._mqtt_pending.clear()
+        self._mqtt_count_label.setText(f"{len(self._mqtt_buffer)} 条")
+        scrollbar = self._mqtt_view.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    @Slot(bool)
+    def _on_mqtt_pause_toggle(self, checked: bool) -> None:
+        self._mqtt_paused = checked
+        if checked:
+            self._mqtt_pause_btn.setText("继续")
+            self._mqtt_pause_btn.setStyleSheet(toggle_btn_style(True))
+        else:
+            self._mqtt_pause_btn.setText("暂停")
+            self._mqtt_pause_btn.setStyleSheet(toggle_btn_style(False))
+            self._flush_mqtt()
+
+    @Slot()
+    def _on_clear_mqtt(self) -> None:
+        self._mqtt_buffer.clear()
+        self._mqtt_view.clear()
+        self._mqtt_count_label.setText("0 条")

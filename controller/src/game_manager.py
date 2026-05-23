@@ -53,6 +53,7 @@ class GameManager(QObject):
         self._sta_team_mapping: dict[str, str] = {}  # node_id → team（开始时记录）
         self._activated_teams: set[str] = set()  # 已激活的队伍（去重）
         self._eliminated_teams: set[str] = set()
+        self._eliminated_sta_nodes: set[str] = set()
         self._det_activation: dict[str, str] = {}  # node_id → team（占领模式）
         self._bomb_timer: QTimer | None = None
         self._bomb_remaining: int = 0
@@ -75,12 +76,23 @@ class GameManager(QObject):
 
         elif self._game_state == GameState.RUNNING:
             if self.mode == GameMode.CONQUEST:
-                # 征服模式：STA 节点再次激活 → 对应队伍淘汰
+                # 征服模式：STA 节点再次激活 → 该节点被淘汰
+                # 当队伍所有 STA 节点都被淘汰时，队伍才被淘汰
                 if node_id in self._sta_team_mapping:
-                    eliminated_team = self._sta_team_mapping[node_id]
-                    if eliminated_team not in self._eliminated_teams:
-                        self._eliminate_team(eliminated_team)
-                        self._check_conquest_victory()
+                    team = self._sta_team_mapping[node_id]
+                    if team not in self._eliminated_teams:
+                        self._eliminated_sta_nodes.add(node_id)
+                        logger.info(f"STA 节点 {node_id} (队伍 {team}) 已被淘汰")
+                        team_sta_nodes = [
+                            nid
+                            for nid, t in self._sta_team_mapping.items()
+                            if t == team
+                        ]
+                        if all(
+                            nid in self._eliminated_sta_nodes for nid in team_sta_nodes
+                        ):
+                            self._eliminate_team(team)
+                            self._check_conquest_victory()
 
             elif self.mode == GameMode.BOMB:
                 # 爆破模式：STA 激活可能触发炸弹激活或拆除
@@ -225,6 +237,7 @@ class GameManager(QObject):
         self._sta_team_mapping.clear()
         self._activated_teams.clear()
         self._eliminated_teams.clear()
+        self._eliminated_sta_nodes.clear()
         self._det_activation.clear()
         self._bomb_remaining = 0
         logger.info("游戏已重置")
