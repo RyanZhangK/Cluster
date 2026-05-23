@@ -1,10 +1,9 @@
-import asyncio
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QTimer
 
 if TYPE_CHECKING:
     from event_bus import EventBus
@@ -55,7 +54,7 @@ class GameManager(QObject):
         self._activated_teams: set[str] = set()  # 已激活的队伍（去重）
         self._eliminated_teams: set[str] = set()
         self._det_activation: dict[str, str] = {}  # node_id → team（占领模式）
-        self._bomb_task: asyncio.Task[Any] | None = None
+        self._bomb_timer: QTimer | None = None
         self._bomb_remaining: int = 0
 
         logger.info(
@@ -121,9 +120,9 @@ class GameManager(QObject):
             and self.bomb_config is not None
             and node_id == self.bomb_config.bomb_node_id
         ):
-            if self._bomb_task and not self._bomb_task.done():
-                self._bomb_task.cancel()
-                self._bomb_task = None
+            if self._bomb_timer is not None:
+                self._bomb_timer.stop()
+                self._bomb_timer = None
                 logger.warning("炸弹节点离线，倒计时已取消")
 
     def _start_game(self) -> None:
@@ -176,32 +175,32 @@ class GameManager(QObject):
     def _activate_bomb(self) -> None:
         """爆破模式：炸弹激活。"""
         logger.info("炸弹已激活，开始 40s 倒计时")
-        self._event_bus.bomb_activated.emit()
         self._bomb_remaining = 40
-        self._bomb_task = asyncio.create_task(self._bomb_countdown())
+        self._bomb_timer = QTimer(self)
+        self._bomb_timer.timeout.connect(self._bomb_tick)
+        self._bomb_timer.start(1000)
+        self._event_bus.bomb_activated.emit()
 
-    async def _bomb_countdown(self) -> None:
-        """爆破模式：40s 倒计时。"""
-        try:
-            while self._bomb_remaining > 0:
-                await asyncio.sleep(1)
-                self._bomb_remaining -= 1
-                self._event_bus.bomb_tick.emit(self._bomb_remaining)
-                logger.debug(f"炸弹倒计时: {self._bomb_remaining}s")
+    def _bomb_tick(self) -> None:
+        """每秒倒计时回调。"""
+        self._bomb_remaining -= 1
+        self._event_bus.bomb_tick.emit(self._bomb_remaining)
+        logger.debug(f"炸弹倒计时: {self._bomb_remaining}s")
 
-            # 倒计时结束，T 队胜利
+        if self._bomb_remaining <= 0:
+            assert self._bomb_timer is not None
+            self._bomb_timer.stop()
+            self._bomb_timer = None
             logger.info("炸弹倒计时结束，T 队胜利")
             self._event_bus.bomb_exploded.emit()
             assert self.bomb_config is not None
             self._end_game(self.bomb_config.attacker_team)
-        except asyncio.CancelledError:
-            logger.info("炸弹倒计时已取消")
 
     def _defuse_bomb(self) -> None:
         """爆破模式：炸弹拆除。"""
-        if self._bomb_task and not self._bomb_task.done():
-            self._bomb_task.cancel()
-            self._bomb_task = None
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         logger.info("炸弹已拆除，CT 队胜利")
         self._event_bus.bomb_defused.emit()
         assert self.bomb_config is not None
@@ -219,13 +218,13 @@ class GameManager(QObject):
 
     def reset(self) -> None:
         """重置游戏状态。"""
-        if self._bomb_task and not self._bomb_task.done():
-            self._bomb_task.cancel()
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         self._game_state = GameState.IDLE
         self._sta_team_mapping.clear()
         self._activated_teams.clear()
         self._eliminated_teams.clear()
         self._det_activation.clear()
-        self._bomb_task = None
         self._bomb_remaining = 0
         logger.info("游戏已重置")

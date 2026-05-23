@@ -23,7 +23,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all deps dev lint hot clean clean-compile clean-stage compile stage deb pacman bump
+.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump
 all: clean deps compile stage deb pacman 
 
 deps: scripts/install_deps.py
@@ -34,6 +34,9 @@ dev:
 
 lint:
 	uvx ruff check . && uvx ruff format --check .
+
+test:
+	uv run pytest
 
 hot:
 	CLUSTER_CONTROLLER__UI_HOT_RELOAD=true CLUSTER_CONTROLLER__DEV=true uv run controller
