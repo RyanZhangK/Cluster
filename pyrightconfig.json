@@ -12,5 +12,6 @@
     "reportUnknownParameterType": "none",
     "reportUnknownMemberType": "none",
     "reportUnknownArgumentType": "none",
-    "reportImplicitStringConcatenation": "none"
+    "reportImplicitStringConcatenation": "none",
+    "reportPrivateUsage": "none"
 }
