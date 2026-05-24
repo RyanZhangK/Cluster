@@ -64,6 +64,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _escape_html(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
 # ─── 主窗口 ───────────────────────────────────────────────────────────────────
 
 
@@ -1721,9 +1730,7 @@ class MainWindow(QMainWindow):
         min_level = self.LEVEL_MAP.get(self._log_level_combo.currentText(), 20)
         if levelno >= min_level:
             color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
-            escaped = (
-                message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-            )
+            escaped = _escape_html(message)
             self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
             scrollbar = self._log_view.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
@@ -1735,9 +1742,7 @@ class MainWindow(QMainWindow):
         for levelno, msg in self._log_buffer:
             if levelno >= min_level:
                 color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
-                escaped = (
-                    msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                )
+                escaped = _escape_html(msg)
                 self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
         scrollbar = self._log_view.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
