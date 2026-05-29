@@ -61,7 +61,7 @@ compile: clean-compile
 		--static-libpython=yes \
 		--include-package=amqtt \
 		--include-data-dir=../resources/audio=resources/audio \
-		--include-data-dir=../resources/frpc=resources/frpc/$(DEB_ARCH) \
+		--include-data-files=../resources/frpc/$(DEB_ARCH)/frpc=resources/frpc/$(DEB_ARCH)/frpc \
 		--output-dir=$(DIST_DIR) \
 		--output-filename=$(PKG_NAME) \
 		--assume-yes-for-downloads \
