@@ -43,10 +43,9 @@ def _frpc_binary_path() -> Path | None:
 
 
 def _frpc_config_path() -> Path:
-    installed = Path("/usr/local/share/cluster/lib")
-    if installed.exists():
-        return installed / "frpc.conf"
-    return Path(__file__).parent.parent / "frpc.conf"
+    config_dir = Path.home() / ".config" / "cluster"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    return config_dir / "frpc.conf"
 
 
 def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:
