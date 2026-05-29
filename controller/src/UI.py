@@ -1,6 +1,5 @@
 import json
 import logging
-import tomllib
 from collections import deque
 from functools import partial
 from pathlib import Path
@@ -1133,27 +1132,28 @@ class MainWindow(QMainWindow):
         return page
 
     def _load_frpc_config(self) -> None:
-        """从上次生成的 frpc.toml 恢复配置，fallback 到 pydantic settings。
+        """从 frpc.conf 恢复配置，fallback 到 pydantic settings。
         如果配置文件不存在，则自动创建默认配置。"""
-        frpc_toml = Path(__file__).parent.parent / "frpc.toml"
-        if frpc_toml.exists():
+        from .frpc_manager import _frpc_config_path
+
+        frpc_conf = _frpc_config_path()
+        if frpc_conf.exists():
             try:
-                data = tomllib.loads(frpc_toml.read_text(encoding="utf-8"))
-                self._frpc_server_addr.setText(data.get("serverAddr", ""))
-                self._frpc_server_port.setValue(
-                    data.get("serverPort", FRPC_SERVER_PORT)
+                data: dict[str, Any] = json.loads(frpc_conf.read_text(encoding="utf-8"))
+                self._frpc_server_addr.setText(
+                    str(data.get("server_addr", ""))
                 )
-                auth = data.get("auth", {})
-                if isinstance(auth, dict):
-                    token: str = cast(dict[str, str], auth).get("token", "")
-                    self._frpc_auth_token.setText(token)
-                proxies = data.get("proxies", FRPC_PROXIES)
-                if isinstance(proxies, str):
-                    proxies = json.loads(proxies)
-                assert isinstance(proxies, list)
-                self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
-                return
-            except (tomllib.TOMLDecodeError, OSError):
+                self._frpc_server_port.setValue(
+                    int(data.get("server_port", FRPC_SERVER_PORT))
+                )
+                self._frpc_auth_token.setText(
+                    str(data.get("auth_token", ""))
+                )
+                proxies = data.get("proxies", [])
+                if isinstance(proxies, list):
+                    self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
+                    return
+            except (json.JSONDecodeError, OSError):
                 pass
 
         self._frpc_server_addr.setText(FRPC_SERVER_ADDR)
@@ -1167,11 +1167,13 @@ class MainWindow(QMainWindow):
         self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
 
         # 配置文件不存在时自动创建默认配置
-        from .frpc_manager import _build_frpc_config
         default_config = self._collect_frpc_config()
         try:
-            frpc_toml.parent.mkdir(parents=True, exist_ok=True)
-            frpc_toml.write_text(_build_frpc_config(default_config), encoding="utf-8")
+            frpc_conf.parent.mkdir(parents=True, exist_ok=True)
+            frpc_conf.write_text(
+                json.dumps(default_config, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
         except OSError:
             pass
 
