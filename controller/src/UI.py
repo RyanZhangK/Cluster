@@ -2,7 +2,6 @@ import json
 import logging
 from collections import deque
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from PySide6.QtCore import Qt, Slot
