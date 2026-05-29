@@ -14,7 +14,7 @@
 #ifndef MQTT_SERVER
 #define MQTT_SERVER "182.92.87.183"
 #endif
-#define MQTT_PORT 9000
+#define MQTT_PORT 9001
 #define MQTT_TOPIC "node/status"
 #ifndef MQTT_USER
 #define MQTT_USER "nodeuser"

@@ -1,11 +1,11 @@
 import asyncio
+import json
 import logging
 import platform
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any
 
-import toml
 from PySide6.QtCore import QObject, Signal
 
 from .config import settings
@@ -42,29 +42,28 @@ def _frpc_binary_path() -> Path | None:
     return None
 
 
-def _build_frpc_config(config: dict[str, Any]) -> str:
-    proxies = config.get("proxies", [])
-    data: dict[str, Any] = {
-        "serverAddr": config.get("server_addr", ""),
-        "serverPort": config.get("server_port", 7000),
-    }
-    token = config.get("auth_token", "")
+def _frpc_config_path() -> Path:
+    config_dir = Path.home() / ".config" / "cluster"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    return config_dir / "frpc.conf"
+
+
+def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:
+    args = [
+        proxy.get("type", "tcp"),
+        "-s", str(server.get("server_addr", "")),
+        "-P", str(server.get("server_port", 7000)),
+    ]
+    token = server.get("auth_token", "")
     if token:
-        data["auth"] = {"token": token}
-
-    if proxies:
-        data["proxies"] = [
-            {
-                "name": p.get("name", ""),
-                "type": p.get("type", "tcp"),
-                "localIP": p.get("local_ip", "127.0.0.1"),
-                "localPort": p.get("local_port", 80),
-                "remotePort": p.get("remote_port", 8080),
-            }
-            for p in proxies
-        ]
-
-    return toml.dumps(data)
+        args.extend(["-t", str(token)])
+    args.extend([
+        "-n", str(proxy.get("name", "")),
+        "-i", str(proxy.get("local_ip", "127.0.0.1")),
+        "-l", str(proxy.get("local_port", 80)),
+        "-r", str(proxy.get("remote_port", 8080)),
+    ])
+    return args
 
 
 class FrpcManager(QObject):
@@ -74,9 +73,9 @@ class FrpcManager(QObject):
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
-        self._process: asyncio.subprocess.Process | None = None
-        self._task: asyncio.Task[None] | None = None
-        self._config_path: Path = Path(__file__).parent.parent / "frpc.toml"
+        self._processes: list[asyncio.subprocess.Process] = []
+        self._tasks: list[asyncio.Task[None]] = []
+        self._config_path = _frpc_config_path()
         self._state = FrpcState.IDLE
 
     @property
@@ -102,16 +101,24 @@ class FrpcManager(QObject):
         except OSError:
             pass
 
-        toml_content = _build_frpc_config(config)
         try:
-            self._config_path.write_text(toml_content, encoding="utf-8")
+            self._config_path.parent.mkdir(parents=True, exist_ok=True)
+            self._config_path.write_text(
+                json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
         except OSError as e:
             self.error_occurred.emit(f"无法写入配置文件: {e}")
             return
 
-        logger.info(f"frpc 配置已写入: {self._config_path}")
+        proxies = config.get("proxies", [])
+        if not proxies:
+            self.error_occurred.emit("没有配置任何代理隧道")
+            return
+
         self._state = FrpcState.STARTING
-        self._task = asyncio.create_task(self._run(binary))
+        for proxy in proxies:
+            task = asyncio.create_task(self._run(binary, config, proxy))
+            self._tasks.append(task)
 
     def stop(self) -> None:
         if self._state not in (FrpcState.RUNNING, FrpcState.STARTING):
@@ -120,55 +127,64 @@ class FrpcManager(QObject):
         logger.info("正在停止 frpc...")
         self._state = FrpcState.STOPPING
 
-        if self._process is not None and self._process.returncode is None:
-            self._process.terminate()
+        for proc in self._processes:
+            if proc.returncode is None:
+                proc.terminate()
 
-        if self._task is not None and not self._task.done():
-            self._task.cancel()
+        for task in self._tasks:
+            if not task.done():
+                task.cancel()
 
-    async def _run(self, binary: Path) -> None:
+    async def _run(
+        self, binary: Path, server: dict[str, Any], proxy: dict[str, Any]
+    ) -> None:
+        args = _build_cli_args(server, proxy)
+        name = proxy.get("name", "unknown")
+        proc: asyncio.subprocess.Process | None = None
         try:
-            self._process = await asyncio.create_subprocess_exec(
+            proc = await asyncio.create_subprocess_exec(
                 str(binary),
-                "-c",
-                str(self._config_path),
+                *args,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
             )
-            self.log_received.emit(f"[系统] frpc 已启动，PID: {self._process.pid}")
+            self._processes.append(proc)
+            self.log_received.emit(f"[系统] 隧道 {name} 已启动，PID: {proc.pid}")
 
             if self._state == FrpcState.STARTING:
                 self._state = FrpcState.RUNNING
                 self.status_changed.emit(True)
 
-            assert self._process.stdout is not None
+            assert proc.stdout is not None
             while True:
-                line = await self._process.stdout.readline()
+                line = await proc.stdout.readline()
                 if not line:
                     break
                 text = line.decode("utf-8", errors="replace").rstrip()
                 if text:
-                    self.log_received.emit(text)
+                    self.log_received.emit(f"[{name}] {text}")
 
-            await self._process.wait()
-            exit_code = self._process.returncode
+            await proc.wait()
+            exit_code = proc.returncode
             if exit_code != 0:
-                self.log_received.emit(f"[系统] frpc 进程退出，返回码: {exit_code}")
+                self.log_received.emit(f"[系统] 隧道 {name} 进程退出，返回码: {exit_code}")
             else:
-                self.log_received.emit("[系统] frpc 进程已正常退出")
+                self.log_received.emit(f"[系统] 隧道 {name} 进程已正常退出")
         except asyncio.CancelledError:
-            if self._process and self._process.returncode is None:
-                self._process.terminate()
+            if proc is not None and proc.returncode is None:
+                proc.terminate()
                 try:
-                    await asyncio.wait_for(self._process.wait(), timeout=5)
+                    await asyncio.wait_for(proc.wait(), timeout=5)
                 except asyncio.TimeoutError:
-                    self._process.kill()
-                    await self._process.wait()
-            self.log_received.emit("[系统] frpc 已停止")
+                    proc.kill()
+                    await proc.wait()
+            self.log_received.emit(f"[系统] 隧道 {name} 已停止")
         except Exception as e:
-            self.error_occurred.emit(f"frpc 运行时错误: {e}")
+            self.error_occurred.emit(f"隧道 {name} 运行时错误: {e}")
             logger.error(f"frpc 运行时错误: {e}", exc_info=True)
         finally:
-            self._process = None
-            self._state = FrpcState.IDLE
-            self.status_changed.emit(False)
+            if proc is not None and proc in self._processes:
+                self._processes.remove(proc)
+            if not self._processes and self._state != FrpcState.STOPPING:
+                self._state = FrpcState.IDLE
+                self.status_changed.emit(False)
