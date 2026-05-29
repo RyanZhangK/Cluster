@@ -1133,7 +1133,8 @@ class MainWindow(QMainWindow):
         return page
 
     def _load_frpc_config(self) -> None:
-        """从上次生成的 frpc.toml 恢复配置，fallback 到 pydantic settings。"""
+        """从上次生成的 frpc.toml 恢复配置，fallback 到 pydantic settings。
+        如果配置文件不存在，则自动创建默认配置。"""
         frpc_toml = Path(__file__).parent.parent / "frpc.toml"
         if frpc_toml.exists():
             try:
@@ -1164,6 +1165,15 @@ class MainWindow(QMainWindow):
             proxies = []
         assert isinstance(proxies, list)
         self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
+
+        # 配置文件不存在时自动创建默认配置
+        from .frpc_manager import _build_frpc_config
+        default_config = self._collect_frpc_config()
+        try:
+            frpc_toml.parent.mkdir(parents=True, exist_ok=True)
+            frpc_toml.write_text(_build_frpc_config(default_config), encoding="utf-8")
+        except OSError:
+            pass
 
     def _collect_frpc_config(self) -> dict[str, Any]:
         """从 UI 表单收集 frpc 配置。"""
