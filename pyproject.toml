@@ -1,7 +1,7 @@
 [project]
 name = "Cluster"
-version = "1.0.0"
-description = "Add your description here"
+version = "1.0.1"
+description = "what can i say?"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

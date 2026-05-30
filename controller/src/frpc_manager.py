@@ -51,18 +51,26 @@ def _frpc_config_path() -> Path:
 def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:
     args = [
         proxy.get("type", "tcp"),
-        "-s", str(server.get("server_addr", "")),
-        "-P", str(server.get("server_port", 7000)),
+        "-s",
+        str(server.get("server_addr", "")),
+        "-P",
+        str(server.get("server_port", 7000)),
     ]
     token = server.get("auth_token", "")
     if token:
         args.extend(["-t", str(token)])
-    args.extend([
-        "-n", str(proxy.get("name", "")),
-        "-i", str(proxy.get("local_ip", "127.0.0.1")),
-        "-l", str(proxy.get("local_port", 80)),
-        "-r", str(proxy.get("remote_port", 8080)),
-    ])
+    args.extend(
+        [
+            "-n",
+            str(proxy.get("name", "")),
+            "-i",
+            str(proxy.get("local_ip", "127.0.0.1")),
+            "-l",
+            str(proxy.get("local_port", 80)),
+            "-r",
+            str(proxy.get("remote_port", 8080)),
+        ]
+    )
     return args
 
 
@@ -155,7 +163,9 @@ class FrpcManager(QObject):
                 self._state = FrpcState.RUNNING
                 self.status_changed.emit(True)
 
-            assert proc.stdout is not None
+            if proc.stdout is None:
+                logger.error(f"隧道 {name} 的进程没有 stdout 管道")
+                return
             while True:
                 line = await proc.stdout.readline()
                 if not line:
@@ -167,7 +177,9 @@ class FrpcManager(QObject):
             await proc.wait()
             exit_code = proc.returncode
             if exit_code != 0:
-                self.log_received.emit(f"[系统] 隧道 {name} 进程退出，返回码: {exit_code}")
+                self.log_received.emit(
+                    f"[系统] 隧道 {name} 进程退出，返回码: {exit_code}"
+                )
             else:
                 self.log_received.emit(f"[系统] 隧道 {name} 进程已正常退出")
         except asyncio.CancelledError:

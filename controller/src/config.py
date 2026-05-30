@@ -73,7 +73,7 @@ class Settings(BaseSettings):
         env_prefix="CLUSTER_",
         env_nested_delimiter="__",
         extra="ignore",
-        toml_file="config.toml",
+        toml_file=str(_Path(__file__).parent.parent.parent / "config.toml"),
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
