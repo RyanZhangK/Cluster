@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""
+检查 controller/src/ 中的运行时同包导入是否遗漏 '.' 前缀。
+TYPE_CHECKING 块内的导入供 IDE/类型检查用，允许裸导入。
+"""
+
+import re
+import sys
+from pathlib import Path
+
+SRC = Path("controller/src")
+ERRORS = False
+
+modules = sorted(p.stem for p in SRC.glob("*.py") if p.stem != "__init__")
+
+for pyfile in SRC.glob("*.py"):
+    text = pyfile.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    skip = False  # inside TYPE_CHECKING block
+
+    for lineno, line in enumerate(lines, 1):
+        stripped = line.strip()
+        raw = line  # keep original indentation
+
+        if re.match(r"^if TYPE_CHECKING:", stripped):
+            skip = True
+            continue
+
+        # module-level non-empty line → exit TYPE_CHECKING block
+        if skip and stripped:
+            if not raw[0].isspace():  # not indented → back to module level
+                skip = False
+
+        if skip:
+            continue
+
+        m = re.match(r"^from (\w+) import", stripped)
+        if m and m.group(1) in modules:
+            print(f"ERROR: {pyfile}:{lineno}: 运行时同包导入缺少 '.' 前缀: {stripped}")
+            ERRORS = True  # pyright: ignore[reportConstantRedefinition]
+
+sys.exit(1 if ERRORS else 0)

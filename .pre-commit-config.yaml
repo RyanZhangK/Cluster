@@ -14,3 +14,11 @@ repos:
   - id: clang-format
     # Optional: restrict to specific languages
     types_or: [c++]
+- repo: local
+  hooks:
+    - id: bare-imports
+      name: bare-imports check
+      entry: scripts/check_bare_imports
+      language: script
+      files: ^controller/src/.*\.py$
+      pass_filenames: false
