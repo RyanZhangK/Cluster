@@ -89,6 +89,8 @@ class NodeManager(QObject):
 
     def handle_activation(self, node_id: str, team: int) -> NodeState:
         """处理激活"""
+        if not 1 <= team <= 4:
+            raise ValueError(f"队伍编号无效: {team}，必须为 1-4")
         state = self._get_or_create(node_id)
         team_char = chr(ord("A") + team - 1)
 

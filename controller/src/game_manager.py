@@ -220,6 +220,9 @@ class GameManager(QObject):
 
     def _end_game(self, winner: str) -> None:
         """游戏结束。"""
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         self._game_state = GameState.ENDED
         logger.info(f"游戏结束！队伍 {winner} 获胜")
         self._event_bus.team_victory.emit(winner)

@@ -111,16 +111,12 @@ class MQTTClient:
             node_id, action_type, team_or_zero = parse_message(raw_payload)
 
             if action_type == "H":
-                came_online, state = self._node_manager.handle_heartbeat(node_id)
-                self._event_bus.node_status_changed.emit(node_id, state)
+                came_online, _ = self._node_manager.handle_heartbeat(node_id)
                 if came_online:
                     logger.info(f"节点 {node_id} 上线")
 
             elif action_type == "A":
-                state = self._node_manager.handle_activation(node_id, team_or_zero)
-                team_char = chr(ord("A") + team_or_zero - 1)
-                self._event_bus.node_activated.emit(node_id, team_char, state)
-                self._event_bus.node_status_changed.emit(node_id, state)
+                self._node_manager.handle_activation(node_id, team_or_zero)
 
         except MessageParseError as e:
             logger.warning(f"消息解析失败: {e}，原始 payload: {message.payload!r}")

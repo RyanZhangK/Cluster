@@ -1139,15 +1139,11 @@ class MainWindow(QMainWindow):
         if frpc_conf.exists():
             try:
                 data: dict[str, Any] = json.loads(frpc_conf.read_text(encoding="utf-8"))
-                self._frpc_server_addr.setText(
-                    str(data.get("server_addr", ""))
-                )
+                self._frpc_server_addr.setText(str(data.get("server_addr", "")))
                 self._frpc_server_port.setValue(
                     int(data.get("server_port", FRPC_SERVER_PORT))
                 )
-                self._frpc_auth_token.setText(
-                    str(data.get("auth_token", ""))
-                )
+                self._frpc_auth_token.setText(str(data.get("auth_token", "")))
                 proxies = data.get("proxies", [])
                 if isinstance(proxies, list):
                     self._populate_proxy_table(cast(list[dict[str, Any]], proxies))
@@ -1533,7 +1529,7 @@ class MainWindow(QMainWindow):
         self._populate_table()
         self._status_label.setText(f"节点 {node_id} 激活 → 队伍 {team}")
         if self._game_manager:
-            from game_manager import GameState
+            from .game_manager import GameState
 
             if node_id.startswith("STA"):
                 was_idle = self._game_manager.game_state == GameState.IDLE
@@ -1671,7 +1667,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_start_game_clicked(self) -> None:
-        from game_manager import BombConfig, GameManager, GameMode
+        from .game_manager import BombConfig, GameManager, GameMode
 
         mode_map = {
             "征服": GameMode.CONQUEST,
