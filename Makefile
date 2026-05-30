@@ -80,6 +80,7 @@ stage: clean-stage
 	install -m755 $(NUITKA_OUT)/$(PKG_NAME) $(STAGE_DIR)$(INSTALL_SHARE)/lib/$(PKG_NAME)
 	
 	cp $(NUITKA_OUT)/resources/audio/*.wav $(STAGE_DIR)$(INSTALL_SHARE)/audio/ 2>/dev/null || true
+	install -m644 $(ROOT_DIR)/config.toml $(STAGE_DIR)$(INSTALL_SHARE)/config.toml
 	install -dm755 $(STAGE_DIR)$(INSTALL_SHARE)/frpc/$(DEB_ARCH)
 	install -m755 $(NUITKA_OUT)/resources/frpc/$(DEB_ARCH)/frpc $(STAGE_DIR)$(INSTALL_SHARE)/frpc/$(DEB_ARCH)/frpc
 	
