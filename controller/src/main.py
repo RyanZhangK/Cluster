@@ -7,6 +7,8 @@ from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
 import qasync
+import watchdog.events
+import watchdog.observers
 from PySide6.QtWidgets import QApplication
 
 from controller.src import UI
@@ -46,59 +48,78 @@ async def ui_hot_reload_watcher(
     audio_player: AudioPlayer,
     frpc_manager: "FrpcManager",
 ):
-    """每秒检查一次 UI.py 的修改时间"""
+    """使用 inotify 监听 UI 文件改动，变更立刻 reload"""
     logger = logging.getLogger("HotReload")
 
-    ui_file = Path(__file__).parent / "UI.py"
+    ui_file = Path(__file__).resolve().parent / "UI.py"
     if not ui_file.exists():
-        ui_file = Path(__file__).parent / "UI" / "__init__.py"
+        ui_file = Path(__file__).resolve().parent / "__init__.py"
 
     if not ui_file.exists():
         logger.warning(f"无法找到 UI 文件: {ui_file}，热重载未激活。")
         return
 
-    last_mtime = ui_file.stat().st_mtime
-    logger.info(f"UI 热重载已激活，正在监听: {ui_file.name}")
+    loop = asyncio.get_running_loop()
+    queue: asyncio.Queue[None] = asyncio.Queue()
 
-    while True:
-        await asyncio.sleep(1)
-        try:
-            current_mtime = ui_file.stat().st_mtime
-            if current_mtime > last_mtime:
-                last_mtime = current_mtime
-                logger.info("检测到 UI 代码变动，正在重新加载...")
+    class _Handler(watchdog.events.FileSystemEventHandler):
+        def on_modified(
+            self,
+            event: watchdog.events.DirModifiedEvent | watchdog.events.FileModifiedEvent,
+        ):
+            if event.is_directory:
+                return
+            loop.call_soon_threadsafe(queue.put_nowait, None)
 
-                app = QApplication.instance()
-                _window = None
-                geometry = None
+    observer = watchdog.observers.Observer()
+    observer.schedule(
+        _Handler(),
+        str(ui_file.parent),
+        recursive=(ui_file.name == "__init__.py"),
+    )
+    observer.start()
+    logger.info(f"UI 热重载已激活，正在监听: {ui_file}")
 
-                if isinstance(app, QApplication):
-                    for widget in app.topLevelWidgets():
-                        if (
-                            widget.__class__.__name__ == "MainWindow"
-                            and widget.isVisible()
-                        ):
-                            _window = widget
-                            geometry = _window.geometry()
-                            break
+    try:
+        while True:
+            await queue.get()
+            try:
+                while True:
+                    await asyncio.wait_for(queue.get(), timeout=0.15)
+            except asyncio.TimeoutError:
+                pass
 
-                importlib.reload(UI)
+            logger.info("检测到 UI 代码变动，正在重新加载...")
 
-                if _window:
-                    _window.close()
-                    _window.deleteLater()
+            app = QApplication.instance()
+            _window = None
+            geometry = None
 
-                new_window = UI.MainWindow(
-                    node_manager, event_bus, audio_player, frpc_manager
-                )
+            if isinstance(app, QApplication):
+                for widget in app.topLevelWidgets():
+                    if widget.__class__.__name__ == "MainWindow" and widget.isVisible():
+                        _window = widget
+                        geometry = _window.geometry()
+                        break
 
-                if geometry:
-                    new_window.setGeometry(geometry)
+            importlib.reload(UI)
 
-                new_window.show()
-                logger.info("UI 热重载完成！")
-        except Exception as e:
-            logger.error(f"热重载失败: {e}", exc_info=True)
+            if _window:
+                _window.close()
+                _window.deleteLater()
+
+            new_window = UI.MainWindow(
+                node_manager, event_bus, audio_player, frpc_manager
+            )
+
+            if geometry:
+                new_window.setGeometry(geometry)
+
+            new_window.show()
+            logger.info("UI 热重载完成！")
+    finally:
+        observer.stop()
+        observer.join(timeout=1)
 
 
 def main() -> None:
@@ -143,20 +164,31 @@ def main() -> None:
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
 
-    def at_exit(signum: int, _):
-        logger.info(f"接收到终端退出指令{{{signum}}}，正在关闭程序...")
-        app.quit()
+    async def _shutdown() -> None:
+        logger.info("正在关闭所有服务...")
+        try:
+            tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+            for task in tasks:
+                task.cancel()
+            if tasks:
+                await asyncio.wait(tasks, timeout=5)
+        except Exception:
+            logger.exception("关闭时发生错误")
+        finally:
+            logger.info("所有服务已关闭。")
+            app.quit()
 
-    signal.signal(signal.SIGINT, at_exit)
-    signal.signal(signal.SIGTERM, at_exit)
+    def _schedule_shutdown(signum: int, _):
+        logger.info(f"接收到信号 {{{signum}}}，正在关闭程序...")
+        loop.call_soon_threadsafe(lambda: asyncio.create_task(_shutdown()))
+
+    signal.signal(signal.SIGINT, _schedule_shutdown)
+    signal.signal(signal.SIGTERM, _schedule_shutdown)
 
     with loop:
-        # 内嵌 Broker 优先启动，让客户端连接时已可用
         if EMBEDDED_BROKER:
             broker = EmbeddedBroker()
             loop.create_task(broker.run(), name="embedded_broker")
-            # 给 Broker 一点点启动时间（amqtt.start() 是异步的，但客户端立即连接可能竞态）
-            # MQTTClient 自带重试机制，即使首次失败也会自动重连，所以无需精确同步
 
         loop.create_task(mqtt_client.run(), name="mqtt_client")
         loop.create_task(node_manager.heartbeat_watchdog(), name="heartbeat_watchdog")
