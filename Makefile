@@ -58,7 +58,6 @@ compile: clean-compile
 	cd $(SRC_DIR) && uv run python -m nuitka \
 		--enable-plugin=pyside6 \
 		--standalone \
-		--static-libpython=yes \
 		--include-package=amqtt \
 		--include-data-dir=../resources/audio=resources/audio \
 		--include-data-files=../resources/frpc/$(DEB_ARCH)/frpc=resources/frpc/$(DEB_ARCH)/frpc \

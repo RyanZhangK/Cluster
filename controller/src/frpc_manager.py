@@ -66,9 +66,9 @@ def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:
             "-i",
             str(proxy.get("local_ip", "127.0.0.1")),
             "-l",
-            str(proxy.get("local_port", 80)),
+            str(proxy.get("local_port", 1883)),
             "-r",
-            str(proxy.get("remote_port", 8080)),
+            str(proxy.get("remote_port", 9001)),
         ]
     )
     return args
@@ -148,6 +148,9 @@ class FrpcManager(QObject):
     ) -> None:
         args = _build_cli_args(server, proxy)
         name = proxy.get("name", "unknown")
+        cmd_str = f"{binary} {' '.join(args)}"
+        logger.info(f"启动 frpc: {cmd_str}")
+        self.log_received.emit(f"[系统] 执行命令: {cmd_str}")
         proc: asyncio.subprocess.Process | None = None
         try:
             proc = await asyncio.create_subprocess_exec(
@@ -163,9 +166,7 @@ class FrpcManager(QObject):
                 self._state = FrpcState.RUNNING
                 self.status_changed.emit(True)
 
-            if proc.stdout is None:
-                logger.error(f"隧道 {name} 的进程没有 stdout 管道")
-                return
+            assert proc.stdout is not None
             while True:
                 line = await proc.stdout.readline()
                 if not line:
@@ -197,6 +198,6 @@ class FrpcManager(QObject):
         finally:
             if proc is not None and proc in self._processes:
                 self._processes.remove(proc)
-            if not self._processes and self._state != FrpcState.STOPPING:
+            if not self._processes:
                 self._state = FrpcState.IDLE
                 self.status_changed.emit(False)
