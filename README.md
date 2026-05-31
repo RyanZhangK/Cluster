@@ -7,7 +7,6 @@
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 graph TD
-    %% 去掉你原来的 classDef，或者改成深色系
     subgraph Controller ["Controller (主控)"]
         MQTT_B["MQTT Broker<br>(amqtt)"]
         Node_M["Node Manager<br>(内存缓存)"]
@@ -141,7 +140,15 @@ Cluster/
 │   │       └── frpc/               # Frpc 二进制 (amd64/arm64)
 │   ├── test/
 │       └── send_test_message.py    # MQTT 测试脚本
+├── doc/                            # 项目文档
+├── scripts/
+│   ├── check_bare_imports          # 检查同包导入是否遗漏 '.' 前缀
+│   ├── config_init.py              # config.toml 生成与校验工具
+│   ├── install_deps.py             # 安装依赖
+│   └── setup_dev.py                # 开发环境初始化
 ├── mcu/                            # ESP8266 固件代码
+├── README.md                       # 本文件
+├── config.toml                     # 配置文件 
 ├── README.md                       # 本文件
 ├── LICENSE                         # 开源协议
 ```
