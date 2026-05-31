@@ -82,7 +82,7 @@ reconnect()
     Serial.print(MQTT_PORT);
     Serial.print(" ... ");
 
-    if (client.connect(NODE_ID, MQTT_USER, MQTT_PASSWORD)) {
+    if (client.connect(NODE_ID)) {
       Serial.println("connected");
       client.subscribe(MQTT_TOPIC);
     } else {
@@ -168,18 +168,24 @@ loop()
 
   static unsigned long lastDebounceTime = 0;
   static int lastButtonState = HIGH;
+  static int stableButtonState = HIGH;
   int buttonState = digitalRead(BUTTON_PIN);
 
   if (buttonState != lastButtonState) {
     lastDebounceTime = millis();
   }
 
-  if ((millis() - lastDebounceTime) > 50 && buttonState == LOW) {
-    blinkLED(3, 50);
-    send_activation();
-    while (digitalRead(BUTTON_PIN) == LOW)
-      delay(10);
-    blinkLED(1, 50);
+  // 状态稳定 50ms 后才确认
+  if ((millis() - lastDebounceTime) > 50) {
+    if (buttonState != stableButtonState) {
+      stableButtonState = buttonState;
+      // 下降沿：按钮按下
+      if (stableButtonState == LOW) {
+        Serial.println("Button pressed!");
+        blinkLED(3, 50);
+        send_activation();
+      }
+    }
   }
 
   lastButtonState = buttonState;

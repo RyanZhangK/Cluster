@@ -93,7 +93,7 @@ connectMQTT()
     Serial.println("[网络] 尝试连接MQTT服务器...");
 
     // 带状态码的详细错误输出
-    if (client.connect(NODE_ID, MQTT_USER, MQTT_PASSWORD)) {
+    if (client.connect(NODE_ID)) {
       client.subscribe(MQTT_TOPIC);
       Serial.println("[网络] MQTT已连接");
     } else {
