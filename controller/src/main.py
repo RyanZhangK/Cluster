@@ -16,7 +16,7 @@ from controller.src.audio_player import AudioPlayer
 from controller.src.config import EMBEDDED_BROKER, LOG_DIR, settings
 from controller.src.embedded_broker import EmbeddedBroker
 from controller.src.event_bus import EventBus
-from controller.src.frpc_manager import FrpcManager
+from controller.src.frpc_manager import FrpcManager, _frpc_config_path
 from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
 
@@ -122,6 +122,32 @@ async def ui_hot_reload_watcher(
         observer.join(timeout=1)
 
 
+async def _auto_start_frpc(frpc_manager: FrpcManager) -> None:
+    """如果 frpc 配置文件存在且有代理隧道配置，自动启动 frpc"""
+    logger = logging.getLogger(__name__)
+
+    config_path = _frpc_config_path()
+    if not config_path.exists():
+        logger.info("frpc 配置文件不存在，跳过自动启动")
+        return
+
+    try:
+        import json
+
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        logger.warning(f"读取 frpc 配置文件失败: {e}")
+        return
+
+    proxies = config.get("proxies", [])
+    if not proxies:
+        logger.info("frpc 配置中没有代理隧道，跳过自动启动")
+        return
+
+    logger.info(f"检测到 frpc 配置 ({len(proxies)} 个隧道)，正在自动启动...")
+    frpc_manager.start(config)
+
+
 def main() -> None:
     setup_logging()
     logger = logging.getLogger(__name__)
@@ -192,6 +218,7 @@ def main() -> None:
 
         loop.create_task(mqtt_client.run(), name="mqtt_client")
         loop.create_task(node_manager.heartbeat_watchdog(), name="heartbeat_watchdog")
+        loop.create_task(_auto_start_frpc(frpc_manager), name="frpc_auto_start")
         if settings.controller.ui_hot_reload:
             loop.create_task(
                 ui_hot_reload_watcher(

@@ -12,7 +12,7 @@ char keys[ROWS][COLS] = { { '1', '2', '3' },
                           { '7', '8', '9' },
                           { '*', '0', '#' } };
 byte rowPins[ROWS] = { D1, D2, D3, D4 }; // 行引脚(输出)
-byte colPins[COLS] = { D5, D6, D7, D8 }; // 列引脚(输入，内部上拉)
+byte colPins[COLS] = { D5, D6, D7 }; // 列引脚(输入，内部上拉)
 
 // 初始化Keypad实例
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
