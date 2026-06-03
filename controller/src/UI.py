@@ -1529,7 +1529,7 @@ class MainWindow(QMainWindow):
         self._populate_table()
         self._status_label.setText(f"节点 {node_id} 激活 → 队伍 {team}")
         if self._game_manager:
-            from .game_manager import GameState
+            from .game_manager import GameMode, GameState
 
             if node_id.startswith("STA"):
                 was_idle = self._game_manager.game_state == GameState.IDLE
@@ -1541,12 +1541,15 @@ class MainWindow(QMainWindow):
                 if was_idle:
                     self._update_team_card(team, "已激活")
             elif node_id.startswith("DET"):
-                self._audio_player.play_activated(team)
+                # DET 节点按游戏模式触发不同音频
+                if self._game_manager.mode == GameMode.OCCUPY:
+                    self._audio_player.play_hotpoint(team)
+                # Bomb 模式音频由 bomb_activated/bomb_defused 事件触发，此处不播
                 self._game_manager.on_det_activated(
                     node_id, team, self._node_manager.get_all_nodes()
                 )
                 self._update_occupy_bars()
-        else:
+        elif node_id.startswith("STA"):
             self._audio_player.play_activated(team)
 
     @Slot(str, object)
