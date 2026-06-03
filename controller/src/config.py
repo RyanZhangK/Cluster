@@ -224,6 +224,11 @@ AUDIO_FILES = {
     # 爆破模式胜利
     "victory_T": "TEAM_T_WIN.wav",
     "victory_CT": "TEAM_CT_WIN.wav",
+    # DET 节点占领（Occupy 模式）
+    "hotpoint_A": "TEAM_A_HOTPOINT.wav",
+    "hotpoint_B": "TEAM_B_HOTPOINT.wav",
+    "hotpoint_C": "TEAM_C_HOTPOINT.wav",
+    "hotpoint_D": "TEAM_D_HOTPOINT.wav",
     # 炸弹事件
     "bomb_activated": "BOOM_PLANTED.wav",
     "bomb_defused": "BOOM_DEFUSED.wav",
