@@ -2,6 +2,17 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+/******************** 调试开关 ********************/
+#define DEBUG false
+
+#if DEBUG
+#define LOG_PRINT(x) Serial.print(x)
+#define LOG_PRINTLN(x) Serial.println(x)
+#else
+#define LOG_PRINT(x)
+#define LOG_PRINTLN(x)
+#endif
+
 /******************** 网络配置 ********************/
 #ifndef WIFI_SSID
 #define WIFI_SSID "208207"
@@ -52,19 +63,19 @@ blinkLED(int times = 1, int duration = 100)
 void
 setup_wifi()
 {
-  Serial.print("Connecting to WiFi: ");
-  Serial.println(WIFI_SSID);
+  LOG_PRINT("Connecting to WiFi: ");
+  LOG_PRINTLN(WIFI_SSID);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     blinkLED(1, 100);
     delay(400);
-    Serial.print(".");
+    LOG_PRINT(".");
   }
 
-  Serial.println();
-  Serial.print("WiFi connected, IP: ");
-  Serial.println(WiFi.localIP());
+  LOG_PRINTLN("");
+  LOG_PRINT("WiFi connected, IP: ");
+  LOG_PRINTLN(WiFi.localIP());
 }
 
 void
@@ -72,24 +83,24 @@ reconnect()
 {
   while (!client.connected()) {
     if (WiFi.status() != WL_CONNECTED) {
-      Serial.println("WiFi 断开，先重连 WiFi...");
+      LOG_PRINTLN("WiFi disconnected, reconnecting...");
       setup_wifi();
     }
 
-    Serial.print("Connecting to MQTT ");
-    Serial.print(MQTT_SERVER);
-    Serial.print(":");
-    Serial.print(MQTT_PORT);
-    Serial.print(" ... ");
+    LOG_PRINT("Connecting to MQTT ");
+    LOG_PRINT(MQTT_SERVER);
+    LOG_PRINT(":");
+    LOG_PRINT(MQTT_PORT);
+    LOG_PRINT(" ... ");
 
     if (client.connect(NODE_ID)) {
-      Serial.println("connected");
+      LOG_PRINTLN("connected");
       client.subscribe(MQTT_TOPIC);
     } else {
       int state = client.state();
-      Serial.print("failed, rc=");
-      Serial.print(state);
-      Serial.println(", retry in 500ms");
+      LOG_PRINT("failed, rc=");
+      LOG_PRINT(state);
+      LOG_PRINTLN(", retry in 500ms");
       blinkLED(1, 100);
       for (int i = 0; i < 10; i++) {
         delay(50);
@@ -102,12 +113,12 @@ reconnect()
 void
 callback(char* topic, byte* payload, unsigned int length)
 {
-  Serial.print("Message [");
-  Serial.print(topic);
-  Serial.print("]: ");
+  LOG_PRINT("Message [");
+  LOG_PRINT(topic);
+  LOG_PRINT("]: ");
   for (unsigned int i = 0; i < length; i++)
-    Serial.print((char)payload[i]);
-  Serial.println();
+    LOG_PRINT((char)payload[i]);
+  LOG_PRINTLN("");
 }
 
 void
@@ -115,7 +126,8 @@ send_heartbeat()
 {
   String msg = String(NODE_ID) + HEARTBEAT_CODE;
   client.publish(MQTT_TOPIC, msg.c_str());
-  Serial.println("Heartbeat: " + msg);
+  LOG_PRINT("Heartbeat: ");
+  LOG_PRINTLN(msg);
 }
 
 void
@@ -123,7 +135,8 @@ send_activation()
 {
   String msg = String(NODE_ID) + ACTIVATION_CODE;
   client.publish(MQTT_TOPIC, msg.c_str());
-  Serial.println("Activation: " + msg);
+  LOG_PRINT("Activation: ");
+  LOG_PRINTLN(msg);
 }
 
 void
@@ -134,9 +147,11 @@ setup()
 
   Serial.begin(115200);
   delay(100);
-  Serial.println("\n\n--- STA Node Starting ---");
-  Serial.print("Node ID: ");
-  Serial.println(NODE_ID);
+  LOG_PRINTLN("");
+  LOG_PRINTLN("");
+  LOG_PRINTLN("--- STA Node Starting ---");
+  LOG_PRINT("Node ID: ");
+  LOG_PRINTLN(NODE_ID);
 
   blinkLED(2, 50);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -149,7 +164,7 @@ setup()
 
   send_heartbeat();
   last_heartbeat = millis();
-  Serial.println("Setup complete");
+  LOG_PRINTLN("Setup complete");
 }
 
 void
@@ -181,7 +196,7 @@ loop()
       stableButtonState = buttonState;
       // 下降沿：按钮按下
       if (stableButtonState == LOW) {
-        Serial.println("Button pressed!");
+        LOG_PRINTLN("Button pressed!");
         blinkLED(3, 50);
         send_activation();
       }
