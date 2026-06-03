@@ -29,14 +29,8 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 #ifndef MQTT_SERVER
 #define MQTT_SERVER "182.92.87.183"
 #endif
-#define MQTT_PORT 9000
+#define MQTT_PORT 9001
 #define MQTT_TOPIC "node/status"
-#ifndef MQTT_USER
-#define MQTT_USER "nodeuser"
-#endif
-#ifndef MQTT_PASSWORD
-#define MQTT_PASSWORD "nodeuserpassword"
-#endif
 
 /******************** 节点配置 ********************/
 #define NODE_ID "DET01"           // 节点识别码
@@ -44,7 +38,6 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /******************** 报文配置 ********************/
 #define HEARTBEAT_CODE "H0"   // 心跳报文后缀
-#define ACTIVATION_CODE "000" // 激活验证码
 
 // 全局变量
 WiFiClient espClient;
@@ -56,13 +49,14 @@ bool isRecording = false;
 
 /**
  * 初始化WiFi连接
- * 自动重试直到连接成功
- * 失败时会自动重启设备
+ * 自动重试直到连接成功，30秒超时自动重启
  */
 void
 setupWiFi()
 {
-  Serial.println("\n[网络] 正在连接WiFi...");
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(WIFI_SSID);
+
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   unsigned long startTime = millis();
@@ -72,63 +66,51 @@ setupWiFi()
 
     // 30秒连接超时自动重启
     if (millis() - startTime > 30000) {
-      Serial.println("\n[错误] WiFi连接超时，即将重启...");
+      Serial.println();
+      Serial.println("WiFi connect timeout, restarting...");
       ESP.restart();
     }
   }
 
-  Serial.println("\n[网络] WiFi已连接");
-  Serial.print("[网络] IP地址: ");
+  Serial.println();
+  Serial.print("WiFi connected, IP: ");
   Serial.println(WiFi.localIP());
 }
 
 /**
- * 连接MQTT服务器
+ * 连接MQTT服务器（匿名认证）
  * 包含错误状态码输出和自动重试机制
  */
 void
 connectMQTT()
 {
   if (!client.connected()) {
-    Serial.println("[网络] 尝试连接MQTT服务器...");
+    Serial.print("Connecting to MQTT ");
+    Serial.print(MQTT_SERVER);
+    Serial.print(":");
+    Serial.print(MQTT_PORT);
+    Serial.print(" ... ");
 
-    // 带状态码的详细错误输出
     if (client.connect(NODE_ID)) {
+      Serial.println("connected");
       client.subscribe(MQTT_TOPIC);
-      Serial.println("[网络] MQTT已连接");
     } else {
-      Serial.print("[错误] MQTT连接失败，状态码: ");
-      Serial.println(client.state());
+      int state = client.state();
+      Serial.print("failed, rc=");
+      Serial.print(state);
 
       // 常见错误码说明
-      switch (client.state()) {
-        case -4:
-          Serial.println("[提示] 网络连接超时");
-          break;
-        case -3:
-          Serial.println("[提示] 服务器不可达");
-          break;
-        case -2:
-          Serial.println("[提示] 协议版本不匹配");
-          break;
-        case -1:
-          Serial.println("[提示] 客户端ID无效");
-          break;
-        case 1:
-          Serial.println("[提示] 不支持的协议版本");
-          break;
-        case 2:
-          Serial.println("[提示] 客户端ID被拒绝");
-          break;
-        case 3:
-          Serial.println("[提示] 服务器不可用");
-          break;
-        case 4:
-          Serial.println("[提示] 用户名/密码错误");
-          break;
-        case 5:
-          Serial.println("[提示] 未授权");
-          break;
+      switch (state) {
+        case -4: Serial.println(" (connection timeout)"); break;
+        case -3: Serial.println(" (server unreachable)"); break;
+        case -2: Serial.println(" (protocol mismatch)"); break;
+        case -1: Serial.println(" (invalid client ID)"); break;
+        case 1:  Serial.println(" (unsupported protocol)"); break;
+        case 2:  Serial.println(" (client ID rejected)"); break;
+        case 3:  Serial.println(" (server unavailable)"); break;
+        case 4:  Serial.println(" (bad username/password)"); break;
+        case 5:  Serial.println(" (unauthorized)"); break;
+        default: Serial.println(); break;
       }
     }
   }
@@ -141,7 +123,7 @@ sendHeartbeat()
   String message = String(NODE_ID) + HEARTBEAT_CODE;
   client.publish(MQTT_TOPIC, message.c_str());
   lastHeartbeat = millis();
-  Serial.println("心跳已发送: " + message);
+  Serial.println("Heartbeat: " + message);
 }
 
 // 发送激活包
@@ -150,30 +132,22 @@ sendActivation(char team)
 {
   String message = String(NODE_ID) + "A" + team;
   client.publish(MQTT_TOPIC, message.c_str());
-  Serial.println("激活包已发送: " + message);
+  Serial.println("Activation: " + message);
 }
 
 /**
  * 键盘扫描处理
- * 包含去抖动机制和扫描频率控制
- * 返回检测到的按键字符，无按键时返回'\0'
+ * 使用Keypad库获取按键，返回检测到的按键字符，无按键时返回'\0'
  */
-// 使用Keypad库获取按键并输出状态
 char
 scanKeyboard()
 {
-  char key = keypad.getKey();
-  if (key) {
-    Serial.print("[键盘状态] 当前按下键: ");
-    Serial.print(key);
-    Serial.print(" (ASCII ");
-    Serial.print((int)key);
-    Serial.println(")");
-  }
-  return key;
+  return keypad.getKey();
 }
 
 // 处理键盘输入
+// * 开始输入, # 结束输入
+// 三位重复数字: 111→A队, 222→B队, 333→C队, 444→D队
 void
 handleInput(char key)
 {
@@ -183,49 +157,49 @@ handleInput(char key)
     isRecording = true;
     inputBuffer = "";
     inputStart = millis();
-    Serial.println("开始输入激活码...");
+    Serial.println("Keypad: input started");
     return;
   }
 
   if (isRecording) {
+    // 30秒超时
     if (millis() - inputStart > 30000) {
       isRecording = false;
-      Serial.println("输入超时");
+      Serial.println("Keypad: input timeout");
       return;
     }
 
+    // * 取消输入
     if (key == '*') {
       isRecording = false;
-      Serial.println("输入已取消");
+      Serial.println("Keypad: input cancelled");
       return;
     }
 
+    // # 确认输入
     if (key == '#') {
       isRecording = false;
-      Serial.print("[验证] 输入内容: ");
-      Serial.println(inputBuffer);
 
-      if (inputBuffer.length() == 8 &&
-          (inputBuffer[0] >= '1' && inputBuffer[0] <= '4') &&
-          inputBuffer.substring(1) == ACTIVATION_CODE) {
-        Serial.println("[验证] 激活码格式正确");
-        // 将数字1-4转换为A-D发送
+      // 验证: 必须恰好3个相同数字 (111, 222, 333, 444)
+      if (inputBuffer.length() == 3 &&
+          inputBuffer[0] == inputBuffer[1] &&
+          inputBuffer[1] == inputBuffer[2] &&
+          inputBuffer[0] >= '1' && inputBuffer[0] <= '4') {
         char team = 'A' + (inputBuffer[0] - '1');
+        Serial.print("Keypad: team ");
+        Serial.print(team);
+        Serial.print(" (");
+        Serial.print(inputBuffer);
+        Serial.println(")");
         sendActivation(team);
-      } else {
-        Serial.println("[错误] 无效激活码");
-        Serial.println("[提示] 正确格式: [A-D]7355608");
-        Serial.print("[诊断] 长度: ");
-        Serial.print(inputBuffer.length());
-        Serial.print(", 首字符: ");
-        Serial.print(inputBuffer[0]);
-        Serial.print(", 剩余部分: ");
-        Serial.println(inputBuffer.substring(1));
       }
-    } else if (inputBuffer.length() < 8) { // 允许输入8个字符（1字母+7数字）
+      // 格式不符合: 静默重置，不响应
+      return;
+    }
+
+    // 仅收集数字键 (0-9)，忽略 * 和 #
+    if (key >= '0' && key <= '9' && inputBuffer.length() < 3) {
       inputBuffer += key;
-      Serial.print("[输入] 当前长度: ");
-      Serial.println(inputBuffer.length());
     }
   }
 }
@@ -234,24 +208,24 @@ void
 setup()
 {
   Serial.begin(115200);
-  Serial.println("[系统] 初始化中...");
+  delay(100);
+  Serial.println("\n\n--- DET Node Starting ---");
+  Serial.print("Node ID: ");
+  Serial.println(NODE_ID);
 
   // 初始化硬件
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH); // 初始关闭LED
-
-  // Keypad库自动初始化键盘引脚
-  Serial.println("[硬件] 键盘初始化完成");
+  Serial.println("Keypad initialized");
 
   // 初始化看门狗（8秒超时，loop()中手动喂狗）
   ESP.wdtEnable(8000);
-  Serial.println("[系统] 看门狗已启用");
 
   // 网络连接
   setupWiFi();
   client.setServer(MQTT_SERVER, MQTT_PORT);
 
-  Serial.println("[系统] 初始化完成，等待输入...");
+  Serial.println("Setup complete");
 }
 
 void
