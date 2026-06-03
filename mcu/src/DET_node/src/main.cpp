@@ -4,6 +4,17 @@
 
 #include <Keypad.h>
 
+/******************** 调试开关 ********************/
+#define DEBUG false
+
+#if DEBUG
+#define LOG_PRINT(x) Serial.print(x)
+#define LOG_PRINTLN(x) Serial.println(x)
+#else
+#define LOG_PRINT(x)
+#define LOG_PRINTLN(x)
+#endif
+
 /******************** 键盘配置 ********************/
 const byte ROWS = 4;
 const byte COLS = 3;
@@ -54,27 +65,27 @@ bool isRecording = false;
 void
 setupWiFi()
 {
-  Serial.print("Connecting to WiFi: ");
-  Serial.println(WIFI_SSID);
+  LOG_PRINT("Connecting to WiFi: ");
+  LOG_PRINTLN(WIFI_SSID);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    LOG_PRINT(".");
 
     // 30秒连接超时自动重启
     if (millis() - startTime > 30000) {
-      Serial.println();
-      Serial.println("WiFi connect timeout, restarting...");
+      LOG_PRINTLN("");
+      LOG_PRINTLN("WiFi connect timeout, restarting...");
       ESP.restart();
     }
   }
 
-  Serial.println();
-  Serial.print("WiFi connected, IP: ");
-  Serial.println(WiFi.localIP());
+  LOG_PRINTLN("");
+  LOG_PRINT("WiFi connected, IP: ");
+  LOG_PRINTLN(WiFi.localIP());
 }
 
 /**
@@ -85,32 +96,32 @@ void
 connectMQTT()
 {
   if (!client.connected()) {
-    Serial.print("Connecting to MQTT ");
-    Serial.print(MQTT_SERVER);
-    Serial.print(":");
-    Serial.print(MQTT_PORT);
-    Serial.print(" ... ");
+    LOG_PRINT("Connecting to MQTT ");
+    LOG_PRINT(MQTT_SERVER);
+    LOG_PRINT(":");
+    LOG_PRINT(MQTT_PORT);
+    LOG_PRINT(" ... ");
 
     if (client.connect(NODE_ID)) {
-      Serial.println("connected");
+      LOG_PRINTLN("connected");
       client.subscribe(MQTT_TOPIC);
     } else {
       int state = client.state();
-      Serial.print("failed, rc=");
-      Serial.print(state);
+      LOG_PRINT("failed, rc=");
+      LOG_PRINT(state);
 
       // 常见错误码说明
       switch (state) {
-        case -4: Serial.println(" (connection timeout)"); break;
-        case -3: Serial.println(" (server unreachable)"); break;
-        case -2: Serial.println(" (protocol mismatch)"); break;
-        case -1: Serial.println(" (invalid client ID)"); break;
-        case 1:  Serial.println(" (unsupported protocol)"); break;
-        case 2:  Serial.println(" (client ID rejected)"); break;
-        case 3:  Serial.println(" (server unavailable)"); break;
-        case 4:  Serial.println(" (bad username/password)"); break;
-        case 5:  Serial.println(" (unauthorized)"); break;
-        default: Serial.println(); break;
+        case -4: LOG_PRINTLN(" (connection timeout)"); break;
+        case -3: LOG_PRINTLN(" (server unreachable)"); break;
+        case -2: LOG_PRINTLN(" (protocol mismatch)"); break;
+        case -1: LOG_PRINTLN(" (invalid client ID)"); break;
+        case 1:  LOG_PRINTLN(" (unsupported protocol)"); break;
+        case 2:  LOG_PRINTLN(" (client ID rejected)"); break;
+        case 3:  LOG_PRINTLN(" (server unavailable)"); break;
+        case 4:  LOG_PRINTLN(" (bad username/password)"); break;
+        case 5:  LOG_PRINTLN(" (unauthorized)"); break;
+        default: LOG_PRINTLN(""); break;
       }
     }
   }
@@ -123,7 +134,8 @@ sendHeartbeat()
   String message = String(NODE_ID) + HEARTBEAT_CODE;
   client.publish(MQTT_TOPIC, message.c_str());
   lastHeartbeat = millis();
-  Serial.println("Heartbeat: " + message);
+  LOG_PRINT("Heartbeat: ");
+  LOG_PRINTLN(message);
 }
 
 // 发送激活包
@@ -132,7 +144,8 @@ sendActivation(char team)
 {
   String message = String(NODE_ID) + "A" + team;
   client.publish(MQTT_TOPIC, message.c_str());
-  Serial.println("Activation: " + message);
+  LOG_PRINT("Activation: ");
+  LOG_PRINTLN(message);
 }
 
 /**
@@ -142,7 +155,17 @@ sendActivation(char team)
 char
 scanKeyboard()
 {
-  return keypad.getKey();
+  char key = keypad.getKey();
+#if DEBUG
+  if (key) {
+    LOG_PRINT("Key pressed: ");
+    LOG_PRINT(key);
+    LOG_PRINT(" (ASCII ");
+    LOG_PRINT((int)key);
+    LOG_PRINTLN(")");
+  }
+#endif
+  return key;
 }
 
 // 处理键盘输入
@@ -157,7 +180,7 @@ handleInput(char key)
     isRecording = true;
     inputBuffer = "";
     inputStart = millis();
-    Serial.println("Keypad: input started");
+    LOG_PRINTLN("Keypad: input started");
     return;
   }
 
@@ -165,14 +188,14 @@ handleInput(char key)
     // 30秒超时
     if (millis() - inputStart > 30000) {
       isRecording = false;
-      Serial.println("Keypad: input timeout");
+      LOG_PRINTLN("Keypad: input timeout");
       return;
     }
 
     // * 取消输入
     if (key == '*') {
       isRecording = false;
-      Serial.println("Keypad: input cancelled");
+      LOG_PRINTLN("Keypad: input cancelled");
       return;
     }
 
@@ -186,11 +209,11 @@ handleInput(char key)
           inputBuffer[1] == inputBuffer[2] &&
           inputBuffer[0] >= '1' && inputBuffer[0] <= '4') {
         char team = 'A' + (inputBuffer[0] - '1');
-        Serial.print("Keypad: team ");
-        Serial.print(team);
-        Serial.print(" (");
-        Serial.print(inputBuffer);
-        Serial.println(")");
+        LOG_PRINT("Keypad: team ");
+        LOG_PRINT(team);
+        LOG_PRINT(" (");
+        LOG_PRINT(inputBuffer);
+        LOG_PRINTLN(")");
         sendActivation(team);
       }
       // 格式不符合: 静默重置，不响应
@@ -209,14 +232,16 @@ setup()
 {
   Serial.begin(115200);
   delay(100);
-  Serial.println("\n\n--- DET Node Starting ---");
-  Serial.print("Node ID: ");
-  Serial.println(NODE_ID);
+  LOG_PRINTLN("");
+  LOG_PRINTLN("");
+  LOG_PRINTLN("--- DET Node Starting ---");
+  LOG_PRINT("Node ID: ");
+  LOG_PRINTLN(NODE_ID);
 
   // 初始化硬件
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH); // 初始关闭LED
-  Serial.println("Keypad initialized");
+  LOG_PRINTLN("Keypad initialized");
 
   // 初始化看门狗（8秒超时，loop()中手动喂狗）
   ESP.wdtEnable(8000);
@@ -224,8 +249,10 @@ setup()
   // 网络连接
   setupWiFi();
   client.setServer(MQTT_SERVER, MQTT_PORT);
+  connectMQTT();
+  sendHeartbeat();
 
-  Serial.println("Setup complete");
+  LOG_PRINTLN("Setup complete");
 }
 
 void
