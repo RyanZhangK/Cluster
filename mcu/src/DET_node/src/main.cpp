@@ -6,7 +6,6 @@
 
 /******************** 调试开关 ********************/
 #define DEBUG false
-
 #if DEBUG
 #define LOG_PRINT(x) Serial.print(x)
 #define LOG_PRINTLN(x) Serial.println(x)
@@ -30,10 +29,10 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /******************** 网络配置 ********************/
 #ifndef WIFI_SSID
-#define WIFI_SSID "208207"
+#define WIFI_SSID "ZG"
 #endif
 #ifndef WIFI_PASSWORD
-#define WIFI_PASSWORD "1234567890"
+#define WIFI_PASSWORD "ZG888888"
 #endif
 
 /******************** MQTT配置 ********************/
@@ -44,7 +43,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 #define MQTT_TOPIC "node/status"
 
 /******************** 节点配置 ********************/
-#define NODE_ID "DET01"           // 节点识别码
+#define NODE_ID "DET05"           // 节点识别码
 #define HEARTBEAT_INTERVAL 180000 // 心跳间隔(ms)，3分钟=180000ms
 
 /******************** 报文配置 ********************/
