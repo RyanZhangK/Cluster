@@ -15,10 +15,11 @@
 
 /******************** 网络配置 ********************/
 #ifndef WIFI_SSID
-#define WIFI_SSID "208207"
+#define WIFI_SSID "ZG"
+
 #endif
 #ifndef WIFI_PASSWORD
-#define WIFI_PASSWORD "1234567890"
+#define WIFI_PASSWORD "ZG888888"
 #endif
 
 /******************** MQTT配置 ********************/
@@ -35,7 +36,7 @@
 #endif
 
 /******************** 节点配置 ********************/
-#define NODE_ID "STA01"
+#define NODE_ID "STA04"
 #define BUTTON_PIN D1
 #define LED_PIN D4
 #define HEARTBEAT_INTERVAL 180000
