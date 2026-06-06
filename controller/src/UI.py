@@ -745,6 +745,15 @@ class MainWindow(QMainWindow):
                 ],
             ),
             (
+                "DET 热点占领",
+                [
+                    ("hotpoint_A", "A 队占领"),
+                    ("hotpoint_B", "B 队占领"),
+                    ("hotpoint_C", "C 队占领"),
+                    ("hotpoint_D", "D 队占领"),
+                ],
+            ),
+            (
                 "炸弹",
                 [
                     ("bomb_activated", "炸弹激活"),
