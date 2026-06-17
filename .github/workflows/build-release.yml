@@ -75,7 +75,7 @@ jobs:
           pip install --upgrade pip
           pip install uv
           sudo apt-get update -qq && sudo apt-get install -y -qq libxcb-cursor0 libxkbcommon-x11-0
-        
+
       - name: Run Tests
         run: uv run pytest
 
@@ -94,10 +94,91 @@ jobs:
           name: packages-${{ matrix.arch }}
           path: build/pkg/*
 
+  build-flasher-linux:
+    name: Build Flasher (Linux ${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-22.04
+          - arch: arm64
+            runner: ubuntu-22.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y build-essential patchelf
+          pip install --upgrade pip
+          pip install uv
+
+      - name: Build flasher
+        run: make flasher
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cluster-flasher-linux-${{ matrix.arch }}
+          path: build/dist/flasher.dist/
+
+  build-flasher-win:
+    name: Build Flasher (Windows x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Sync dependencies
+        run: uv sync --group flasher
+
+      - name: Build flasher
+        run: |
+          mkdir -p build/dist/flasher.dist
+          cd tools/flasher
+          uv run python -m nuitka `
+            --enable-plugin=pyside6 `
+            --standalone `
+            --include-package=esptool `
+            --include-package=serial `
+            --output-dir=../../build/dist/flasher.dist `
+            --output-filename=cluster-flasher `
+            --assume-yes-for-downloads `
+            --main=main.py
+
+      - name: Package (zip)
+        shell: pwsh
+        run: |
+          $dist = "build/dist/flasher.dist"
+          Compress-Archive -Path "$dist/*" -DestinationPath "build/dist/cluster-flasher-win64.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cluster-flasher-win64
+          path: build/dist/cluster-flasher-win64.zip
+
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, build-flasher-linux, build-flasher-win]
     permissions:
       contents: write
 
@@ -107,6 +188,13 @@ jobs:
         with:
           path: artifacts/
           pattern: packages-*
+          merge-multiple: true
+
+      - name: Download flasher artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/flasher/
+          pattern: cluster-flasher-*
           merge-multiple: true
 
       - name: Create Release
@@ -119,3 +207,4 @@ jobs:
           files: |
             artifacts/*.deb
             artifacts/*.pkg.tar.zst
+            artifacts/flasher/**

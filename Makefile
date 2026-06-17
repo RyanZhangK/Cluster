@@ -12,6 +12,8 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 SRC_DIR         := $(ROOT_DIR)/controller/src
 NUITKA_OUT      := $(DIST_DIR)/main.dist
+FLASHER_SRC     := $(ROOT_DIR)/tools/flasher
+FLASHER_DIST    := $(DIST_DIR)/flasher.dist
 
 ARCH_NAME       := $(shell uname -m)
 DEB_ARCH        := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
@@ -23,7 +25,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump
+.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump flasher flasher-dev flasher-clean
 all: clean deps compile stage deb pacman 
 
 deps: scripts/install_deps.py
@@ -125,3 +127,24 @@ pacman:
 
 bump:
 	uvx bump-my-version bump patch
+
+# ── Flasher 烧录工具 ──────────────────────────────────────────────────────
+
+flasher-dev:
+	uv run python -m tools.flasher.main
+
+flasher-clean:
+	@rm -rf $(FLASHER_DIST)
+
+flasher: flasher-clean
+	@echo "==> Nuitka 编译 flasher ..."
+	@mkdir -p $(FLASHER_DIST)
+	cd $(FLASHER_SRC) && uv run python -m nuitka \
+		--enable-plugin=pyside6 \
+		--standalone \
+		--include-package=esptool \
+		--include-package=serial \
+		--output-dir=$(FLASHER_DIST) \
+		--output-filename=cluster-flasher \
+		--assume-yes-for-downloads \
+		--main=main.py
