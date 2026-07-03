@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
 
         self.erase_check = QCheckBox("烧录前全片擦除 (--erase-all)")
         self.erase_check.setStyleSheet(f"color: {C_TEXT_SEC}; font-size: 12px;")
-        row3.addWidget(self.erase_check, alignment=Qt.AlignBottom)
+        row3.addWidget(self.erase_check, alignment=Qt.AlignmentFlag.AlignBottom)
 
         layout.addLayout(row3)
 
