@@ -1,5 +1,6 @@
 import asyncio
 import importlib
+import json
 import logging
 import signal
 import sys
@@ -132,8 +133,6 @@ async def _auto_start_frpc(frpc_manager: FrpcManager) -> None:
         return
 
     try:
-        import json
-
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as e:
         logger.warning(f"读取 frpc 配置文件失败: {e}")

@@ -53,7 +53,9 @@ class FlashWorker(QObject):
         self._process = QProcess(self)
         self._process.setProgram(sys.executable)
         self._process.setArguments(args)
-        self._process.setProcessChannelMode(QProcess.SeparateChannels)
+        self._process.setProcessChannelMode(
+            QProcess.ProcessChannelMode.SeparateChannels
+        )
 
         # esptool writes progress/status to stderr
         self._process.readyReadStandardError.connect(self._on_stderr)
@@ -68,7 +70,7 @@ class FlashWorker(QObject):
 
     def cancel(self) -> None:
         """Kill a running flash operation."""
-        if self._process and self._process.state() != QProcess.NotRunning:
+        if self._process and self._process.state() != QProcess.ProcessState.NotRunning:
             self._process.kill()
             self.log_message.emit(f"[{_now()}] 烧录已取消")
 
@@ -79,7 +81,12 @@ class FlashWorker(QObject):
     def _on_stderr(self) -> None:
         if self._process is None:
             return
-        data = self._process.readAllStandardError().data().decode(errors="replace")
+        raw = self._process.readAllStandardError().data()
+        data = (
+            raw.decode(errors="replace")
+            if isinstance(raw, (bytes, bytearray))
+            else raw.tobytes().decode(errors="replace")
+        )
         for line in data.splitlines():
             stripped = line.strip()
             if not stripped:
@@ -93,7 +100,12 @@ class FlashWorker(QObject):
     def _on_stdout(self) -> None:
         if self._process is None:
             return
-        data = self._process.readAllStandardOutput().data().decode(errors="replace")
+        raw = self._process.readAllStandardOutput().data()
+        data = (
+            raw.decode(errors="replace")
+            if isinstance(raw, (bytes, bytearray))
+            else raw.tobytes().decode(errors="replace")
+        )
         for line in data.splitlines():
             stripped = line.strip()
             if stripped:
@@ -109,15 +121,15 @@ class FlashWorker(QObject):
 
     def _on_error(self, error: QProcess.ProcessError) -> None:
         messages = {
-            QProcess.FailedToStart: (
+            QProcess.ProcessError.FailedToStart: (
                 "无法启动 esptool。请确认 esptool 已安装 (uv sync --group flasher)"
             ),
-            QProcess.Timedout: "烧录超时，请检查设备连接",
+            QProcess.ProcessError.Timedout: "烧录超时，请检查设备连接",
         }
         msg = messages.get(error, f"烧录进程错误 (code={error})")
 
         # Permission errors on Linux
-        if error == QProcess.FailedToStart:
+        if error == QProcess.ProcessError.FailedToStart:
             msg += (
                 "\n提示: Linux 用户请确保当前用户已加入 dialout 组: "
                 "sudo usermod -aG dialout $USER"
