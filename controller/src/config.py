@@ -74,6 +74,7 @@ class MQTTSettings(BaseSettings):
     qos: int = 1
     topic_sub: str = "node/status"
     topic_pub: str = "node/{node_id}/status"
+    topic_cmd: str = "node/command"
 
 
 class BrokerSettings(BaseSettings):
@@ -167,6 +168,7 @@ MQTT_PORT = settings.mqtt.port
 MQTT_QOS = settings.mqtt.qos
 MQTT_TOPIC_SUB = settings.mqtt.topic_sub
 MQTT_TOPIC_PUB = settings.mqtt.topic_pub
+MQTT_TOPIC_CMD = settings.mqtt.topic_cmd
 
 # 内嵌 Broker 配置
 EMBEDDED_BROKER = settings.broker.enabled
@@ -247,6 +249,7 @@ __all__ = [
     "MQTT_QOS",
     "MQTT_TOPIC_SUB",
     "MQTT_TOPIC_PUB",
+    "MQTT_TOPIC_CMD",
     "EMBEDDED_BROKER",
     "BROKER_BIND_HOST",
     "BROKER_BIND_PORT",

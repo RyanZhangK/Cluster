@@ -12,8 +12,9 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 SRC_DIR         := $(ROOT_DIR)/controller/src
 NUITKA_OUT      := $(DIST_DIR)/main.dist
-FLASHER_SRC     := $(ROOT_DIR)/tools/flasher
-FLASHER_DIST    := $(DIST_DIR)/flasher.dist
+FLASHER_SRC     := $(ROOT_DIR)/tools/flasher-cpp
+FLASHER_BUILD   := /tmp/flasher-cpp-build
+FLASHER_BIN     := $(FLASHER_BUILD)/bin/cluster-flasher
 
 ARCH_NAME       := $(shell uname -m)
 DEB_ARCH        := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
@@ -128,23 +129,18 @@ pacman:
 bump:
 	uvx bump-my-version bump patch
 
-# ── Flasher 烧录工具 ──────────────────────────────────────────────────────
+# ── Flasher 烧录工具 (C++ / Dear ImGui) ───────────────────────────────────
 
 flasher-dev:
-	uv run flasher
+	@cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Debug
+	@cmake --build $(FLASHER_BUILD) -j$$(nproc)
+	$(FLASHER_BIN)
 
 flasher-clean:
-	@rm -rf $(FLASHER_DIST)
+	@rm -rf $(FLASHER_BUILD)
 
 flasher: flasher-clean
-	@echo "==> Nuitka 编译 flasher ..."
-	@mkdir -p $(FLASHER_DIST)
-	cd $(FLASHER_SRC) && uv run python -m nuitka \
-		--enable-plugin=pyside6 \
-		--standalone \
-		--include-package=esptool \
-		--include-package=serial \
-		--output-dir=$(FLASHER_DIST) \
-		--output-filename=cluster-flasher \
-		--assume-yes-for-downloads \
-		--main=main.py
+	@echo "==> CMake 编译 flasher ..."
+	cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Release -DBUNDLE_ESPTOOL=ON
+	cmake --build $(FLASHER_BUILD) -j$$(nproc)
+	@echo "==> Flasher binary: $(FLASHER_BIN)"
