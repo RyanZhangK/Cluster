@@ -61,6 +61,8 @@ blinkLED(int times = 1, int duration = 100)
     if (i < times - 1)
       delay(duration);
   }
+  // Restore lock-state LED indicator
+  digitalWrite(LED_PIN, venue_locked ? HIGH : LOW);
 }
 
 void
@@ -118,8 +120,9 @@ void
 callback(char* topic, byte* payload, unsigned int length)
 {
   // 构建以 null 结尾的字符串
-  char msg[16] = {0};
-  unsigned int copy_len = length < (sizeof(msg) - 1) ? length : (sizeof(msg) - 1);
+  char msg[16] = { 0 };
+  unsigned int copy_len =
+    length < (sizeof(msg) - 1) ? length : (sizeof(msg) - 1);
   memcpy(msg, payload, copy_len);
 
   LOG_PRINT("Message [");
@@ -131,11 +134,11 @@ callback(char* topic, byte* payload, unsigned int length)
   if (strcmp(topic, MQTT_CMD_TOPIC) == 0) {
     if (strcmp(msg, "LOCK:1") == 0) {
       venue_locked = true;
-      digitalWrite(LED_PIN, HIGH);  // LED 熄灭（active-LOW）
+      digitalWrite(LED_PIN, HIGH); // LED 熄灭（active-LOW）
       LOG_PRINTLN("Venue LOCKED");
     } else if (strcmp(msg, "LOCK:0") == 0) {
       venue_locked = false;
-      digitalWrite(LED_PIN, LOW);  // LED 亮起（active-LOW）
+      digitalWrite(LED_PIN, LOW); // LED 亮起（active-LOW）
       LOG_PRINTLN("Venue UNLOCKED");
     }
   }

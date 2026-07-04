@@ -26,7 +26,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump flasher flasher-dev flasher-clean
+.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump flasher flasher-dev flasher-clean flasher-compile-commands
 all: clean deps compile stage deb pacman 
 
 deps: scripts/install_deps.py
@@ -144,3 +144,9 @@ flasher: flasher-clean
 	cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Release -DBUNDLE_ESPTOOL=ON
 	cmake --build $(FLASHER_BUILD) -j$$(nproc)
 	@echo "==> Flasher binary: $(FLASHER_BIN)"
+
+compile-commands:
+	@echo "==> 生成 compile_commands.json ..."
+	@cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+	@ln -sf $(FLASHER_BUILD)/compile_commands.json $(FLASHER_SRC)/compile_commands.json
+	@echo "==> $(FLASHER_SRC)/compile_commands.json 已就绪"

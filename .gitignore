@@ -47,3 +47,5 @@ DevVENV/
 .vscode-ctags
 CLAUDE.md
 imgui.ini
+
+compile_commands.json

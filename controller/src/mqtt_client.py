@@ -83,6 +83,8 @@ class MQTTClient:
                 logger.info(f"Published to {topic}: {payload}")
             except aiomqtt.MqttError as e:
                 logger.error(f"Failed to publish to {topic}: {e}")
+            except Exception:
+                logger.exception(f"Unexpected error publishing to {topic}")
 
     async def run(self) -> None:
         """
