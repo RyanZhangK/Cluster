@@ -7,6 +7,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include <atomic>
 #include <cstdio>
 #include <deque>
 #include <fstream>
@@ -52,13 +53,14 @@ struct AppState {
     int selected_port = -1;
     char firmware_path[1024] = {};
     int baud_index = 0;
-    FlashState flash_state = FlashState::Idle;
-    float progress = 0.0f;
+    std::atomic<FlashState> flash_state{FlashState::Idle};
+    std::atomic<float> progress{0.0f};
     std::deque<std::string> log_lines;
     std::mutex log_mutex;
     bool erase_chip = false;
     bool scroll_to_bottom = true;
     bool flash_result = false;
+    std::thread flash_thread;
 
     const std::vector<int> baud_rates = {460800, 115200, 921600, 230400, 74880};
 
@@ -69,7 +71,7 @@ struct AppState {
     }
 
     bool can_flash() const {
-        return flash_state == FlashState::Idle
+        return flash_state.load() == FlashState::Idle
             && selected_port >= 0
             && firmware_path[0] != '\0';
     }
@@ -199,50 +201,49 @@ int main() {
         ImGui::Spacing();
 
         // --- Flash button ---
-        if (!st.can_flash()) ImGui::BeginDisabled();
+        bool was_disabled = !st.can_flash();
+        if (was_disabled) ImGui::BeginDisabled();
         if (ImGui::Button("开始烧录", ImVec2(-1, 40))) {
+            // Join previous thread if still running
+            if (st.flash_thread.joinable()) st.flash_thread.join();
+
             FlashConfig cfg;
             cfg.port = st.ports[st.selected_port].device;
             cfg.firmware_path = st.firmware_path;
             cfg.baud = st.baud_rates[st.baud_index];
             cfg.erase = st.erase_chip;
-            st.flash_state = FlashState::Flashing;
-            st.progress = 0.0f;
+            st.flash_state.store(FlashState::Flashing);
+            st.progress.store(0.0f);
             st.add_log("[INFO] Starting flash...");
 
-            // Run esptool on a background thread
-            std::thread([cfg](AppState* s) {
+            st.flash_thread = std::thread([cfg](AppState* s) {
                 s->flash_result = run_esptool(cfg,
-                    [s](const std::string& line) {
-                        // Called from worker thread — safe because ImGui
-                        // renders on main thread and deque is not accessed
-                        // concurrently in a data-racy way for log-only display.
-                        s->add_log(line);
-                    },
+                    [s](const std::string& line) { s->add_log(line); },
                     [s](int pct) {
-                        s->progress = static_cast<float>(pct) / 100.0f;
+                        s->progress.store(static_cast<float>(pct) / 100.0f);
                     });
-                s->flash_state = s->flash_result ? FlashState::Success : FlashState::Failed;
-            }, &st).detach();
+                s->flash_state.store(s->flash_result ? FlashState::Success : FlashState::Failed);
+            }, &st);
         }
-        if (!st.can_flash()) ImGui::EndDisabled();
+        if (was_disabled) ImGui::EndDisabled();
         ImGui::Spacing();
 
         // --- Progress bar ---
-        if (st.flash_state == FlashState::Success)
+        FlashState current_state = st.flash_state.load();
+        if (current_state == FlashState::Success)
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.133f, 0.773f, 0.369f, 1.0f));
-        else if (st.flash_state == FlashState::Failed)
+        else if (current_state == FlashState::Failed)
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.937f, 0.267f, 0.267f, 1.0f));
-        ImGui::ProgressBar(st.progress, ImVec2(-1, 8), "");
-        if (st.flash_state != FlashState::Idle && st.flash_state != FlashState::Flashing)
+        ImGui::ProgressBar(st.progress.load(), ImVec2(-1, 8), "");
+        if (current_state != FlashState::Idle && current_state != FlashState::Flashing)
             ImGui::PopStyleColor();
         ImGui::Spacing();
 
         // --- Status text ---
         const char* status = "就绪";
-        if (st.flash_state == FlashState::Flashing) status = "正在烧录...";
-        else if (st.flash_state == FlashState::Success) status = "烧录成功!";
-        else if (st.flash_state == FlashState::Failed) status = "烧录失败，请查看日志";
+        if (current_state == FlashState::Flashing) status = "正在烧录...";
+        else if (current_state == FlashState::Success) status = "烧录成功!";
+        else if (current_state == FlashState::Failed) status = "烧录失败，请查看日志";
         ImGui::TextUnformatted(status);
         ImGui::Spacing();
 
@@ -273,6 +274,7 @@ int main() {
     }
 
     // --- Cleanup ---
+    if (st.flash_thread.joinable()) st.flash_thread.join();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

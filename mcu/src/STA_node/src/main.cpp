@@ -61,6 +61,8 @@ blinkLED(int times = 1, int duration = 100)
     if (i < times - 1)
       delay(duration);
   }
+  // Restore lock-state LED indicator
+  digitalWrite(LED_PIN, venue_locked ? HIGH : LOW);
 }
 
 void

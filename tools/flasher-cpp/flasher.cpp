@@ -29,9 +29,11 @@ static std::string find_esptool() {
     fs::path exe_dir = fs::path(exe_path).parent_path();
     fs::path bundled = exe_dir / "esptool.exe";
 #else
-    char exe_path[PATH_MAX];
+    char exe_path[PATH_MAX] = {};
     ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
     if (len != -1) exe_path[len] = '\0';
+    // If readlink fails (/proc not mounted), fall back to empty path
+    // which will skip the bundled esptool check below
     fs::path exe_dir = fs::path(exe_path).parent_path();
     fs::path bundled = exe_dir / "esptool";
 #endif
@@ -57,13 +59,14 @@ static int parse_progress(const std::string& line) {
 static std::string build_cmdline(const FlashConfig& cfg) {
     std::string cmd = find_esptool();
     cmd += " --chip auto";
-    cmd += " --port " + cfg.port;
+    cmd += " --port '" + cfg.port + "'";
     cmd += " --baud " + std::to_string(cfg.baud);
     cmd += " --before default_reset --after hard_reset";
     cmd += " write_flash";
     if (cfg.erase) cmd += " --erase-all";
-    cmd += " 0x00000 ";
+    cmd += " 0x00000 '";
     cmd += cfg.firmware_path;
+    cmd += "'";
     return cmd;
 }
 
@@ -77,7 +80,11 @@ static void read_pipe(int fd, bool is_stderr,
     std::string leftover;
     for (;;) {
         ssize_t n = read(fd, buf.data(), buf.size() - 1);
-        if (n <= 0) break;
+        if (n < 0) {
+            if (errno == EINTR) continue;  // signal interrupted, retry
+            break;  // real error
+        }
+        if (n == 0) break;  // EOF
         buf[n] = '\0';
         leftover += buf.data();
         // Process complete lines
