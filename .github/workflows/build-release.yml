@@ -112,7 +112,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y build-essential cmake libgl-dev libx11-dev libxrandr-dev libwayland-dev libxkbcommon-dev python3 python3-pip
+          sudo apt-get install -y build-essential cmake libgl-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libwayland-dev libxkbcommon-dev python3 python3-pip
 
       - name: Build flasher
         run: make flasher
