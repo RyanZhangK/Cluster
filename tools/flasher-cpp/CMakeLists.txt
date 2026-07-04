@@ -82,25 +82,29 @@ set_target_properties(cluster-flasher PROPERTIES
 
 # ---- Bundle esptool via PyInstaller ----
 if(BUNDLE_ESPTOOL)
-    # Use system python (with pip), not venv python
-    find_program(SYSTEM_PYTHON NAMES python3
-        PATHS /usr/bin /usr/local/bin
-        NO_DEFAULT_PATH
-    )
-    if(NOT SYSTEM_PYTHON)
-        find_program(SYSTEM_PYTHON python3 REQUIRED)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    set(SYSTEM_PYTHON ${Python3_EXECUTABLE})
+
+    # Platform-specific venv scripts directory
+    if(WIN32)
+        set(VENV_SCRIPTS_DIR "Scripts")
+    else()
+        set(VENV_SCRIPTS_DIR "bin")
     endif()
+
     set(ESPTOOL_ENTRY "${CMAKE_SOURCE_DIR}/bundle_esptool.py")
     set(ESPTOOL_OUTPUT "${CMAKE_BINARY_DIR}/bin/esptool")
 
     add_custom_command(
         OUTPUT ${ESPTOOL_OUTPUT}
-        COMMAND ${SYSTEM_PYTHON} -m pip install esptool pyserial pyinstaller --quiet --break-system-packages
-        COMMAND ${SYSTEM_PYTHON} -m PyInstaller --onefile --noconfirm --clean
+        COMMAND ${SYSTEM_PYTHON} -m venv "${CMAKE_BINARY_DIR}/_esptool_venv"
+        COMMAND "${CMAKE_BINARY_DIR}/_esptool_venv/${VENV_SCRIPTS_DIR}/pip" install esptool pyserial pyinstaller --quiet
+        COMMAND "${CMAKE_BINARY_DIR}/_esptool_venv/${VENV_SCRIPTS_DIR}/pyinstaller" --onefile --noconfirm --clean
                 --collect-submodules esptool
                 --distpath "${CMAKE_BINARY_DIR}/bin" --name esptool "${ESPTOOL_ENTRY}"
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/_esptool_venv"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-        COMMENT "Bundling esptool with PyInstaller..."
+        COMMENT "Bundling esptool with PyInstaller (temp venv)..."
     )
     add_custom_target(bundle_esptool DEPENDS ${ESPTOOL_OUTPUT})
     add_dependencies(cluster-flasher bundle_esptool)

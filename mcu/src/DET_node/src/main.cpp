@@ -22,7 +22,7 @@ char keys[ROWS][COLS] = { { '1', '2', '3' },
                           { '7', '8', '9' },
                           { '*', '0', '#' } };
 byte rowPins[ROWS] = { D1, D2, D3, D4 }; // 行引脚(输出)
-byte colPins[COLS] = { D5, D6, D7 }; // 列引脚(输入，内部上拉)
+byte colPins[COLS] = { D5, D6, D7 };     // 列引脚(输入，内部上拉)
 
 // 初始化Keypad实例
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
@@ -47,7 +47,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 #define HEARTBEAT_INTERVAL 180000 // 心跳间隔(ms)，3分钟=180000ms
 
 /******************** 报文配置 ********************/
-#define HEARTBEAT_CODE "H0"   // 心跳报文后缀
+#define HEARTBEAT_CODE "H0" // 心跳报文后缀
 
 // 全局变量
 WiFiClient espClient;
@@ -111,16 +111,36 @@ connectMQTT()
 
       // 常见错误码说明
       switch (state) {
-        case -4: LOG_PRINTLN(" (connection timeout)"); break;
-        case -3: LOG_PRINTLN(" (server unreachable)"); break;
-        case -2: LOG_PRINTLN(" (protocol mismatch)"); break;
-        case -1: LOG_PRINTLN(" (invalid client ID)"); break;
-        case 1:  LOG_PRINTLN(" (unsupported protocol)"); break;
-        case 2:  LOG_PRINTLN(" (client ID rejected)"); break;
-        case 3:  LOG_PRINTLN(" (server unavailable)"); break;
-        case 4:  LOG_PRINTLN(" (bad username/password)"); break;
-        case 5:  LOG_PRINTLN(" (unauthorized)"); break;
-        default: LOG_PRINTLN(""); break;
+        case -4:
+          LOG_PRINTLN(" (connection timeout)");
+          break;
+        case -3:
+          LOG_PRINTLN(" (server unreachable)");
+          break;
+        case -2:
+          LOG_PRINTLN(" (protocol mismatch)");
+          break;
+        case -1:
+          LOG_PRINTLN(" (invalid client ID)");
+          break;
+        case 1:
+          LOG_PRINTLN(" (unsupported protocol)");
+          break;
+        case 2:
+          LOG_PRINTLN(" (client ID rejected)");
+          break;
+        case 3:
+          LOG_PRINTLN(" (server unavailable)");
+          break;
+        case 4:
+          LOG_PRINTLN(" (bad username/password)");
+          break;
+        case 5:
+          LOG_PRINTLN(" (unauthorized)");
+          break;
+        default:
+          LOG_PRINTLN("");
+          break;
       }
     }
   }
@@ -203,10 +223,9 @@ handleInput(char key)
       isRecording = false;
 
       // 验证: 必须恰好3个相同数字 (111, 222, 333, 444)
-      if (inputBuffer.length() == 3 &&
-          inputBuffer[0] == inputBuffer[1] &&
-          inputBuffer[1] == inputBuffer[2] &&
-          inputBuffer[0] >= '1' && inputBuffer[0] <= '4') {
+      if (inputBuffer.length() == 3 && inputBuffer[0] == inputBuffer[1] &&
+          inputBuffer[1] == inputBuffer[2] && inputBuffer[0] >= '1' &&
+          inputBuffer[0] <= '4') {
         char team = 'A' + (inputBuffer[0] - '1');
         LOG_PRINT("Keypad: team ");
         LOG_PRINT(team);
