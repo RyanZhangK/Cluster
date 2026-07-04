@@ -28,6 +28,7 @@
 #endif
 #define MQTT_PORT 9001
 #define MQTT_TOPIC "node/status"
+#define MQTT_CMD_TOPIC "node/command"
 #ifndef MQTT_USER
 #define MQTT_USER "nodeuser"
 #endif
@@ -36,7 +37,7 @@
 #endif
 
 /******************** 节点配置 ********************/
-#define NODE_ID "STA04"
+#define NODE_ID "STA01"
 #define BUTTON_PIN D1
 #define LED_PIN D4
 #define HEARTBEAT_INTERVAL 180000
@@ -48,6 +49,7 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 unsigned long last_heartbeat = 0;
+bool venue_locked = false;
 
 void
 blinkLED(int times = 1, int duration = 100)
@@ -97,6 +99,7 @@ reconnect()
     if (client.connect(NODE_ID)) {
       LOG_PRINTLN("connected");
       client.subscribe(MQTT_TOPIC);
+      client.subscribe(MQTT_CMD_TOPIC);
     } else {
       int state = client.state();
       LOG_PRINT("failed, rc=");
@@ -114,12 +117,28 @@ reconnect()
 void
 callback(char* topic, byte* payload, unsigned int length)
 {
+  // 构建以 null 结尾的字符串
+  char msg[16] = {0};
+  unsigned int copy_len = length < (sizeof(msg) - 1) ? length : (sizeof(msg) - 1);
+  memcpy(msg, payload, copy_len);
+
   LOG_PRINT("Message [");
   LOG_PRINT(topic);
   LOG_PRINT("]: ");
-  for (unsigned int i = 0; i < length; i++)
-    LOG_PRINT((char)payload[i]);
-  LOG_PRINTLN("");
+  LOG_PRINTLN(msg);
+
+  // 处理场馆锁定命令
+  if (strcmp(topic, MQTT_CMD_TOPIC) == 0) {
+    if (strcmp(msg, "LOCK:1") == 0) {
+      venue_locked = true;
+      digitalWrite(LED_PIN, HIGH);  // LED 熄灭（active-LOW）
+      LOG_PRINTLN("Venue LOCKED");
+    } else if (strcmp(msg, "LOCK:0") == 0) {
+      venue_locked = false;
+      digitalWrite(LED_PIN, LOW);  // LED 亮起（active-LOW）
+      LOG_PRINTLN("Venue UNLOCKED");
+    }
+  }
 }
 
 void
@@ -198,8 +217,12 @@ loop()
       // 下降沿：按钮按下
       if (stableButtonState == LOW) {
         LOG_PRINTLN("Button pressed!");
-        blinkLED(3, 50);
-        send_activation();
+        if (venue_locked) {
+          LOG_PRINTLN("Venue locked, activation blocked");
+        } else {
+          blinkLED(3, 50);
+          send_activation();
+        }
       }
     }
   }

@@ -68,6 +68,21 @@ class MQTTClient:
     def __init__(self, node_manager: "NodeManager", event_bus: "EventBus") -> None:
         self._node_manager = node_manager
         self._event_bus = event_bus
+        self._publish_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
+
+    def publish(self, topic: str, payload: str) -> None:
+        """入队发布请求。可从 Qt 主线程同步调用，不阻塞 UI。"""
+        self._publish_queue.put_nowait((topic, payload))
+
+    async def _publish_worker(self, client: aiomqtt.Client) -> None:
+        """从队列取出消息并通过 MQTT 发布。"""
+        while True:
+            topic, payload = await self._publish_queue.get()
+            try:
+                await client.publish(topic, payload, qos=MQTT_QOS)
+                logger.info(f"Published to {topic}: {payload}")
+            except aiomqtt.MqttError as e:
+                logger.error(f"Failed to publish to {topic}: {e}")
 
     async def run(self) -> None:
         """
@@ -87,8 +102,19 @@ class MQTTClient:
                     self._event_bus.mqtt_connected.emit()
                     await client.subscribe(MQTT_TOPIC_SUB, qos=MQTT_QOS)
                     logger.info(f"已订阅主题: {MQTT_TOPIC_SUB}")
-                    async for message in client.messages:
-                        await self._handle_message(message)
+
+                    publish_task = asyncio.create_task(
+                        self._publish_worker(client), name="mqtt_publish_worker"
+                    )
+                    try:
+                        async for message in client.messages:
+                            await self._handle_message(message)
+                    finally:
+                        publish_task.cancel()
+                        try:
+                            await publish_task
+                        except asyncio.CancelledError:
+                            pass
             except aiomqtt.MqttError as e:
                 logger.error(f"MQTT 连接错误: {e}，5 秒后重试...")
                 await asyncio.sleep(5)

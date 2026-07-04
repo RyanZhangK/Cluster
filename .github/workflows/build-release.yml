@@ -109,17 +109,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y build-essential patchelf
-          pip install --upgrade pip
-          pip install uv
+          sudo apt-get install -y build-essential cmake libgl-dev libx11-dev libwayland-dev libxkbcommon-dev python3 python3-pip
 
       - name: Build flasher
         run: make flasher
@@ -128,7 +121,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cluster-flasher-linux-${{ matrix.arch }}
-          path: build/dist/flasher.dist/
+          path: |
+            build/flasher-cpp/bin/cluster-flasher
+            build/flasher-cpp/bin/esptool
 
   build-flasher-win:
     name: Build Flasher (Windows x64)
@@ -138,42 +133,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install uv
-        run: pip install uv
-
-      - name: Sync dependencies
-        run: uv sync --group flasher
+      - name: Install Python deps
+        run: pip install pyinstaller esptool pyserial
 
       - name: Build flasher
         run: |
-          mkdir -p build/dist/flasher.dist
-          cd tools/flasher
-          uv run python -m nuitka `
-            --enable-plugin=pyside6 `
-            --standalone `
-            --include-package=esptool `
-            --include-package=serial `
-            --output-dir=../../build/dist/flasher.dist `
-            --output-filename=cluster-flasher `
-            --assume-yes-for-downloads `
-            --main=main.py
+          cmake -S tools/flasher-cpp -B build/flasher-cpp -DCMAKE_BUILD_TYPE=Release -DBUNDLE_ESPTOOL=ON
+          cmake --build build/flasher-cpp --config Release -j $env:NUMBER_OF_PROCESSORS
 
       - name: Package (zip)
         shell: pwsh
         run: |
-          $dist = "build/dist/flasher.dist"
-          Compress-Archive -Path "$dist/*" -DestinationPath "build/dist/cluster-flasher-win64.zip"
+          Compress-Archive -Path @("build/flasher-cpp/bin/Release/cluster-flasher.exe", "build/flasher-cpp/bin/Release/esptool.exe") -DestinationPath "build/cluster-flasher-win64.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: cluster-flasher-win64
-          path: build/dist/cluster-flasher-win64.zip
+          path: build/cluster-flasher-win64.zip
 
   release:
     name: Create GitHub Release

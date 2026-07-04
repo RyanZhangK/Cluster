@@ -14,7 +14,7 @@ from PySide6.QtWidgets import QApplication
 
 from controller.src import UI
 from controller.src.audio_player import AudioPlayer
-from controller.src.config import EMBEDDED_BROKER, LOG_DIR, settings
+from controller.src.config import EMBEDDED_BROKER, LOG_DIR, MQTT_TOPIC_CMD, settings
 from controller.src.embedded_broker import EmbeddedBroker
 from controller.src.event_bus import EventBus
 from controller.src.frpc_manager import FrpcManager, _frpc_config_path
@@ -180,6 +180,13 @@ def main() -> None:
     audio_player = AudioPlayer()
     mqtt_client = MQTTClient(node_manager, event_bus)
     frpc_manager = FrpcManager()
+
+    # 场馆锁定信号 → MQTT 下发桥接
+    event_bus.venue_lock_changed.connect(
+        lambda locked: mqtt_client.publish(
+            MQTT_TOPIC_CMD, "LOCK:1" if locked else "LOCK:0"
+        )
+    )
 
     # 创建并展示主窗口
     window = UI.MainWindow(node_manager, event_bus, audio_player, frpc_manager)

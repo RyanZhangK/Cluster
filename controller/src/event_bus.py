@@ -40,6 +40,10 @@ class EventBus(QObject):
     bomb_exploded = Signal()
     bomb_tick = Signal(int)  # 倒计时剩余秒数
 
+    # 场馆锁定控制信号
+    # 参数: locked: bool (True=锁定, False=解锁)
+    venue_lock_changed = Signal(bool)
+
     # 调试面板信号
     log_received = Signal(str, int)  # formatted_message, levelno
     mqtt_message_received = Signal(str, str, str)  # topic, payload, timestamp

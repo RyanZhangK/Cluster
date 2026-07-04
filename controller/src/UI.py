@@ -27,7 +27,12 @@ from PySide6.QtWidgets import (
 )
 
 from .audio_player import AudioPlayer
-from .config import FRPC_AUTH_TOKEN, FRPC_PROXIES, FRPC_SERVER_ADDR, FRPC_SERVER_PORT
+from .config import (
+    FRPC_AUTH_TOKEN,
+    FRPC_PROXIES,
+    FRPC_SERVER_ADDR,
+    FRPC_SERVER_PORT,
+)
 from .event_bus import EventBus
 from .node_manager import NodeManager, OnlineStatus
 from .styles import (
@@ -325,6 +330,30 @@ class MainWindow(QMainWindow):
         self._stat_val_total = self._stat_card(stats_row, "总节点", "0", C_PRIMARY)
         self._stat_val_online = self._stat_card(stats_row, "在线", "0", C_SUCCESS)
         self._stat_val_offline = self._stat_card(stats_row, "离线", "0", C_DANGER)
+
+        # 场馆锁定卡片
+        self._venue_lock_card = Card()
+        self._venue_lock_card.setFixedSize(150, 76)
+        vl = QVBoxLayout(self._venue_lock_card)
+        vl.setContentsMargins(16, 10, 16, 10)
+        vl.setSpacing(2)
+
+        venue_lock_label = QLabel("场馆锁定")
+        venue_lock_label.setStyleSheet(
+            f"color: {C_TEXT_MUTED}; font-size: 11px; background: transparent;"
+        )
+
+        self._venue_lock_btn = QPushButton("解锁")
+        self._venue_lock_btn.setCheckable(True)
+        self._venue_lock_btn.setFixedHeight(30)
+        self._venue_lock_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._venue_lock_btn.setStyleSheet(toggle_btn_style(False))
+        self._venue_lock_btn.clicked.connect(self._on_venue_lock_toggled)
+
+        vl.addWidget(self._venue_lock_btn)
+        vl.addWidget(venue_lock_label)
+        stats_row.addWidget(self._venue_lock_card)
+
         stats_row.addStretch()
         layout.addLayout(stats_row)
 
@@ -435,6 +464,16 @@ class MainWindow(QMainWindow):
         self._stat_val_total.setText(str(total))
         self._stat_val_online.setText(str(online))
         self._stat_val_offline.setText(str(total - online))
+
+    # ── 场馆锁定 ────────────────────────────────────────────────────────────────
+
+    def _on_venue_lock_toggled(self, checked: bool) -> None:
+        """场馆锁定切换：LOCK:1 锁定（LED 灭），LOCK:0 解锁（LED 亮）。"""
+        self._venue_lock_btn.setText("锁定" if checked else "解锁")
+        self._venue_lock_btn.setStyleSheet(toggle_btn_style(checked))
+
+        self._event_bus.venue_lock_changed.emit(checked)
+        logger.info(f"场馆锁定状态变更: {'锁定' if checked else '解锁'}")
 
     # ── 游戏控制页 ─────────────────────────────────────────────────────────────
 
