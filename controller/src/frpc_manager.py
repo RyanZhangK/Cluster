@@ -188,13 +188,13 @@ class FrpcManager(QObject):
                 proc.terminate()
                 try:
                     await asyncio.wait_for(proc.wait(), timeout=5)
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     proc.kill()
                     await proc.wait()
             self.log_received.emit(f"[系统] 隧道 {name} 已停止")
         except Exception as e:
             self.error_occurred.emit(f"隧道 {name} 运行时错误: {e}")
-            logger.error(f"frpc 运行时错误: {e}", exc_info=True)
+            logger.exception("frpc 运行时错误")
         finally:
             if proc is not None and proc in self._processes:
                 self._processes.remove(proc)

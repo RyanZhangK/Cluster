@@ -131,11 +131,11 @@ class GameManager(QObject):
             self.mode == GameMode.BOMB
             and self.bomb_config is not None
             and node_id == self.bomb_config.bomb_node_id
+            and self._bomb_timer is not None
         ):
-            if self._bomb_timer is not None:
-                self._bomb_timer.stop()
-                self._bomb_timer = None
-                logger.warning("炸弹节点离线，倒计时已取消")
+            self._bomb_timer.stop()
+            self._bomb_timer = None
+            logger.warning("炸弹节点离线，倒计时已取消")
 
     def _start_game(self) -> None:
         """游戏开始。"""
@@ -171,7 +171,7 @@ class GameManager(QObject):
 
         # 统计各队伍激活的 DET 节点数
         team_det_count = {}
-        for _, team in self._det_activation.items():
+        for team in self._det_activation.values():
             team_det_count[team] = team_det_count.get(team, 0) + 1
 
         # 检查是否有队伍超过半数

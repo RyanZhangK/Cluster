@@ -29,16 +29,18 @@ def _toml_dev_true(path: _Path) -> bool:
         with open(path, "rb") as f:
             data = tomllib.load(f)
         return bool(data.get("controller", {}).get("dev", False))
-    except Exception:
+    except (tomllib.TOMLDecodeError, OSError):
         return False
 
 
 def _resolve_config() -> _Path | None:
     """查找配置"""
     # 1. 环境变量显式指定 dev 模式
-    if os.environ.get("CLUSTER_CONTROLLER__DEV", "").lower() in ("true", "1"):
-        if _DEV_CFG.exists():
-            return _DEV_CFG
+    if (
+        os.environ.get("CLUSTER_CONTROLLER__DEV", "").lower() in ("true", "1")
+        and _DEV_CFG.exists()
+    ):
+        return _DEV_CFG
 
     # 2. 标准路径查找
     for candidate in (
@@ -49,9 +51,12 @@ def _resolve_config() -> _Path | None:
         if not candidate or not candidate.exists():
             continue
 
-        if candidate is not _DEV_CFG and _toml_dev_true(candidate):
-            if _DEV_CFG.exists():
-                return _DEV_CFG
+        if (
+            candidate is not _DEV_CFG
+            and _toml_dev_true(candidate)
+            and _DEV_CFG.exists()
+        ):
+            return _DEV_CFG
 
         if candidate is _SYSTEM_CONFIG_PATH:
             _USER_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -243,28 +248,28 @@ FRPC_AUTH_TOKEN = settings.frpc.auth_token
 FRPC_PROXIES = settings.frpc.proxies
 
 __all__ = [
-    "settings",
+    "AUDIO_DIR",
+    "AUDIO_FILES",
+    "BROKER_BIND_HOST",
+    "BROKER_BIND_PORT",
+    "BROKER_READY",
+    "DEV",
+    "EMBEDDED_BROKER",
+    "FRPC_AUTH_TOKEN",
+    "FRPC_PROXIES",
+    "FRPC_SERVER_ADDR",
+    "FRPC_SERVER_PORT",
+    "HEARTBEAT_TIMEOUT",
+    "LOG_DIR",
     "MQTT_BROKER",
     "MQTT_PORT",
     "MQTT_QOS",
-    "MQTT_TOPIC_SUB",
-    "MQTT_TOPIC_PUB",
     "MQTT_TOPIC_CMD",
-    "EMBEDDED_BROKER",
-    "BROKER_BIND_HOST",
-    "BROKER_BIND_PORT",
-    "HEARTBEAT_TIMEOUT",
-    "WATCHDOG_INTERVAL",
-    "DEV",
-    "UI_HOT_RELOAD",
+    "MQTT_TOPIC_PUB",
+    "MQTT_TOPIC_SUB",
     "MSG_LENGTH",
     "NODE_ID_LENGTH",
-    "AUDIO_DIR",
-    "LOG_DIR",
-    "AUDIO_FILES",
-    "BROKER_READY",
-    "FRPC_SERVER_ADDR",
-    "FRPC_SERVER_PORT",
-    "FRPC_AUTH_TOKEN",
-    "FRPC_PROXIES",
+    "UI_HOT_RELOAD",
+    "WATCHDOG_INTERVAL",
+    "settings",
 ]

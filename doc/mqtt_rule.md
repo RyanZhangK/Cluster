@@ -140,15 +140,15 @@ if node_id not in NODE_IDS:
     raise ValueError("无效节点ID")
 
 # action_type验证
-if action_type not in ('H', 'A'):
+if action_type not in ("H", "A"):
     raise ValueError("无效动作类型")
 
 # 心跳包extra_info必须为0
-if action_type == 'H' and extra_info != '0':
+if action_type == "H" and extra_info != "0":
     raise ValueError("心跳包补充信息必须为0")
 
 # 激活包extra_info必须为1-4
-if action_type == 'A' and extra_info not in ('1', '2', '3', '4'):
+if action_type == "A" and extra_info not in ("1", "2", "3", "4"):
     raise ValueError("激活包补充信息必须为1-4")
 ```
 

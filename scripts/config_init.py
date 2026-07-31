@@ -99,7 +99,7 @@ def validate(user: bool = False) -> bool:
 
     try:
         data = toml.load(path)
-    except Exception as e:
+    except (toml.TomlDecodeError, OSError) as e:
         print(f"错误: config.toml 解析失败: {e}")
         return False
 

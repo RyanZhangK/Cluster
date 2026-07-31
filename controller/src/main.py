@@ -12,7 +12,7 @@ import watchdog.events
 import watchdog.observers
 from PySide6.QtWidgets import QApplication
 
-from controller.src import UI
+from controller.src import ui as UI
 from controller.src.audio_player import AudioPlayer
 from controller.src.config import EMBEDDED_BROKER, LOG_DIR, MQTT_TOPIC_CMD, settings
 from controller.src.embedded_broker import EmbeddedBroker
@@ -20,6 +20,8 @@ from controller.src.event_bus import EventBus
 from controller.src.frpc_manager import FrpcManager, _frpc_config_path
 from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
+
+_stack_index = 0
 
 
 def setup_logging() -> None:
@@ -52,7 +54,7 @@ async def ui_hot_reload_watcher(
     """使用 inotify 监听 UI 文件改动，变更立刻 reload"""
     logger = logging.getLogger("HotReload")
 
-    ui_file = Path(__file__).resolve().parent / "UI.py"
+    ui_file = Path(__file__).resolve().parent / "ui.py"
     if not ui_file.exists():
         ui_file = Path(__file__).resolve().parent / "__init__.py"
 
@@ -87,7 +89,7 @@ async def ui_hot_reload_watcher(
             try:
                 while True:
                     await asyncio.wait_for(queue.get(), timeout=0.15)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             logger.info("检测到 UI 代码变动，正在重新加载...")
@@ -116,6 +118,7 @@ async def ui_hot_reload_watcher(
             if geometry:
                 new_window.setGeometry(geometry)
 
+            new_window._switch_page(_stack_index)
             new_window.show()
             logger.info("UI 热重载完成！")
     finally:
@@ -169,7 +172,7 @@ def main() -> None:
             try:
                 msg = self.format(record)
                 event_bus.log_received.emit(msg, record.levelno)
-            except Exception:
+            except Exception:  # noqa: BLE001 - 日志处理器永不崩溃，交给 handleError
                 self.handleError(record)
 
     _qt_handler = _QtLogHandler()
@@ -183,7 +186,7 @@ def main() -> None:
 
     # 场馆锁定信号 → MQTT 下发桥接
     event_bus.venue_lock_changed.connect(
-        lambda locked: mqtt_client.publish(
+        lambda locked: mqtt_client.publish(  # pyright: ignore[reportUnknownLambdaType]
             MQTT_TOPIC_CMD, "LOCK:1" if locked else "LOCK:0"
         )
     )

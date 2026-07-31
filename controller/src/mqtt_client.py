@@ -29,8 +29,6 @@ TEAM_MAP = {"1": 1, "2": 2, "3": 3, "4": 4, "A": 1, "B": 2, "C": 3, "D": 4}
 class MessageParseError(ValueError):
     """消息解析错误。"""
 
-    pass
-
 
 def parse_message(raw: str) -> tuple[str, str, int]:
     """
@@ -120,7 +118,7 @@ class MQTTClient:
             except aiomqtt.MqttError as e:
                 logger.error(f"MQTT 连接错误: {e}，5 秒后重试...")
                 await asyncio.sleep(5)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - 连接循环兜底，保持重试
                 logger.error(f"未预期的错误: {e}，5 秒后重试...")
                 await asyncio.sleep(5)
 
@@ -132,7 +130,7 @@ class MQTTClient:
         """
         try:
             raw_payload = message.payload.decode("utf-8", errors="replace")
-            timestamp = datetime.now().strftime("%H:%M:%S")
+            timestamp = datetime.now().astimezone().strftime("%H:%M:%S")
             self._event_bus.mqtt_message_received.emit(
                 MQTT_TOPIC_SUB, raw_payload, timestamp
             )
@@ -148,5 +146,5 @@ class MQTTClient:
 
         except MessageParseError as e:
             logger.warning(f"消息解析失败: {e}，原始 payload: {message.payload!r}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - 单条消息兜底，不中断消息循环
             logger.error(f"处理消息时出错: {e}，原始 payload: {message.payload!r}")

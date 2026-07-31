@@ -13,7 +13,7 @@ def step(msg: str) -> None:
 
 def run(cmd: list[str], cwd: Path | None = None) -> None:
     print(f"    $ {' '.join(cmd)}")
-    result = subprocess.run(cmd, cwd=cwd or PROJECT_ROOT)
+    result = subprocess.run(cmd, cwd=cwd or PROJECT_ROOT, check=False)
     if result.returncode != 0:
         print(f"    [失败] 返回码 {result.returncode}")
         sys.exit(result.returncode)

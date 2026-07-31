@@ -78,7 +78,7 @@ class NodeManager(QObject):
         came_online = state.status != OnlineStatus.ONLINE
 
         state.status = OnlineStatus.ONLINE
-        state.last_heartbeat = datetime.now()
+        state.last_heartbeat = datetime.now().astimezone()
 
         self.node_status_changed.emit(node_id, state)
 
@@ -95,7 +95,7 @@ class NodeManager(QObject):
         team_char = chr(ord("A") + team - 1)
 
         state.active_team = team_char
-        state.last_activated = datetime.now()
+        state.last_activated = datetime.now().astimezone()
 
         logger.info(f"节点 {node_id} 激活为队伍 {team_char}")
 
@@ -141,7 +141,7 @@ class NodeManager(QObject):
     async def heartbeat_watchdog(self) -> None:
         while True:
             await asyncio.sleep(WATCHDOG_INTERVAL)
-            now = datetime.now()
+            now = datetime.now().astimezone()
 
             for state in list(self._nodes.values()):
                 if (
