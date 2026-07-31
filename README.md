@@ -126,7 +126,7 @@ Cluster/
 │   ├── log/                        # 日志输出目录
 │   ├── src/
 │   │   ├── main.py                 # 应用入口
-│   │   ├── UI.py                   # PySide6 UI 界面
+│   │   ├── ui.py                   # PySide6 UI 界面
 │   │   ├── node_manager.py         # 节点状态管理
 │   │   ├── game_manager.py         # 游戏状态机
 │   │   ├── mqtt_client.py          # MQTT 客户端
@@ -170,7 +170,7 @@ BROKER_BIND_PORT = 1883
 
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = 600  # 秒
-WATCHDOG_INTERVAL = 30   # 秒
+WATCHDOG_INTERVAL = 30  # 秒
 
 # Frpc 内网穿透 (config.toml 仅作默认值，运行时配置持久化在 controller/frpc.toml)
 FRPC_SERVER_ADDR = ""
@@ -188,7 +188,7 @@ FRPC_AUTH_TOKEN = ""
 
 1. 在 `game_manager.py` 的 `GameMode` 枚举中添加新模式
 2. 在 `GameManager.on_sta_activated()` 和 `on_det_activated()` 中实现逻辑
-3. 在 `UI.py` 的游戏控制页添加对应的 UI 控件
+3. 在 `ui.py` 的游戏控制页添加对应的 UI 控件
 
 ### 添加新的音效
 

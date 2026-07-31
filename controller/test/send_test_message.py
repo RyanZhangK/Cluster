@@ -21,7 +21,7 @@ async def send_message(payload: str) -> None:
         async with aiomqtt.Client(MQTT_BROKER, MQTT_PORT) as client:
             await client.publish(MQTT_TOPIC_SUB, payload, qos=1)
             print(f"✓ 已发送: {payload}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - 一次性测试工具，任何失败都直接退出
         print(f"✗ 发送失败: {e}")
         sys.exit(1)
 

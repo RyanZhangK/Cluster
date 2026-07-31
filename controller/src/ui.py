@@ -2,7 +2,7 @@ import json
 import logging
 from collections import deque
 from functools import partial
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QColor, QFont, QTextCursor
@@ -85,7 +85,13 @@ class MainWindow(QMainWindow):
     COL_STATUS = 2
     COL_TEAM = 3
     COL_HEARTBEAT = 4
-    COLUMN_HEADERS = ["节点ID", "类型", "在线状态", "激活队伍", "最后心跳"]
+    COLUMN_HEADERS: ClassVar[list[str]] = [
+        "节点ID",
+        "类型",
+        "在线状态",
+        "激活队伍",
+        "最后心跳",
+    ]
 
     def __init__(
         self,
@@ -99,8 +105,8 @@ class MainWindow(QMainWindow):
         self._node_manager = node_manager
         self._event_bus = event_bus
         self._audio_player = audio_player
-        self._frpc_manager: "FrpcManager | None" = frpc_manager
-        self._game_manager: "GameManager | None" = None
+        self._frpc_manager: FrpcManager | None = frpc_manager
+        self._game_manager: GameManager | None = None
         self._current_mode = "征服"
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
@@ -110,8 +116,8 @@ class MainWindow(QMainWindow):
         self._filter_status = "全部状态"
         self._filter_team = "全部队伍"
 
-        self._log_buffer: "deque[tuple[int, str]]" = deque(maxlen=500)
-        self._mqtt_buffer: "deque[str]" = deque(maxlen=500)
+        self._log_buffer: deque[tuple[int, str]] = deque(maxlen=500)
+        self._mqtt_buffer: deque[str] = deque(maxlen=500)
         self._mqtt_pending: list[str] = []
         self._mqtt_paused = False
 
@@ -1060,8 +1066,13 @@ class MainWindow(QMainWindow):
 
     # ── 调试页 ─────────────────────────────────────────────────────────────────
 
-    LEVEL_MAP = {"DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40}
-    LEVEL_COLORS = {
+    LEVEL_MAP: ClassVar[dict[str, int]] = {
+        "DEBUG": 10,
+        "INFO": 20,
+        "WARNING": 30,
+        "ERROR": 40,
+    }
+    LEVEL_COLORS: ClassVar[dict[int, str]] = {
         10: "#888888",
         20: "#CCCCCC",
         30: "#FFCC00",
@@ -1544,6 +1555,9 @@ class MainWindow(QMainWindow):
         for i, btn in enumerate(self._nav_buttons):
             btn.setChecked(i == index)
         self._stack.setCurrentIndex(index)
+        import controller.src.main as m
+
+        m._stack_index = index
         self._page_title.setText(self._page_titles[index])
 
     # ── Node Slots ─────────────────────────────────────────────────────────────

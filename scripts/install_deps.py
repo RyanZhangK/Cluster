@@ -31,10 +31,9 @@ async def frp_install(
     try:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
-            with open(tar_path, "wb") as f:
-                async for chunk in response.aiter_bytes():
-                    f.write(chunk)
-    except Exception as e:
+            data = await response.aread()
+        await asyncio.to_thread(tar_path.write_bytes, data)
+    except Exception as e:  # noqa: BLE001 - 一次性安装脚本，下载失败直接跳过该架构
         print(f"下载失败 {arch_name}: {e}")
         return
 
@@ -63,8 +62,8 @@ async def frpc_run_installer():
         print("错误: 未找到 frpc.json 文件")
         return
 
-    with open(frpc_file, "r", encoding="utf-8") as f:
-        frpc = json.load(f)
+    content = await asyncio.to_thread(frpc_file.read_text, encoding="utf-8")
+    frpc = json.loads(content)
 
     async with httpx.AsyncClient(follow_redirects=True) as client:
         tasks = [frp_install(arch, url, base_dir, client) for arch, url in frpc.items()]

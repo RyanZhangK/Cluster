@@ -62,5 +62,5 @@ class EmbeddedBroker:
             try:
                 await self._broker.shutdown()
                 logger.info("内嵌 Broker 已关闭")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - 关闭时尽力而为，忽略任何错误
                 logger.error(f"内嵌 Broker 关闭时出错: {e}")
