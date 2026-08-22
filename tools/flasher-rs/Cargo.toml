@@ -1,0 +1,12 @@
+[package]
+name = "cluster-flasher"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Cluster Firmware Flasher — egui + espflash rewrite of tools/flasher-cpp"
+
+[dependencies]
+eframe = "0.36"
+espflash = { version = "4.5", default-features = false, features = ["serialport"] }
+serialport = "4.7"
+rfd = "0.15"
