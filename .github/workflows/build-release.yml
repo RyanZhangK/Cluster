@@ -109,10 +109,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y build-essential cmake libgl-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libwayland-dev libxkbcommon-dev python3 python3-pip python3-venv
+          sudo apt-get install -y build-essential
 
       - name: Build flasher
         run: make flasher
@@ -121,9 +124,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cluster-flasher-linux-${{ matrix.arch }}
-          path: |
-            /tmp/flasher-cpp-build/bin/cluster-flasher
-            /tmp/flasher-cpp-build/bin/esptool
+          path: tools/flasher-rs/target/release/cluster-flasher
 
   build-flasher-win:
     name: Build Flasher (Windows x64)
@@ -133,18 +134,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Python deps
-        run: python -m pip install pyinstaller esptool pyserial
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build flasher
-        run: |
-          cmake -S tools/flasher-cpp -B build/flasher-cpp -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUNDLE_ESPTOOL=ON
-          cmake --build build/flasher-cpp
+        shell: pwsh
+        run: cargo build --release --manifest-path tools/flasher-rs/Cargo.toml
 
       - name: Package (zip)
         shell: pwsh
         run: |
-          Compress-Archive -Path @("build/flasher-cpp/bin/cluster-flasher.exe", "build/flasher-cpp/bin/esptool.exe") -DestinationPath "build/cluster-flasher-win64.zip"
+          Compress-Archive -Path "tools/flasher-rs/target/release/cluster-flasher.exe" -DestinationPath "build/cluster-flasher-win64.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

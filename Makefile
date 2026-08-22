@@ -12,9 +12,8 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 SRC_DIR         := $(ROOT_DIR)/controller/src
 NUITKA_OUT      := $(DIST_DIR)/main.dist
-FLASHER_SRC     := $(ROOT_DIR)/tools/flasher-cpp
-FLASHER_BUILD   := /tmp/flasher-cpp-build
-FLASHER_BIN     := $(FLASHER_BUILD)/bin/cluster-flasher
+FLASHER_SRC     := $(ROOT_DIR)/tools/flasher-rs
+FLASHER_BIN     := $(FLASHER_SRC)/target/release/cluster-flasher
 
 ARCH_NAME       := $(shell uname -m)
 DEB_ARCH        := $(if $(filter x86_64,$(ARCH_NAME)),amd64,arm64)
@@ -26,7 +25,7 @@ INSTALL_DESKTOP := /usr/local/share/applications/$(PKG_NAME).desktop
 
 export PATH     := $(shell ruby -e 'puts Gem.user_dir' 2>/dev/null)/bin:$(PATH)
 
-.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump flasher flasher-dev flasher-clean flasher-compile-commands
+.PHONY: all deps dev lint test hot clean clean-compile clean-stage compile stage deb pacman bump flasher flasher-dev flasher-clean
 all: clean deps compile stage deb pacman 
 
 deps: scripts/install_deps.py
@@ -129,24 +128,18 @@ pacman:
 bump:
 	uvx bump-my-version bump patch
 
-# ── Flasher 烧录工具 (C++ / Dear ImGui) ───────────────────────────────────
+# ── Flasher 烧录工具 (Rust / egui + espflash，单二进制无 Python 依赖) ───────
+
+FLASH_DEBUG_BIN := $(FLASHER_SRC)/target/debug/cluster-flasher
 
 flasher-dev:
-	@cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Debug
-	@cmake --build $(FLASHER_BUILD) -j$$(nproc)
-	$(FLASHER_BIN)
+	cargo build --manifest-path $(FLASHER_SRC)/Cargo.toml
+	$(FLASH_DEBUG_BIN)
 
 flasher-clean:
-	@rm -rf $(FLASHER_BUILD)
+	cargo clean --manifest-path $(FLASHER_SRC)/Cargo.toml
 
-flasher: flasher-clean
-	@echo "==> CMake 编译 flasher ..."
-	cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Release -DBUNDLE_ESPTOOL=ON
-	cmake --build $(FLASHER_BUILD) -j$$(nproc)
+flasher:
+	@echo "==> Cargo 编译 flasher ..."
+	cargo build --release --manifest-path $(FLASHER_SRC)/Cargo.toml
 	@echo "==> Flasher binary: $(FLASHER_BIN)"
-
-compile-commands:
-	@echo "==> 生成 compile_commands.json ..."
-	@cmake -S $(FLASHER_SRC) -B $(FLASHER_BUILD) -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-	@ln -sf $(FLASHER_BUILD)/compile_commands.json $(FLASHER_SRC)/compile_commands.json
-	@echo "==> $(FLASHER_SRC)/compile_commands.json 已就绪"
