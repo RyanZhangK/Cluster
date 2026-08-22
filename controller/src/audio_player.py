@@ -1,7 +1,6 @@
 import logging
 from collections import deque
 from pathlib import Path
-from typing import Any
 
 from PySide6.QtCore import QObject, QUrl
 from PySide6.QtMultimedia import QSoundEffect
@@ -15,7 +14,6 @@ class AudioPlayer(QObject):
     """
     串行播放队列：同一时刻只播放一条音效，后续请求排队等候。
     延迟加载：第一次播放时才创建 QSoundEffect，避免启动阻塞。
-    继承 QObject 以支持 sender() 和 Slot。
     """
 
     def __init__(self, parent: "QObject | None" = None) -> None:
@@ -23,25 +21,12 @@ class AudioPlayer(QObject):
         self._effects: dict[str, QSoundEffect] = {}
         self._queue: deque[str] = deque()
         self._current: QSoundEffect | None = None
-        self._method_cache = {}
 
-    def __getattr__(self, name: str) -> Any:
-        if name in self._method_cache:
-            return self._method_cache[name]
-        if name.startswith("play_"):
-            action = name[len("play_") :]
+    # ── 播放入口 ──────────────────────────────────────────
 
-            def wrapper(*args: Any):
-                key = f"{action}_{args[0]}" if args else action
-                self._play(key)
-
-            self._method_cache[name] = wrapper
-            return wrapper
-        raise AttributeError(
-            f"'{type(self).__name__}' object has no attribute '{name}'"
-        )
-
-    # ── 加载 ──────────────────────────────────────────────
+    def play(self, key: str) -> None:
+        """按音效键播放（如 "sys_online"、"activated_A"）。"""
+        self._play(key)
 
     def _get_or_load(self, key: str) -> QSoundEffect | None:
         if key in self._effects:

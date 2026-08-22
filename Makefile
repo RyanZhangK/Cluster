@@ -1,5 +1,5 @@
 PKG_NAME        := cluster
-PKG_VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || uv run python -c "import toml; print(\"v%s\" % (toml.load('pyproject.toml')['project']['version']))")
+PKG_VERSION     ?= $(shell git describe --tags --always --dirty 2>/dev/null || uv run python -c "import tomllib; print('v%s' % tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
 PKG_VERSION     ?= v0.1.6
 PKG_MAINTAINER  := "RyanZ <ryanzzzz@foxmail.com>"
 PKG_DESCRIPTION := "MQTT 节点管理与游戏控制系统（征服/占领/爆破三模式）"

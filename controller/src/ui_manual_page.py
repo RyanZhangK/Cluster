@@ -18,7 +18,6 @@ from .styles import (
     C_SURFACE,
     C_TEXT,
     C_WARNING,
-    btn_style,
 )
 from .widgets import Card, add_section_label
 
@@ -119,7 +118,6 @@ def build_manual_page(parent: Any) -> QWidget:
             btn = QPushButton(label)
             btn.setFixedHeight(34)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.setStyleSheet(btn_style(C_CARD).replace(C_CARD, C_SURFACE))
             btn.setStyleSheet(f"""
                 QPushButton {{
                     background-color: {C_SURFACE};

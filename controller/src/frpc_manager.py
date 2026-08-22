@@ -42,10 +42,29 @@ def _frpc_binary_path() -> Path | None:
     return None
 
 
-def _frpc_config_path() -> Path:
+def _frpc_config_dir() -> Path:
     config_dir = Path.home() / ".config" / "cluster"
     config_dir.mkdir(parents=True, exist_ok=True)
-    return config_dir / "frpc.conf"
+    return config_dir
+
+
+def _frpc_config_path() -> Path:
+    return _frpc_config_dir() / "frpc-ui.json"
+
+
+def _frpc_legacy_config_path() -> Path:
+    return _frpc_config_dir() / "frpc.conf"
+
+
+def load_frpc_config() -> dict[str, Any] | None:
+    """读取 frpc 配置：优先 frpc-ui.json，缺失时回退旧版 frpc.conf（只读迁移）。"""
+    for path in (_frpc_config_path(), _frpc_legacy_config_path()):
+        try:
+            if path.exists():
+                return json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+    return None
 
 
 def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:
@@ -192,6 +211,7 @@ class FrpcManager(QObject):
                     proc.kill()
                     await proc.wait()
             self.log_received.emit(f"[系统] 隧道 {name} 已停止")
+            raise
         except Exception as e:
             self.error_occurred.emit(f"隧道 {name} 运行时错误: {e}")
             logger.exception("frpc 运行时错误")

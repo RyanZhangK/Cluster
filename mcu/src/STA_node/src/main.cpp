@@ -29,12 +29,6 @@
 #define MQTT_PORT 9001
 #define MQTT_TOPIC "node/status"
 #define MQTT_CMD_TOPIC "node/command"
-#ifndef MQTT_USER
-#define MQTT_USER "nodeuser"
-#endif
-#ifndef MQTT_PASSWORD
-#define MQTT_PASSWORD "nodeuserpassword"
-#endif
 
 /******************** 节点配置 ********************/
 #define NODE_ID "STA01"

@@ -257,14 +257,13 @@ def build_frpc_page(parent: Any) -> QWidget:
 
 
 def load_frpc_config(parent: Any) -> None:
-    """从 frpc.conf 恢复配置，fallback 到 pydantic settings。
+    """从 frpc-ui.json（或旧版 frpc.conf）恢复配置，fallback 到 pydantic settings。
     如果配置文件不存在，则自动创建默认配置。"""
-    from .frpc_manager import _frpc_config_path
+    from .frpc_manager import _frpc_config_path, load_frpc_config
 
-    frpc_conf = _frpc_config_path()
-    if frpc_conf.exists():
+    data = load_frpc_config()
+    if data is not None:
         try:
-            data: dict[str, Any] = json.loads(frpc_conf.read_text(encoding="utf-8"))
             parent._frpc_server_addr.setText(str(data.get("server_addr", "")))
             parent._frpc_server_port.setValue(
                 int(data.get("server_port", FRPC_SERVER_PORT))
@@ -276,7 +275,7 @@ def load_frpc_config(parent: Any) -> None:
                     parent._proxy_table, cast(list[dict[str, Any]], proxies)
                 )
                 return
-        except (json.JSONDecodeError, OSError):
+        except (json.JSONDecodeError, OSError, TypeError, ValueError):
             pass
 
     parent._frpc_server_addr.setText(FRPC_SERVER_ADDR)
@@ -289,9 +288,10 @@ def load_frpc_config(parent: Any) -> None:
     assert isinstance(proxies, list)
     populate_proxy_table(parent._proxy_table, cast(list[dict[str, Any]], proxies))
 
-    # 配置文件不存在时自动创建默认配置
+    # 配置文件不存在时自动创建默认配置（写入新文件名 frpc-ui.json）
     default_config = collect_frpc_config(parent)
     try:
+        frpc_conf = _frpc_config_path()
         frpc_conf.parent.mkdir(parents=True, exist_ok=True)
         frpc_conf.write_text(
             json.dumps(default_config, ensure_ascii=False, indent=2),
