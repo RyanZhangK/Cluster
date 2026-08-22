@@ -1,6 +1,5 @@
 import asyncio
 import importlib
-import json
 import logging
 import signal
 import sys
@@ -17,11 +16,9 @@ from controller.src.audio_player import AudioPlayer
 from controller.src.config import EMBEDDED_BROKER, LOG_DIR, MQTT_TOPIC_CMD, settings
 from controller.src.embedded_broker import EmbeddedBroker
 from controller.src.event_bus import EventBus
-from controller.src.frpc_manager import FrpcManager, _frpc_config_path
+from controller.src.frpc_manager import FrpcManager, load_frpc_config
 from controller.src.mqtt_client import MQTTClient
 from controller.src.node_manager import NodeManager
-
-_stack_index = 0
 
 
 def setup_logging() -> None:
@@ -97,12 +94,14 @@ async def ui_hot_reload_watcher(
             app = QApplication.instance()
             _window = None
             geometry = None
+            page = 0
 
             if isinstance(app, QApplication):
                 for widget in app.topLevelWidgets():
                     if widget.__class__.__name__ == "MainWindow" and widget.isVisible():
                         _window = widget
                         geometry = _window.geometry()
+                        page = getattr(_window, "_current_page", 0)
                         break
 
             importlib.reload(UI)
@@ -118,7 +117,7 @@ async def ui_hot_reload_watcher(
             if geometry:
                 new_window.setGeometry(geometry)
 
-            new_window._switch_page(_stack_index)
+            new_window._switch_page(page)
             new_window.show()
             logger.info("UI 热重载完成！")
     finally:
@@ -130,15 +129,9 @@ async def _auto_start_frpc(frpc_manager: FrpcManager) -> None:
     """如果 frpc 配置文件存在且有代理隧道配置，自动启动 frpc"""
     logger = logging.getLogger(__name__)
 
-    config_path = _frpc_config_path()
-    if not config_path.exists():
+    config = load_frpc_config()
+    if config is None:
         logger.info("frpc 配置文件不存在，跳过自动启动")
-        return
-
-    try:
-        config = json.loads(config_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as e:
-        logger.warning(f"读取 frpc 配置文件失败: {e}")
         return
 
     proxies = config.get("proxies", [])

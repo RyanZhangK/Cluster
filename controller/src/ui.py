@@ -1,3 +1,4 @@
+import html
 import logging
 from collections import deque
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -51,15 +52,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _escape_html(text: str) -> str:
-    return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
-
-
 # ─── 主窗口 ───────────────────────────────────────────────────────────────────
 
 
@@ -108,6 +100,7 @@ class MainWindow(QMainWindow):
         self._current_mode = "征服"
         self._current_team_count = 2
         self._current_participating_teams: list[str] = []
+        self._current_page = 0
 
         self._filter_text = ""
         self._filter_type = "全部类型"
@@ -388,13 +381,6 @@ class MainWindow(QMainWindow):
             filtered[node_id] = state
         return filtered
 
-    def _find_row(self, node_id: str) -> int:
-        for row in range(self._table.rowCount()):
-            item = self._table.item(row, self.COL_NODE_ID)
-            if item and item.text() == node_id:
-                return row
-        return -1
-
     def _update_row_at(self, row: int, node_id: str, state: "NodeState") -> None:
         is_online = state.status == OnlineStatus.ONLINE
         row_data = [
@@ -416,23 +402,13 @@ class MainWindow(QMainWindow):
             self._table.setItem(row, col, item)
         self._table.setRowHeight(row, 44)
 
-    def _update_row(self, node_id: str, state: "NodeState") -> None:
-        row = self._find_row(node_id)
-        if row == -1:
-            row = self._table.rowCount()
-            self._table.insertRow(row)
-        self._update_row_at(row, node_id, state)
-        self._update_stats()
-
     # ── 切页 ───────────────────────────────────────────────────────────────────
 
     def _switch_page(self, index: int) -> None:
         for i, btn in enumerate(self._nav_buttons):
             btn.setChecked(i == index)
         self._stack.setCurrentIndex(index)
-        import controller.src.main as m
-
-        m._stack_index = index
+        self._current_page = index
         self._page_title.setText(self._page_titles[index])
 
     # ── Node Slots ─────────────────────────────────────────────────────────────
@@ -450,7 +426,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_mqtt_connected(self) -> None:
-        self._audio_player.play_sys_online()
+        self._audio_player.play("sys_online")
         self._conn_dot.set_color(C_SUCCESS)
         self._conn_label.setText("已连接")
 
@@ -471,7 +447,7 @@ class MainWindow(QMainWindow):
             if node_id.startswith("STA"):
                 was_idle = self._game_manager.game_state == GameState.IDLE
                 if was_idle:
-                    self._audio_player.play_activated(team)
+                    self._audio_player.play(f"activated_{team}")
                 self._game_manager.on_sta_activated(
                     node_id, team, self._node_manager.get_all_nodes()
                 )
@@ -480,14 +456,14 @@ class MainWindow(QMainWindow):
             elif node_id.startswith("DET"):
                 # DET 节点按游戏模式触发不同音频
                 if self._game_manager.mode == GameMode.OCCUPY:
-                    self._audio_player.play_hotpoint(team)
+                    self._audio_player.play(f"hotpoint_{team}")
                 # Bomb 模式音频由 bomb_activated/bomb_defused 事件触发，此处不播
                 self._game_manager.on_det_activated(
                     node_id, team, self._node_manager.get_all_nodes()
                 )
                 self._update_occupy_bars()
         elif node_id.startswith("STA"):
-            self._audio_player.play_activated(team)
+            self._audio_player.play(f"activated_{team}")
 
     @Slot(str, object)
     def _on_node_reset(self, node_id: str, _state: "NodeState") -> None:
@@ -530,8 +506,7 @@ class MainWindow(QMainWindow):
         if reply != QMessageBox.StandardButton.Yes:
             return
         for node_id in list(self._node_manager.get_all_nodes().keys()):
-            state = self._node_manager.reset_node(node_id)
-            self._event_bus.node_reset.emit(node_id, state)
+            self._node_manager.reset_node(node_id)
 
     @Slot()
     def _on_reset_btn_clicked(self) -> None:
@@ -545,14 +520,13 @@ class MainWindow(QMainWindow):
             if not node_id_item:
                 continue
             node_id = node_id_item.text()
-            state = self._node_manager.reset_node(node_id)
-            self._event_bus.node_reset.emit(node_id, state)
+            self._node_manager.reset_node(node_id)
 
     # ── Game Slots ─────────────────────────────────────────────────────────────
 
     @Slot()
     def _on_game_started(self) -> None:
-        self._audio_player.play_game_started()
+        self._audio_player.play("game_started")
         self._game_state_dot.set_color(C_SUCCESS)
         self._game_state_label.setText("RUNNING  ·  游戏进行中")
         self._game_state_label.setStyleSheet(
@@ -563,14 +537,14 @@ class MainWindow(QMainWindow):
 
     @Slot(str)
     def _on_team_eliminated(self, team: str) -> None:
-        self._audio_player.play_team_eliminated(team)
+        self._audio_player.play(f"eliminated_{team}")
         self._status_label.setText(f"队伍 {team} 已淘汰")
         self._update_team_card(team, "已淘汰", eliminated=True)
 
     @Slot(str)
     def _on_team_victory(self, team: str) -> None:
-        self._audio_player.play_game_stopped()
-        self._audio_player.play_team_victory(team)
+        self._audio_player.play("game_stopped")
+        self._audio_player.play(f"victory_{team}")
         self._game_state_dot.set_color(C_WARNING)
         self._game_state_label.setText(f"ENDED  ·  队伍 {team} 获胜")
         self._game_state_label.setStyleSheet(
@@ -583,7 +557,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_bomb_activated(self) -> None:
-        self._audio_player.play_bomb_activated()
+        self._audio_player.play("bomb_activated")
         self._status_label.setText("炸弹已激活，40s 倒计时")
         self._bomb_status_card.setVisible(True)
         self._bomb_timer_label.setText("40")
@@ -601,7 +575,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _on_bomb_defused(self) -> None:
-        self._audio_player.play_bomb_defused()
+        self._audio_player.play("bomb_defused")
         self._status_label.setText("炸弹已拆除，CT 队胜利")
         self._bomb_status_card.setVisible(False)
 
@@ -677,7 +651,7 @@ class MainWindow(QMainWindow):
         min_level = self.LEVEL_MAP.get(self._log_level_combo.currentText(), 20)
         if levelno >= min_level:
             color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
-            escaped = _escape_html(message)
+            escaped = html.escape(message)
             self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
             scrollbar = self._log_view.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
@@ -689,7 +663,7 @@ class MainWindow(QMainWindow):
         for levelno, msg in self._log_buffer:
             if levelno >= min_level:
                 color = self.LEVEL_COLORS.get(levelno, "#CCCCCC")
-                escaped = _escape_html(msg)
+                escaped = html.escape(msg)
                 self._log_view.append(f'<span style="color: {color}">{escaped}</span>')
         scrollbar = self._log_view.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
@@ -715,8 +689,8 @@ class MainWindow(QMainWindow):
             return
         cursor = self._mqtt_view.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.End)
-        for html in self._mqtt_pending:
-            cursor.insertHtml(html + "<br>")
+        for frag in self._mqtt_pending:
+            cursor.insertHtml(frag + "<br>")
         self._mqtt_pending.clear()
         self._mqtt_count_label.setText(f"{len(self._mqtt_buffer)} 条")
         scrollbar = self._mqtt_view.verticalScrollBar()

@@ -5,6 +5,7 @@
 #include <regex>
 #include <string>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,7 +21,13 @@
 namespace fs = std::filesystem;
 
 // ---- Locate esptool executable ----
-static std::string
+struct EsptoolCommand
+{
+  std::string program;                  // executable to run
+  std::vector<std::string> prefix_args; // args inserted before the flash args
+};
+
+static EsptoolCommand
 find_esptool()
 {
   // 1. Bundled esptool next to the flasher binary
@@ -41,13 +48,13 @@ find_esptool()
   fs::path bundled = exe_dir / "esptool";
 #endif
   if (fs::exists(bundled, ec))
-    return bundled.string();
+    return { bundled.string(), {} };
 
   // 2. Fall back to system python + esptool
 #ifdef _WIN32
-  return "python -m esptool";
+  return { "python", { "-m", "esptool" } };
 #else
-  return "python3 -m esptool";
+  return { "python3", { "-m", "esptool" } };
 #endif
 }
 
@@ -62,22 +69,32 @@ parse_progress(const std::string& line)
   return -1;
 }
 
-// ---- Build the esptool argument list ----
-static std::string
-build_cmdline(const FlashConfig& cfg)
+// ---- Build the esptool argv (program + args, no shell involved) ----
+static std::vector<std::string>
+build_argv(const FlashConfig& cfg)
 {
-  std::string cmd = find_esptool();
-  cmd += " --chip auto";
-  cmd += " --port '" + cfg.port + "'";
-  cmd += " --baud " + std::to_string(cfg.baud);
-  cmd += " --before default_reset --after hard_reset";
-  cmd += " write_flash";
+  EsptoolCommand esptool = find_esptool();
+  std::vector<std::string> argv;
+  argv.reserve(esptool.prefix_args.size() + 10);
+  argv.push_back(esptool.program);
+  for (const auto& a : esptool.prefix_args)
+    argv.push_back(a);
+  argv.push_back("--chip");
+  argv.push_back("auto");
+  argv.push_back("--port");
+  argv.push_back(cfg.port);
+  argv.push_back("--baud");
+  argv.push_back(std::to_string(cfg.baud));
+  argv.push_back("--before");
+  argv.push_back("default_reset");
+  argv.push_back("--after");
+  argv.push_back("hard_reset");
+  argv.push_back("write_flash");
   if (cfg.erase)
-    cmd += " --erase-all";
-  cmd += " 0x00000 '";
-  cmd += cfg.firmware_path;
-  cmd += "'";
-  return cmd;
+    argv.push_back("--erase-all");
+  argv.push_back("0x00000");
+  argv.push_back(cfg.firmware_path);
+  return argv;
 }
 
 // ---- Linux implementation (fork/exec + pipe) ----
@@ -132,7 +149,14 @@ run_esptool(const FlashConfig& cfg,
             std::function<void(const std::string&)> on_output,
             std::function<void(int)> on_progress)
 {
-  std::string cmd = build_cmdline(cfg);
+  std::vector<std::string> argv = build_argv(cfg);
+  // Log line: join argv with spaces (display only, no shell interpretation)
+  std::string cmd;
+  for (size_t i = 0; i < argv.size(); ++i) {
+    if (i)
+      cmd += ' ';
+    cmd += argv[i];
+  }
   on_output("[CMD] " + cmd);
 
   int pipe_stdout[2], pipe_stderr[2];
@@ -148,14 +172,19 @@ run_esptool(const FlashConfig& cfg,
   }
 
   if (pid == 0) {
-    // Child: redirect stdout/stderr, exec
+    // Child: redirect stdout/stderr, exec (no shell)
     dup2(pipe_stdout[1], STDOUT_FILENO);
     dup2(pipe_stderr[1], STDERR_FILENO);
     close(pipe_stdout[0]);
     close(pipe_stdout[1]);
     close(pipe_stderr[0]);
     close(pipe_stderr[1]);
-    execl("/bin/sh", "sh", "-c", cmd.c_str(), nullptr);
+    std::vector<char*> argv_data;
+    argv_data.reserve(argv.size() + 1);
+    for (const auto& a : argv)
+      argv_data.push_back(const_cast<char*>(a.c_str()));
+    argv_data.push_back(nullptr);
+    execvp(argv_data[0], argv_data.data());
     _exit(127);
   }
 
@@ -189,6 +218,50 @@ run_esptool(const FlashConfig& cfg,
 #else // _WIN32
 
 // ---- Windows implementation (CreateProcess + anonymous pipes) ----
+
+// Quote a single argument per standard Windows command-line rules
+// (see "Everyone quotes command line arguments the wrong way" / MSDN).
+static std::string
+win_quote_arg(const std::string& arg)
+{
+  // No special characters: pass through unquoted
+  if (!arg.empty() && arg.find_first_of(" \t\"") == std::string::npos)
+    return arg;
+  std::string out = "\"";
+  size_t backslashes = 0;
+  for (char c : arg) {
+    if (c == '\\') {
+      ++backslashes;
+      continue;
+    }
+    if (c == '"') {
+      // Double up preceding backslashes, escape the quote
+      out.append(backslashes * 2 + 1, '\\');
+      out += '"';
+    } else {
+      out.append(backslashes, '\\');
+      out += c;
+    }
+    backslashes = 0;
+  }
+  // Double trailing backslashes before the closing quote
+  out.append(backslashes * 2, '\\');
+  out += '"';
+  return out;
+}
+
+// Build a single command-line string from argv for CreateProcessA.
+static std::string
+win_build_cmdline(const std::vector<std::string>& argv)
+{
+  std::string cmdline;
+  for (size_t i = 0; i < argv.size(); ++i) {
+    if (i)
+      cmdline += ' ';
+    cmdline += win_quote_arg(argv[i]);
+  }
+  return cmdline;
+}
 
 static std::string
 win_error(DWORD code)
@@ -252,11 +325,19 @@ run_esptool(const FlashConfig& cfg,
             std::function<void(const std::string&)> on_output,
             std::function<void(int)> on_progress)
 {
-  std::string cmd = build_cmdline(cfg);
+  std::vector<std::string> argv = build_argv(cfg);
+  // Log line: join argv with spaces (display only, no shell interpretation)
+  std::string cmd;
+  for (size_t i = 0; i < argv.size(); ++i) {
+    if (i)
+      cmd += ' ';
+    cmd += argv[i];
+  }
   on_output("[CMD] " + cmd);
 
-  // Build the command line for CreateProcess
-  std::string cmdline = "cmd /c " + cmd;
+  // Build the command line for CreateProcess (no cmd.exe involved;
+  // args are quoted per standard Windows command-line rules)
+  std::string cmdline = win_build_cmdline(argv);
 
   SECURITY_ATTRIBUTES sa{};
   sa.nLength = sizeof(sa);

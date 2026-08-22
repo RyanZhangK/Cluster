@@ -2,9 +2,10 @@
 
 import argparse
 import os
+import tomllib
 from pathlib import Path
 
-import toml
+from controller.src.config import Settings
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEV_CONFIG_PATH = PROJECT_ROOT / "config.toml"
@@ -13,38 +14,10 @@ USER_CONFIG_DIR = (
 )
 USER_CONFIG_PATH = USER_CONFIG_DIR / "config.toml"
 
-DEFAULT_CONFIG = {
-    "mqtt": {
-        "broker": "127.0.0.1",
-        "port": 1883,
-        "qos": 1,
-        "topic_sub": "node/status",
-        "topic_pub": "node/{node_id}/status",
-    },
-    "broker": {
-        "enabled": True,
-        "bind_host": "0.0.0.0",
-        "bind_port": 1883,
-    },
-    "game": {
-        "heartbeat_timeout": 600,
-        "watchdog_interval": 30,
-    },
-    "controller": {
-        "dev": False,
-        "ui_hot_reload": False,
-    },
-    "message": {
-        "msg_length": 7,
-        "node_id_length": 5,
-    },
-    "frpc": {
-        "server_addr": "",
-        "server_port": 7000,
-        "auth_token": "",
-        "proxies": "[]",
-    },
-}
+# 单一事实来源：直接从 pydantic Settings 模型生成默认配置
+# model_construct 跳过 settings sources，确保只取字段声明默认值，
+# 不会把现有 config.toml / 环境变量烤进生成的“默认”配置里
+DEFAULT_CONFIG: dict[str, dict[str, object]] = Settings.model_construct().model_dump()
 
 
 def toml_dumps_value(val: object) -> str:
@@ -98,8 +71,9 @@ def validate(user: bool = False) -> bool:
         return False
 
     try:
-        data = toml.load(path)
-    except (toml.TomlDecodeError, OSError) as e:
+        with open(path, "rb") as f:
+            data = tomllib.load(f)
+    except (tomllib.TOMLDecodeError, OSError) as e:
         print(f"错误: config.toml 解析失败: {e}")
         return False
 

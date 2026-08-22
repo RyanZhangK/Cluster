@@ -103,7 +103,6 @@ connectMQTT()
 
     if (client.connect(NODE_ID)) {
       LOG_PRINTLN("connected");
-      client.subscribe(MQTT_TOPIC);
     } else {
       int state = client.state();
       LOG_PRINT("failed, rc=");
