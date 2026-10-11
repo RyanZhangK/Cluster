@@ -94,68 +94,10 @@ jobs:
           name: packages-${{ matrix.arch }}
           path: build/pkg/*
 
-  build-flasher-linux:
-    name: Build Flasher (Linux ${{ matrix.arch }})
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      matrix:
-        include:
-          - arch: amd64
-            runner: ubuntu-22.04
-          - arch: arm64
-            runner: ubuntu-22.04-arm
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y build-essential
-
-      - name: Build flasher
-        run: make flasher
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: cluster-flasher-linux-${{ matrix.arch }}
-          path: tools/flasher-rs/target/release/cluster-flasher
-
-  build-flasher-win:
-    name: Build Flasher (Windows x64)
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build flasher
-        shell: pwsh
-        run: cargo build --release --manifest-path tools/flasher-rs/Cargo.toml
-
-      - name: Package (zip)
-        shell: pwsh
-        run: |
-          Compress-Archive -Path "tools/flasher-rs/target/release/cluster-flasher.exe" -DestinationPath "build/cluster-flasher-win64.zip"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: cluster-flasher-win64
-          path: build/cluster-flasher-win64.zip
-
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [build, build-flasher-linux, build-flasher-win]
+    needs: [build]
     permissions:
       contents: write
 
@@ -165,13 +107,6 @@ jobs:
         with:
           path: artifacts/
           pattern: packages-*
-          merge-multiple: true
-
-      - name: Download flasher artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/flasher/
-          pattern: cluster-flasher-*
           merge-multiple: true
 
       - name: Create Release
@@ -184,4 +119,3 @@ jobs:
           files: |
             artifacts/*.deb
             artifacts/*.pkg.tar.zst
-            artifacts/flasher/**
