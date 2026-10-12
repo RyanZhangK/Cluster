@@ -12,6 +12,7 @@ STAGE_DIR       := $(BUILD_DIR)/stage
 PKG_DIR         := $(BUILD_DIR)/pkg
 SRC_DIR         := $(ROOT_DIR)/controller/src
 NUITKA_OUT      := $(DIST_DIR)/main.dist
+STAGE_CFG       := $(BUILD_DIR)/config.toml
 FLASHER_SRC     := $(ROOT_DIR)/tools/flasher-rs
 FLASHER_BIN     := $(FLASHER_SRC)/target/release/cluster-flasher
 
@@ -81,7 +82,9 @@ stage: clean-stage
 	install -m755 $(NUITKA_OUT)/$(PKG_NAME) $(STAGE_DIR)$(INSTALL_SHARE)/lib/$(PKG_NAME)
 	
 	cp $(NUITKA_OUT)/resources/audio/*.wav $(STAGE_DIR)$(INSTALL_SHARE)/audio/ 2>/dev/null || true
-	install -m644 $(ROOT_DIR)/config.toml $(STAGE_DIR)$(INSTALL_SHARE)/config.toml
+	@echo "==> 从 Settings 模型生成默认配置..."
+	uv run scripts/config_init.py --output $(STAGE_CFG) --force
+	install -m644 $(STAGE_CFG) $(STAGE_DIR)$(INSTALL_SHARE)/config.toml
 	install -dm755 $(STAGE_DIR)$(INSTALL_SHARE)/frpc/$(DEB_ARCH)
 	install -m755 $(NUITKA_OUT)/resources/frpc/$(DEB_ARCH)/frpc $(STAGE_DIR)$(INSTALL_SHARE)/frpc/$(DEB_ARCH)/frpc
 	
