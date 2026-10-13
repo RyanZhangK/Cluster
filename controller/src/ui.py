@@ -3,7 +3,7 @@ import logging
 from collections import deque
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, QTimer, Slot
 from PySide6.QtGui import QColor, QTextCursor
 from PySide6.QtWidgets import (
     QComboBox,
@@ -61,6 +61,9 @@ class MainWindow(QMainWindow):
     COL_STATUS = 2
     COL_TEAM = 3
     COL_HEARTBEAT = 4
+
+    # 游戏结束后自动重置的倒计时秒数
+    AUTO_RESET_SECONDS = 120
     COLUMN_HEADERS: ClassVar[list[str]] = [
         "节点ID",
         "类型",
@@ -112,6 +115,12 @@ class MainWindow(QMainWindow):
         self._mqtt_pending: list[str] = []
         self._mqtt_paused = False
 
+        # 游戏结束后自动重置的倒计时状态
+        self._auto_reset_remaining = 0
+        self._auto_reset_timer = QTimer(self)
+        self._auto_reset_timer.setInterval(1000)
+        self._auto_reset_timer.timeout.connect(self._on_auto_reset_tick)
+
         self._bomb_attacker_combo = QComboBox()
         self._bomb_defender_combo = QComboBox()
         self._bomb_node_input = QComboBox()
@@ -152,6 +161,7 @@ class MainWindow(QMainWindow):
         self._bomb_timer_label: Any = None
         self._bomb_progress: Any = None
         self._game_over_bar: Any = None
+        self._auto_reset_label: Any = None
         self._frpc_status_dot: Any = None
         self._frpc_status_label: Any = None
         self._frpc_start_btn: Any = None
@@ -554,6 +564,7 @@ class MainWindow(QMainWindow):
         self._start_game_btn.setEnabled(True)
         self._bomb_status_card.setVisible(False)
         self._game_over_bar.setVisible(True)
+        self._start_auto_reset()
 
     @Slot()
     def _on_bomb_activated(self) -> None:
@@ -580,8 +591,63 @@ class MainWindow(QMainWindow):
         self._bomb_status_card.setVisible(False)
 
     @Slot()
+    def _on_reset_game_clicked(self) -> None:
+        self._cancel_auto_reset()
+        self._apply_game_reset()
+
+    def _start_auto_reset(self) -> None:
+        """游戏结束后启动自动重置倒计时。"""
+        self._auto_reset_remaining = self.AUTO_RESET_SECONDS
+        self._update_auto_reset_label()
+        self._auto_reset_timer.start()
+        logger.info(f"游戏结束，{self.AUTO_RESET_SECONDS}s 后自动重置")
+
+    def _cancel_auto_reset(self) -> None:
+        """取消自动重置倒计时（手动操作时调用）。"""
+        if self._auto_reset_timer.isActive():
+            logger.info("自动重置倒计时已取消")
+        self._auto_reset_timer.stop()
+        self._auto_reset_remaining = 0
+
+    @Slot()
+    def _on_auto_reset_tick(self) -> None:
+        self._auto_reset_remaining -= 1
+        if self._auto_reset_remaining <= 0:
+            self._cancel_auto_reset()
+            self._apply_game_reset()
+            logger.info("倒计时结束，游戏已自动重置")
+            return
+        self._update_auto_reset_label()
+
+    def _update_auto_reset_label(self) -> None:
+        if self._auto_reset_label is not None:
+            self._auto_reset_label.setText(f"{self._auto_reset_remaining}s 后自动重置")
+
+    def _apply_game_reset(self) -> None:
+        """将游戏状态与界面恢复到待开始。"""
+        if self._game_manager:
+            self._game_manager.reset()
+        self._start_game_btn.setEnabled(True)
+        self._bomb_status_card.setVisible(False)
+        self._occupy_card.setVisible(False)
+        self._game_over_bar.setVisible(False)
+        self._game_state_dot.set_color(C_TEXT_MUTED)
+        self._game_state_label.setText("IDLE  ·  等待游戏开始")
+        self._game_state_label.setStyleSheet(
+            f"color: {C_TEXT_SEC}; font-size: 15px; font-weight: bold; background: transparent;"
+        )
+        self._status_label.setText("游戏已重置")
+        for team in ["A", "B", "C", "D"]:
+            if team in self._current_participating_teams:
+                self._update_team_card(team, "等待激活")
+            else:
+                self._update_team_card(team, "未参与")
+
+    @Slot()
     def _on_start_game_clicked(self) -> None:
         from .game_manager import BombConfig, GameManager, GameMode
+
+        self._cancel_auto_reset()
 
         mode_map = {
             "征服": GameMode.CONQUEST,
@@ -622,26 +688,6 @@ class MainWindow(QMainWindow):
         self._status_label.setText(f"等待 {team_count} 个 STA 节点激活...")
         logger.info(f"游戏已启动: 模式={mode.value}, 队伍数={team_count}")
         self._switch_page(2)
-
-    @Slot()
-    def _on_reset_game_clicked(self) -> None:
-        if self._game_manager:
-            self._game_manager.reset()
-        self._start_game_btn.setEnabled(True)
-        self._bomb_status_card.setVisible(False)
-        self._occupy_card.setVisible(False)
-        self._game_over_bar.setVisible(False)
-        self._game_state_dot.set_color(C_TEXT_MUTED)
-        self._game_state_label.setText("IDLE  ·  等待游戏开始")
-        self._game_state_label.setStyleSheet(
-            f"color: {C_TEXT_SEC}; font-size: 15px; font-weight: bold; background: transparent;"
-        )
-        self._status_label.setText("游戏已重置")
-        for team in ["A", "B", "C", "D"]:
-            if team in self._current_participating_teams:
-                self._update_team_card(team, "等待激活")
-            else:
-                self._update_team_card(team, "未参与")
 
     # ── Debug Slots ───────────────────────────────────────────────────────────
 
@@ -790,6 +836,7 @@ class MainWindow(QMainWindow):
         if self._frpc_manager and self._frpc_manager.is_running:
             self._frpc_manager.stop()
 
+        self._cancel_auto_reset()
         if self._game_manager:
             self._game_manager.reset()
             self._switch_page(0)

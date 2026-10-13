@@ -122,6 +122,12 @@ def build_game_status_page(parent: Any) -> QWidget:
     over_row = QHBoxLayout(parent._game_over_bar)
     over_row.setContentsMargins(0, 0, 0, 0)
     over_row.setSpacing(10)
+    parent._auto_reset_label = QLabel("")
+    parent._auto_reset_label.setStyleSheet(
+        f"color: {C_TEXT_SEC}; font-size: 13px; font-weight: bold; background: transparent;"
+    )
+    over_row.addWidget(parent._auto_reset_label)
+    over_row.addStretch()
     parent._back_to_config_btn = QPushButton("返回配置")
     parent._back_to_config_btn.setFixedSize(120, 42)
     parent._back_to_config_btn.setStyleSheet(btn_style(C_PRIMARY))
@@ -134,7 +140,6 @@ def build_game_status_page(parent: Any) -> QWidget:
     parent._reset_from_status_btn.clicked.connect(parent._on_reset_game_clicked)
     over_row.addWidget(parent._back_to_config_btn)
     over_row.addWidget(parent._reset_from_status_btn)
-    over_row.addStretch()
     parent._game_over_bar.setVisible(False)
     layout.addWidget(parent._game_over_bar)
 
