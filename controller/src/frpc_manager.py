@@ -56,15 +56,49 @@ def _frpc_legacy_config_path() -> Path:
     return _frpc_config_dir() / "frpc.conf"
 
 
+def _has_content(config: dict[str, Any]) -> bool:
+    """配置里是否有能用的内容：填了服务器地址，或至少有一条隧道。
+
+    旧版本持久化过一份全空的 frpc.conf，把它当成"已配置"会挡住 config.toml
+    里 [frpc] 的默认值，frpc 也就永远不会自动启动。
+    """
+    if str(config.get("server_addr", "")).strip():
+        return True
+    proxies = config.get("proxies", [])
+    return isinstance(proxies, list) and len(proxies) > 0
+
+
+def _settings_defaults() -> dict[str, Any]:
+    """config.toml / 环境变量提供的 [frpc] 默认值"""
+    try:
+        proxies = json.loads(settings.frpc.proxies)
+    except (json.JSONDecodeError, TypeError):
+        proxies = []
+    return {
+        "server_addr": settings.frpc.server_addr,
+        "server_port": settings.frpc.server_port,
+        "auth_token": settings.frpc.auth_token,
+        "proxies": proxies if isinstance(proxies, list) else [],
+    }
+
+
 def load_frpc_config() -> dict[str, Any] | None:
-    """读取 frpc 配置：优先 frpc-ui.json，缺失时回退旧版 frpc.conf（只读迁移）。"""
+    """读取 frpc 配置：优先 frpc-ui.json，其次旧版 frpc.conf，最后回退 config.toml 的 [frpc]。
+
+    空文件按"未配置"处理，否则它会一直挡住后面两层的默认值。
+    """
     for path in (_frpc_config_path(), _frpc_legacy_config_path()):
         try:
-            if path.exists():
-                return json.loads(path.read_text(encoding="utf-8"))
+            if not path.exists():
+                continue
+            config = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(config, dict) and _has_content(config):
+                return config
         except (json.JSONDecodeError, OSError):
             continue
-    return None
+
+    defaults = _settings_defaults()
+    return defaults if _has_content(defaults) else None
 
 
 def _build_cli_args(server: dict[str, Any], proxy: dict[str, Any]) -> list[str]:

@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .config import FRPC_AUTH_TOKEN, FRPC_PROXIES, FRPC_SERVER_ADDR, FRPC_SERVER_PORT
+from .config import FRPC_SERVER_PORT
 from .styles import (
     C_BG,
     C_BORDER,
@@ -257,38 +257,29 @@ def build_frpc_page(parent: Any) -> QWidget:
 
 
 def load_frpc_config(parent: Any) -> None:
-    """从 frpc-ui.json（或旧版 frpc.conf）恢复配置，fallback 到 pydantic settings。
-    如果配置文件不存在，则自动创建默认配置。"""
+    """从 frpc-ui.json / frpc.conf / config.toml 的 [frpc] 恢复配置。
+    frpc-ui.json 不存在时，把当前值落盘成默认配置。"""
     from .frpc_manager import _frpc_config_path, load_frpc_config
 
     data = load_frpc_config()
     if data is not None:
+        parent._frpc_server_addr.setText(str(data.get("server_addr", "")))
         try:
-            parent._frpc_server_addr.setText(str(data.get("server_addr", "")))
-            parent._frpc_server_port.setValue(
-                int(data.get("server_port", FRPC_SERVER_PORT))
-            )
-            parent._frpc_auth_token.setText(str(data.get("auth_token", "")))
-            proxies = data.get("proxies", [])
-            if isinstance(proxies, list):
-                populate_proxy_table(
-                    parent._proxy_table, cast(list[dict[str, Any]], proxies)
-                )
-                return
-        except (json.JSONDecodeError, OSError, TypeError, ValueError):
-            pass
+            port = int(data.get("server_port", FRPC_SERVER_PORT))
+        except (TypeError, ValueError):
+            port = FRPC_SERVER_PORT
+        parent._frpc_server_port.setValue(port)
+        parent._frpc_auth_token.setText(str(data.get("auth_token", "")))
+        proxies = data.get("proxies", [])
+        populate_proxy_table(
+            parent._proxy_table,
+            cast(list[dict[str, Any]], proxies if isinstance(proxies, list) else []),
+        )
 
-    parent._frpc_server_addr.setText(FRPC_SERVER_ADDR)
-    parent._frpc_server_port.setValue(FRPC_SERVER_PORT)
-    parent._frpc_auth_token.setText(FRPC_AUTH_TOKEN)
-    try:
-        proxies = json.loads(FRPC_PROXIES)
-    except (json.JSONDecodeError, TypeError):
-        proxies = []
-    assert isinstance(proxies, list)
-    populate_proxy_table(parent._proxy_table, cast(list[dict[str, Any]], proxies))
+    if _frpc_config_path().exists():
+        return
 
-    # 配置文件不存在时自动创建默认配置（写入新文件名 frpc-ui.json）
+    # frpc-ui.json 不存在时自动创建默认配置
     default_config = collect_frpc_config(parent)
     try:
         frpc_conf = _frpc_config_path()
