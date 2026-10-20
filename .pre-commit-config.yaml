@@ -8,3 +8,17 @@ repos:
       args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v22.1.5  # Use the latest version available
+  hooks:
+  - id: clang-format
+    # Optional: restrict to specific languages
+    types_or: [c++]
+- repo: local
+  hooks:
+    - id: bare-imports
+      name: bare-imports check
+      entry: scripts/check_bare_imports
+      language: script
+      files: ^controller/src/.*\.py$
+      pass_filenames: false

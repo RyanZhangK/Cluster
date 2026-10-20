@@ -1,16 +1,17 @@
 [project]
 name = "Cluster"
-version = "0.9.4"
-description = "Add your description here"
+version = "1.0.1"
+description = "what can i say?"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiomqtt>=2.3.0",
     "amqtt>=0.11.0",
+    "httpx>=0.28.1",
     "pydantic-settings>=2.14.1",
     "pyside6==6.7.3",
     "qasync>=0.27.1",
-    "toml>=0.10.2",
+    "watchdog>=6.0.0",
 ]
 
 [project.scripts]
@@ -20,13 +21,19 @@ controller = "controller.src.main:main"
 package = true
 
 [tool.setuptools.packages.find]
-include = ["controller"]
-
-[tool.pyright]
-extraPaths = ["controller/src"]
+include = ["controller", "tools", "tools.*"]
 
 [dependency-groups]
 dev = [
     "nuitka>=4.1",
     "pre-commit>=4.6.0",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-qt>=4.4",
+    "ruff>=0.9.0",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["controller/test"]
+python_files = ["test_*.py"]

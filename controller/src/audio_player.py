@@ -14,16 +14,19 @@ class AudioPlayer(QObject):
     """
     串行播放队列：同一时刻只播放一条音效，后续请求排队等候。
     延迟加载：第一次播放时才创建 QSoundEffect，避免启动阻塞。
-    继承 QObject 以支持 sender() 和 Slot。
     """
 
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent: "QObject | None" = None) -> None:
         super().__init__(parent)
         self._effects: dict[str, QSoundEffect] = {}
         self._queue: deque[str] = deque()
         self._current: QSoundEffect | None = None
 
-    # ── 加载 ──────────────────────────────────────────────
+    # ── 播放入口 ──────────────────────────────────────────
+
+    def play(self, key: str) -> None:
+        """按音效键播放（如 "sys_online"、"activated_A"）。"""
+        self._play(key)
 
     def _get_or_load(self, key: str) -> QSoundEffect | None:
         if key in self._effects:
@@ -50,6 +53,15 @@ class AudioPlayer(QObject):
         if self._current is None:
             self._play_next()
 
+    def play_immediate(self, key: str) -> None:
+        self._queue.clear()
+        self._current = None
+        self._play(key)
+
+    @property
+    def is_idle(self) -> bool:
+        return self._current is None and not self._queue
+
     def _play_next(self) -> None:
         while self._queue:
             key = self._queue.popleft()
@@ -74,32 +86,3 @@ class AudioPlayer(QObject):
         if effect is self._current and not effect.isPlaying():
             self._current = None
             self._play_next()
-
-    # ── 公开接口 ──────────────────────────────────────────
-
-    def play_sys_online(self) -> None:
-        self._play("sys_online")
-
-    def play_sys_offline(self) -> None:
-        self._play("sys_offline")
-
-    def play_activated(self, team: str) -> None:
-        self._play(f"activated_{team}")
-
-    def play_game_started(self) -> None:
-        self._play("game_started")
-
-    def play_game_stopped(self) -> None:
-        self._play("game_stopped")
-
-    def play_team_eliminated(self, team: str) -> None:
-        self._play(f"eliminated_{team}")
-
-    def play_team_victory(self, team: str) -> None:
-        self._play(f"victory_{team}")
-
-    def play_bomb_activated(self) -> None:
-        self._play("bomb_activated")
-
-    def play_bomb_defused(self) -> None:
-        self._play("bomb_defused")

@@ -1,10 +1,9 @@
-import asyncio
 import logging
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QTimer
 
 if TYPE_CHECKING:
     from event_bus import EventBus
@@ -52,40 +51,56 @@ class GameManager(QObject):
 
         self._game_state = GameState.IDLE
         self._sta_team_mapping: dict[str, str] = {}  # node_id → team（开始时记录）
+        self._activated_teams: set[str] = set()  # 已激活的队伍（去重）
         self._eliminated_teams: set[str] = set()
+        self._eliminated_sta_nodes: set[str] = set()
         self._det_activation: dict[str, str] = {}  # node_id → team（占领模式）
-        self._bomb_task: asyncio.Task | None = None
+        self._bomb_timer: QTimer | None = None
         self._bomb_remaining: int = 0
 
         logger.info(
             f"GameManager 初始化: 模式={mode.value}, 队伍数={team_count}, 队伍={participating_teams}"
         )
 
-    def on_sta_activated(self, node_id: str, team: str, _: dict) -> None:
+    def on_sta_activated(self, node_id: str, team: str, _: object) -> None:
         """STA 节点激活时调用。"""
         if self._game_state == GameState.IDLE:
             # 开始阶段：记录节点↔队伍映射
             self._sta_team_mapping[node_id] = team
+            self._activated_teams.add(team)
             logger.info(f"记录 STA 节点: {node_id} → 队伍 {team}")
 
-            # 检查开始条件
-            if len(self._sta_team_mapping) == self.team_count:
+            # 检查开始条件（按队伍去重，同队重复激活不计数）
+            if len(self._activated_teams) == self.team_count:
                 self._start_game()
 
         elif self._game_state == GameState.RUNNING:
             if self.mode == GameMode.CONQUEST:
-                # 征服模式：STA 节点再次激活 → 对应队伍淘汰
+                # 征服模式：STA 节点再次激活 → 该节点被淘汰
+                # 当队伍所有 STA 节点都被淘汰时，队伍才被淘汰
                 if node_id in self._sta_team_mapping:
-                    eliminated_team = self._sta_team_mapping[node_id]
-                    if eliminated_team not in self._eliminated_teams:
-                        self._eliminate_team(eliminated_team)
-                        self._check_conquest_victory()
+                    team = self._sta_team_mapping[node_id]
+                    if team not in self._eliminated_teams:
+                        self._eliminated_sta_nodes.add(node_id)
+                        logger.info(f"STA 节点 {node_id} (队伍 {team}) 已被淘汰")
+                        team_sta_nodes = [
+                            nid
+                            for nid, t in self._sta_team_mapping.items()
+                            if t == team
+                        ]
+                        if all(
+                            nid in self._eliminated_sta_nodes for nid in team_sta_nodes
+                        ):
+                            self._eliminate_team(team)
+                            self._check_conquest_victory()
 
             elif self.mode == GameMode.BOMB:
                 # 爆破模式：STA 激活可能触发炸弹激活或拆除
                 pass
 
-    def on_det_activated(self, node_id: str, team: str, nodes: dict) -> None:
+    def on_det_activated(
+        self, node_id: str, team: str, nodes: dict[str, "NodeState"]
+    ) -> None:
         """DET 节点激活时调用。"""
         if self._game_state != GameState.RUNNING:
             return
@@ -112,12 +127,15 @@ class GameManager(QObject):
             return
 
         # 爆破模式：如果炸弹节点离线，取消倒计时
-        assert self.bomb_config is not None
-        if self.mode == GameMode.BOMB and node_id == self.bomb_config.bomb_node_id:
-            if self._bomb_task and not self._bomb_task.done():
-                self._bomb_task.cancel()
-                self._bomb_task = None
-                logger.warning("炸弹节点离线，倒计时已取消")
+        if (
+            self.mode == GameMode.BOMB
+            and self.bomb_config is not None
+            and node_id == self.bomb_config.bomb_node_id
+            and self._bomb_timer is not None
+        ):
+            self._bomb_timer.stop()
+            self._bomb_timer = None
+            logger.warning("炸弹节点离线，倒计时已取消")
 
     def _start_game(self) -> None:
         """游戏开始。"""
@@ -138,7 +156,7 @@ class GameManager(QObject):
             winner = (self.participating_teams - self._eliminated_teams).pop()
             self._end_game(winner)
 
-    def _check_occupy_victory(self, nodes: dict) -> None:
+    def _check_occupy_victory(self, nodes: dict[str, "NodeState"]) -> None:
         """检查占领模式胜利条件。"""
         # 统计在线 DET 节点总数
         online_det_count = sum(
@@ -153,7 +171,7 @@ class GameManager(QObject):
 
         # 统计各队伍激活的 DET 节点数
         team_det_count = {}
-        for _, team in self._det_activation.items():
+        for team in self._det_activation.values():
             team_det_count[team] = team_det_count.get(team, 0) + 1
 
         # 检查是否有队伍超过半数
@@ -169,32 +187,32 @@ class GameManager(QObject):
     def _activate_bomb(self) -> None:
         """爆破模式：炸弹激活。"""
         logger.info("炸弹已激活，开始 40s 倒计时")
-        self._event_bus.bomb_activated.emit()
         self._bomb_remaining = 40
-        self._bomb_task = asyncio.create_task(self._bomb_countdown())
+        self._bomb_timer = QTimer(self)
+        self._bomb_timer.timeout.connect(self._bomb_tick)
+        self._bomb_timer.start(1000)
+        self._event_bus.bomb_activated.emit()
 
-    async def _bomb_countdown(self) -> None:
-        """爆破模式：40s 倒计时。"""
-        try:
-            while self._bomb_remaining > 0:
-                await asyncio.sleep(1)
-                self._bomb_remaining -= 1
-                self._event_bus.bomb_tick.emit(self._bomb_remaining)
-                logger.debug(f"炸弹倒计时: {self._bomb_remaining}s")
+    def _bomb_tick(self) -> None:
+        """每秒倒计时回调。"""
+        self._bomb_remaining -= 1
+        self._event_bus.bomb_tick.emit(self._bomb_remaining)
+        logger.debug(f"炸弹倒计时: {self._bomb_remaining}s")
 
-            # 倒计时结束，T 队胜利
+        if self._bomb_remaining <= 0:
+            assert self._bomb_timer is not None
+            self._bomb_timer.stop()
+            self._bomb_timer = None
             logger.info("炸弹倒计时结束，T 队胜利")
             self._event_bus.bomb_exploded.emit()
             assert self.bomb_config is not None
             self._end_game(self.bomb_config.attacker_team)
-        except asyncio.CancelledError:
-            logger.info("炸弹倒计时已取消")
 
     def _defuse_bomb(self) -> None:
         """爆破模式：炸弹拆除。"""
-        if self._bomb_task and not self._bomb_task.done():
-            self._bomb_task.cancel()
-            self._bomb_task = None
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         logger.info("炸弹已拆除，CT 队胜利")
         self._event_bus.bomb_defused.emit()
         assert self.bomb_config is not None
@@ -202,6 +220,9 @@ class GameManager(QObject):
 
     def _end_game(self, winner: str) -> None:
         """游戏结束。"""
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         self._game_state = GameState.ENDED
         logger.info(f"游戏结束！队伍 {winner} 获胜")
         self._event_bus.team_victory.emit(winner)
@@ -212,12 +233,14 @@ class GameManager(QObject):
 
     def reset(self) -> None:
         """重置游戏状态。"""
-        if self._bomb_task and not self._bomb_task.done():
-            self._bomb_task.cancel()
+        if self._bomb_timer is not None:
+            self._bomb_timer.stop()
+            self._bomb_timer = None
         self._game_state = GameState.IDLE
         self._sta_team_mapping.clear()
+        self._activated_teams.clear()
         self._eliminated_teams.clear()
+        self._eliminated_sta_nodes.clear()
         self._det_activation.clear()
-        self._bomb_task = None
         self._bomb_remaining = 0
         logger.info("游戏已重置")
