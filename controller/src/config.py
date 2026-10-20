@@ -1,4 +1,7 @@
 import logging
+import os
+import shutil
+import tomllib
 from asyncio import Event
 from pathlib import Path as _Path
 
@@ -11,6 +14,62 @@ from pydantic_settings import (
 
 logger = logging.getLogger(__name__)
 
+# ── 配置搜索路径 ──────────────────────────────────────────
+_USER_CONFIG_DIR = (
+    _Path(os.environ.get("XDG_CONFIG_HOME", _Path.home() / ".config")) / "cluster"
+)
+_USER_CONFIG_PATH = _USER_CONFIG_DIR / "config.toml"
+_SYSTEM_CONFIG_PATH = _Path("/usr/local/share/cluster/config.toml")
+_DEV_CFG = _Path(__file__).resolve().parent.parent.parent / "config.toml"
+
+
+def _toml_dev_true(path: _Path) -> bool:
+    """读取配置文件的 [controller].dev 字段"""
+    try:
+        with open(path, "rb") as f:
+            data = tomllib.load(f)
+        return bool(data.get("controller", {}).get("dev", False))
+    except (tomllib.TOMLDecodeError, OSError):
+        return False
+
+
+def _resolve_config() -> _Path | None:
+    """查找配置"""
+    # 1. 环境变量显式指定 dev 模式
+    if (
+        os.environ.get("CLUSTER_CONTROLLER__DEV", "").lower() in ("true", "1")
+        and _DEV_CFG.exists()
+    ):
+        return _DEV_CFG
+
+    # 2. 标准路径查找
+    for candidate in (
+        _USER_CONFIG_PATH,
+        _SYSTEM_CONFIG_PATH,
+        _DEV_CFG,
+    ):
+        if not candidate or not candidate.exists():
+            continue
+
+        if (
+            candidate is not _DEV_CFG
+            and _toml_dev_true(candidate)
+            and _DEV_CFG.exists()
+        ):
+            return _DEV_CFG
+
+        if candidate is _SYSTEM_CONFIG_PATH:
+            _USER_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            try:
+                shutil.copy2(str(candidate), str(_USER_CONFIG_PATH))
+                logger.info("已复制默认配置到 %s", _USER_CONFIG_PATH)
+            except OSError:
+                pass
+
+        return candidate
+
+    return None
+
 
 class MQTTSettings(BaseSettings):
     """MQTT 配置"""
@@ -20,6 +79,7 @@ class MQTTSettings(BaseSettings):
     qos: int = 1
     topic_sub: str = "node/status"
     topic_pub: str = "node/{node_id}/status"
+    topic_cmd: str = "node/command"
 
 
 class BrokerSettings(BaseSettings):
@@ -36,7 +96,11 @@ class GameSettings(BaseSettings):
 
     heartbeat_timeout: int = 600  # 秒，节点心跳超时时间
     watchdog_interval: int = 30  # 秒，看门狗检查间隔
-    ui_hot_reload: bool = True
+
+
+class ControllerSettings(BaseSettings):
+    dev: bool = False
+    ui_hot_reload: bool = False
 
 
 class MessageSettings(BaseSettings):
@@ -46,19 +110,29 @@ class MessageSettings(BaseSettings):
     node_id_length: int = 5
 
 
+class FrpcSettings(BaseSettings):
+    """frpc 内网穿透客户端配置"""
+
+    server_addr: str = ""
+    server_port: int = 7000
+    auth_token: str = ""
+    proxies: str = "[]"
+
+
 class Settings(BaseSettings):
     """Cluster 主配置类"""
 
     mqtt: MQTTSettings = Field(default_factory=MQTTSettings)
     broker: BrokerSettings = Field(default_factory=BrokerSettings)
     game: GameSettings = Field(default_factory=GameSettings)
+    controller: ControllerSettings = Field(default_factory=ControllerSettings)
     message: MessageSettings = Field(default_factory=MessageSettings)
+    frpc: FrpcSettings = Field(default_factory=FrpcSettings)
 
     model_config = SettingsConfigDict(
         env_prefix="CLUSTER_",
         env_nested_delimiter="__",
         extra="ignore",
-        toml_file="config.toml",
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
@@ -75,9 +149,16 @@ class Settings(BaseSettings):
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         from pydantic_settings import TomlConfigSettingsSource
 
+        config_path = _resolve_config()
+        toml_source: list[PydanticBaseSettingsSource] = []
+        if config_path is not None:
+            toml_source = [
+                TomlConfigSettingsSource(settings_cls, toml_file=str(config_path))
+            ]
+
         return (
             init_settings,  # 默认值
-            TomlConfigSettingsSource(settings_cls),  # config.toml
+            *toml_source,  # config.toml
             dotenv_settings,  # .env
             env_settings,  # 系统环境变量
             file_secret_settings,
@@ -92,6 +173,7 @@ MQTT_PORT = settings.mqtt.port
 MQTT_QOS = settings.mqtt.qos
 MQTT_TOPIC_SUB = settings.mqtt.topic_sub
 MQTT_TOPIC_PUB = settings.mqtt.topic_pub
+MQTT_TOPIC_CMD = settings.mqtt.topic_cmd
 
 # 内嵌 Broker 配置
 EMBEDDED_BROKER = settings.broker.enabled
@@ -101,7 +183,9 @@ BROKER_BIND_PORT = settings.broker.bind_port
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = settings.game.heartbeat_timeout
 WATCHDOG_INTERVAL = settings.game.watchdog_interval
-UI_HOT_RELOAD = settings.game.ui_hot_reload
+
+DEV = settings.controller.dev
+UI_HOT_RELOAD = settings.controller.ui_hot_reload
 
 # 消息格式
 MSG_LENGTH = settings.message.msg_length
@@ -115,9 +199,11 @@ if _INSTALLED_AUDIO.exists():
     # 已安装：日志写到用户家目录
     LOG_DIR = str(_Path.home() / ".local" / "share" / "cluster" / "log")
 else:
-    AUDIO_DIR = str(_Path(__file__).parent.parent / "resources" / "audio")
+    AUDIO_DIR = str(  # pyright: ignore[reportConstantRedefinition]
+        _Path(__file__).parent.parent / "resources" / "audio"
+    )
     # 开发环境：日志写到相对路径
-    LOG_DIR = "log"
+    LOG_DIR = "log"  # pyright: ignore[reportConstantRedefinition]
 
 
 AUDIO_FILES = {
@@ -145,27 +231,45 @@ AUDIO_FILES = {
     # 爆破模式胜利
     "victory_T": "TEAM_T_WIN.wav",
     "victory_CT": "TEAM_CT_WIN.wav",
+    # DET 节点占领（Occupy 模式）
+    "hotpoint_A": "TEAM_A_HOTPOINT.wav",
+    "hotpoint_B": "TEAM_B_HOTPOINT.wav",
+    "hotpoint_C": "TEAM_C_HOTPOINT.wav",
+    "hotpoint_D": "TEAM_D_HOTPOINT.wav",
     # 炸弹事件
     "bomb_activated": "BOOM_PLANTED.wav",
     "bomb_defused": "BOOM_DEFUSED.wav",
 }
 
+# frpc 配置
+FRPC_SERVER_ADDR = settings.frpc.server_addr
+FRPC_SERVER_PORT = settings.frpc.server_port
+FRPC_AUTH_TOKEN = settings.frpc.auth_token
+FRPC_PROXIES = settings.frpc.proxies
+
 __all__ = [
-    "settings",
+    "AUDIO_DIR",
+    "AUDIO_FILES",
+    "BROKER_BIND_HOST",
+    "BROKER_BIND_PORT",
+    "BROKER_READY",
+    "DEV",
+    "EMBEDDED_BROKER",
+    "FRPC_AUTH_TOKEN",
+    "FRPC_PROXIES",
+    "FRPC_SERVER_ADDR",
+    "FRPC_SERVER_PORT",
+    "HEARTBEAT_TIMEOUT",
+    "LOG_DIR",
     "MQTT_BROKER",
     "MQTT_PORT",
     "MQTT_QOS",
-    "MQTT_TOPIC_SUB",
+    "MQTT_TOPIC_CMD",
     "MQTT_TOPIC_PUB",
-    "EMBEDDED_BROKER",
-    "BROKER_BIND_HOST",
-    "BROKER_BIND_PORT",
-    "HEARTBEAT_TIMEOUT",
-    "WATCHDOG_INTERVAL",
+    "MQTT_TOPIC_SUB",
     "MSG_LENGTH",
     "NODE_ID_LENGTH",
-    "AUDIO_DIR",
-    "LOG_DIR",
-    "AUDIO_FILES",
-    "BROKER_READY",
+    "UI_HOT_RELOAD",
+    "WATCHDOG_INTERVAL",
+    "settings",
 ]

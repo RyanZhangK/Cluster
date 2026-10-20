@@ -6,6 +6,7 @@ __pycache__/
 *.egg
 dist/
 *.log
+typings/
 
 # IDE
 .vscode/
@@ -18,6 +19,7 @@ dist/
 # controller
 controller/log/
 controller/src/log/
+controller/frpc.toml
 controller/resources/tts_cache/
 controller/resources/tts_temp/
 *.db
@@ -26,6 +28,7 @@ controller/resources/tts_temp/
 build/dist/
 build/stage/
 build/pkg/
+.deps
 
 # PlatformIO
 mcu/*/piolibdeps/
@@ -42,3 +45,7 @@ venv/
 env/
 DevVENV/
 .vscode-ctags
+CLAUDE.md
+imgui.ini
+
+compile_commands.json

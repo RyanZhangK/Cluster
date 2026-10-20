@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import aiomqtt
@@ -28,8 +29,6 @@ TEAM_MAP = {"1": 1, "2": 2, "3": 3, "4": 4, "A": 1, "B": 2, "C": 3, "D": 4}
 class MessageParseError(ValueError):
     """消息解析错误。"""
 
-    pass
-
 
 def parse_message(raw: str) -> tuple[str, str, int]:
     """
@@ -43,8 +42,8 @@ def parse_message(raw: str) -> tuple[str, str, int]:
         raise MessageParseError(f"消息长度错误: 期望 {MSG_LENGTH}，实际 {len(raw)}")
 
     node_id = raw[:NODE_ID_LENGTH]
-    action_type = raw[5]
-    extra_info = raw[6]
+    action_type = raw[NODE_ID_LENGTH]
+    extra_info = raw[NODE_ID_LENGTH + 1]
 
     if action_type not in ("H", "A"):
         raise MessageParseError(f"无效的动作类型: {action_type!r}")
@@ -67,6 +66,23 @@ class MQTTClient:
     def __init__(self, node_manager: "NodeManager", event_bus: "EventBus") -> None:
         self._node_manager = node_manager
         self._event_bus = event_bus
+        self._publish_queue: asyncio.Queue[tuple[str, str]] = asyncio.Queue()
+
+    def publish(self, topic: str, payload: str) -> None:
+        """入队发布请求。可从 Qt 主线程同步调用，不阻塞 UI。"""
+        self._publish_queue.put_nowait((topic, payload))
+
+    async def _publish_worker(self, client: aiomqtt.Client) -> None:
+        """从队列取出消息并通过 MQTT 发布。"""
+        while True:
+            topic, payload = await self._publish_queue.get()
+            try:
+                await client.publish(topic, payload, qos=MQTT_QOS)
+                logger.info(f"Published to {topic}: {payload}")
+            except aiomqtt.MqttError as e:
+                logger.error(f"Failed to publish to {topic}: {e}")
+            except Exception:
+                logger.exception(f"Unexpected error publishing to {topic}")
 
     async def run(self) -> None:
         """
@@ -77,7 +93,7 @@ class MQTTClient:
             async with asyncio.timeout(5):
                 await BROKER_READY.wait()
         except TimeoutError as e:
-            logger.warning(f"MQTT 连接超时: {e}", e)
+            logger.warning(f"MQTT 连接超时: {e}")
 
         while True:
             try:
@@ -86,12 +102,23 @@ class MQTTClient:
                     self._event_bus.mqtt_connected.emit()
                     await client.subscribe(MQTT_TOPIC_SUB, qos=MQTT_QOS)
                     logger.info(f"已订阅主题: {MQTT_TOPIC_SUB}")
-                    async for message in client.messages:
-                        await self._handle_message(message)
+
+                    publish_task = asyncio.create_task(
+                        self._publish_worker(client), name="mqtt_publish_worker"
+                    )
+                    try:
+                        async for message in client.messages:
+                            await self._handle_message(message)
+                    finally:
+                        publish_task.cancel()
+                        try:
+                            await publish_task
+                        except asyncio.CancelledError:
+                            pass
             except aiomqtt.MqttError as e:
                 logger.error(f"MQTT 连接错误: {e}，5 秒后重试...")
                 await asyncio.sleep(5)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - 连接循环兜底，保持重试
                 logger.error(f"未预期的错误: {e}，5 秒后重试...")
                 await asyncio.sleep(5)
 
@@ -102,23 +129,22 @@ class MQTTClient:
         解析失败仅记录警告，不中断循环。
         """
         try:
-            payload = message.payload.decode("utf-8")
-            node_id, action_type, team_or_zero = parse_message(payload)
+            raw_payload = message.payload.decode("utf-8", errors="replace")
+            timestamp = datetime.now().astimezone().strftime("%H:%M:%S")
+            self._event_bus.mqtt_message_received.emit(
+                MQTT_TOPIC_SUB, raw_payload, timestamp
+            )
+            node_id, action_type, team_or_zero = parse_message(raw_payload)
 
             if action_type == "H":
-                came_online, state = self._node_manager.handle_heartbeat(node_id)
-                self._event_bus.node_status_changed.emit(node_id, state)
+                came_online, _ = self._node_manager.handle_heartbeat(node_id)
                 if came_online:
                     logger.info(f"节点 {node_id} 上线")
-                    self._event_bus.node_came_online.emit(node_id, state)
 
             elif action_type == "A":
-                state = self._node_manager.handle_activation(node_id, team_or_zero)
-                team_char = chr(ord("A") + team_or_zero - 1)
-                self._event_bus.node_activated.emit(node_id, team_char, state)
-                self._event_bus.node_status_changed.emit(node_id, state)
+                self._node_manager.handle_activation(node_id, team_or_zero)
 
         except MessageParseError as e:
             logger.warning(f"消息解析失败: {e}，原始 payload: {message.payload!r}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - 单条消息兜底，不中断消息循环
             logger.error(f"处理消息时出错: {e}，原始 payload: {message.payload!r}")

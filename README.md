@@ -2,12 +2,13 @@
 
 一个基于 MQTT 的嵌入式节点管理系统，支持三种游戏模式（征服/占领/爆破），集成实时监控、音效播报、游戏状态管理。
 
+> 依赖说明：`aiomqtt` 是连接节点的 MQTT 客户端，`amqtt` 是内嵌的 MQTT Broker，两者用途不同，缺一不可，请勿误删。
+
 ## 系统架构
 
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 graph TD
-    %% 去掉你原来的 classDef，或者改成深色系
     subgraph Controller ["Controller (主控)"]
         MQTT_B["MQTT Broker<br>(amqtt)"]
         Node_M["Node Manager<br>(内存缓存)"]
@@ -73,9 +74,16 @@ graph TD
 
 ### UI 设计
 - **深蓝管理风格**：专业后端管理界面配色
-- **多页面分层**：节点监控 / 游戏控制 / 游戏状态 / 紧急手动
+- **多页面分层**：节点监控 / 游戏控制 / 游戏状态 / 紧急手动 / Frpc管理
 - **实时反馈**：游戏状态横幅、队伍卡片、倒计时进度条
 - **响应式布局**：自适应窗口大小
+
+### Frpc 内网穿透
+
+- **进程管理**：启动 / 停止 frpc 客户端
+- **配置界面**：服务器地址、端口、认证令牌、代理列表可视化编辑
+- **实时日志**：frpc 进程 stdout 输出
+- **配置持久化**：上次运行配置自动恢复
 
 ## 快速开始
 
@@ -120,19 +128,29 @@ Cluster/
 │   ├── log/                        # 日志输出目录
 │   ├── src/
 │   │   ├── main.py                 # 应用入口
-│   │   ├── UI.py                   # PySide6 UI 界面
+│   │   ├── ui.py                   # PySide6 UI 界面
 │   │   ├── node_manager.py         # 节点状态管理
 │   │   ├── game_manager.py         # 游戏状态机
 │   │   ├── mqtt_client.py          # MQTT 客户端
 │   │   ├── embedded_broker.py      # 内嵌 MQTT Broker
 │   │   ├── audio_player.py         # 音效播放队列
 │   │   ├── event_bus.py            # 信号总线
+│   │   ├── frpc_manager.py         # Frpc 进程管理
 │   │   ├── config.py               # Controller配置
 │   │   ├── resources/
-│   │       └── audio/              # 音效文件目录
+│   │   │   ├── audio/              # 音效文件目录
+│   │       └── frpc/               # Frpc 二进制 (amd64/arm64)
 │   ├── test/
 │       └── send_test_message.py    # MQTT 测试脚本
+├── doc/                            # 项目文档
+├── scripts/
+│   ├── check_bare_imports          # 检查同包导入是否遗漏 '.' 前缀
+│   ├── config_init.py              # config.toml 生成与校验工具
+│   ├── install_deps.py             # 安装依赖
+│   └── setup_dev.py                # 开发环境初始化
 ├── mcu/                            # ESP8266 固件代码
+├── README.md                       # 本文件
+├── config.toml                     # 配置文件 
 ├── README.md                       # 本文件
 ├── LICENSE                         # 开源协议
 ```
@@ -154,7 +172,12 @@ BROKER_BIND_PORT = 1883
 
 # 心跳与看门狗
 HEARTBEAT_TIMEOUT = 600  # 秒
-WATCHDOG_INTERVAL = 30   # 秒
+WATCHDOG_INTERVAL = 30  # 秒
+
+# Frpc 内网穿透 (config.toml 仅作默认值，运行时配置持久化在 controller/frpc.toml)
+FRPC_SERVER_ADDR = ""
+FRPC_SERVER_PORT = 7000
+FRPC_AUTH_TOKEN = ""
 ```
 
 ## 日志
@@ -167,7 +190,7 @@ WATCHDOG_INTERVAL = 30   # 秒
 
 1. 在 `game_manager.py` 的 `GameMode` 枚举中添加新模式
 2. 在 `GameManager.on_sta_activated()` 和 `on_det_activated()` 中实现逻辑
-3. 在 `UI.py` 的游戏控制页添加对应的 UI 控件
+3. 在 `ui.py` 的游戏控制页添加对应的 UI 控件
 
 ### 添加新的音效
 

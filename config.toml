@@ -13,8 +13,17 @@
 # [game]
 # heartbeat_timeout = 600
 # watchdog_interval = 30
+
+# [controller]
+# dev = false
 # ui_hot_reload = false
 
 # [message]
 # msg_length = 7
 # node_id_length = 5
+
+# [frpc]
+# server_addr = ""
+# server_port = 7000
+# auth_token = ""
+# proxies = "[]"
